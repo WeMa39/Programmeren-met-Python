@@ -816,6 +816,511 @@ print("Ik ben " + str(leeftijd) + " jaar")   # met + en str()</pre>
     {id:"h10-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
   ]}
   ]
+},
+{ id:"h11", short:"11. if", title:"Hoofdstuk 11 – Waar of niet waar? Het if-statement",
+  video:"https://youtu.be/u_zh4_jnnTc", videoTitle:"Video 19: De booleaanse expressie (True/False)",
+  video2:"https://youtu.be/ykh3f7f9lFE", video2Title:"Video 20: Het if-statement (ALS/DAN)",
+  video3:"https://youtu.be/o0mhTdb4mLU", video3Title:"Video 21: De relationele operatoren",
+  intro:`<p>Tot nu toe voerde je programma altijd alle regels uit, van boven naar onder. Vanaf nu leer je je programma <b>beslissingen</b> nemen: iets alleen doen <b>als</b> een voorwaarde klopt. Daarvoor heb je eerst <b>beweringen</b> nodig die waar of niet waar zijn.</p>
+  <div class="box"><b>Zo werk je</b><br>Dit is een groot hoofdstuk: je mag het over <b>twee lessen</b> spreiden. Les 1: video 19 en 20, en 11.1 tot en met 11.3. Les 2: video 21, en 11.4 en 11.5.</div>`,
+  sections:[
+  { title:"11.1 Beweringen: True en False", html:`<p>Een <b>bewering</b> (of booleaanse expressie) is een expressie die <b>waar</b> of <b>niet waar</b> is. In Python heet dat <code>True</code> en <code>False</code>. Denk aan ‘het regent’ of ‘5 is groter dan 3’.</p>
+    <p><code>True</code> en <code>False</code> vormen een eigen datatype: <b>bool</b> (naar de wiskundige George Boole).</p>
+    <div class="box warm"><b>Let op</b><br>Schrijf <code>True</code> en <code>False</code> altijd met een <b>hoofdletter</b>. <code>true</code> geeft een foutmelding.</div>`,
+    items:[
+    {id:"h11-try1", type:"play", q:"Voer uit.", starter:'print(5 > 3)\nprint(2 > 9)\nprint(type(True))'},
+    {id:"h11-mc1", type:"mc", q:"Welke waarden kan een bewering hebben?", options:["Alleen getallen","True of False","Ja, nee of misschien"], correct:1, explain:"Een bewering is altijd waar (True) of niet waar (False)."},
+    {id:"h11-mc2", type:"mc", q:"Wat is het datatype van <code>False</code>?", options:["str","int","bool"], correct:2, explain:"True en False zijn van het type bool."}
+  ]},
+  { title:"11.2 Het if-statement", html:`<p>Met een <b>if-statement</b> voert je programma code alleen uit <b>als</b> een bewering <code>True</code> is. Zoals in het dagelijks leven: <i>als het regent, dan doe ik mijn regenjas aan</i>.</p>
+    <pre>getal = 100
+if getal > 5:
+    print("Het getal is groter dan 5.")
+    print("Dat is best een groot getal.")
+print("Klaar!")</pre>
+    <p>Let goed op de schrijfwijze:</p>
+    <ul><li>Na de bewering komt een <b>dubbelpunt</b> <code>:</code></li>
+    <li>De regels die bij de if horen, <b>springen in</b> met 4 spaties. Samen vormen ze een <b>codeblok</b>. In het codevak springt de volgende regel automatisch in na een dubbelpunt.</li>
+    <li>De regel <code>print("Klaar!")</code> springt niet in. Die hoort dus <b>niet</b> bij de if, en wordt <b>altijd</b> uitgevoerd.</li></ul>`,
+    items:[
+    {id:"h11-try2", type:"play", q:"Voer uit. Verander daarna getal = 100 in getal = 4 en voer opnieuw uit. Wat verandert er?", starter:'getal = 100\nif getal > 5:\n    print("Het getal is groter dan 5.")\n    print("Dat is best een groot getal.")\nprint("Klaar!")'},
+    {id:"h11-fill1", type:"fill", q:"Hoeveel regels toont het programma hierboven als <code>getal = 4</code>? (Typ een getal.)", answers:["1"], explain:"De bewering 4 > 5 is False, dus het codeblok wordt overgeslagen. Alleen Klaar! verschijnt."},
+    {id:"h11-mc3", type:"mc", q:"Hoe weet Python welke regels bij de if horen?", options:["Aan de regels die inspringen","Aan de regels met een print","Aan de regels die met # beginnen"], correct:0, explain:"Alle regels die na de dubbelpunt inspringen, vormen samen het codeblok van de if."},
+    {id:"h11-code1", type:"code", q:"In dit programma zitten twee fouten tegen de schrijfwijze van een if. Verbeter ze, zodat het programma <i>Proficiat!</i> en <i>Einde</i> toont.", starter:'score = 15\nif score > 10\nprint("Proficiat!")\nprint("Einde")',
+      expect:["Proficiat!","Einde"], must:[[/if\s+score\s*>\s*10\s*:/,"Zet een dubbelpunt op het einde van de regel met if."],[/:\s*\n[ \t]+print\(\s*["']Proficiat!["']\s*\)/,"Laat print(\"Proficiat!\") inspringen, zodat het bij de if hoort."],[/\nprint\(\s*["']Einde["']\s*\)/,"print(\"Einde\") hoort niet bij de if: laat die regel niet inspringen."]],
+      hint:'score = 15\nif score > 10:\n    print("Proficiat!")\nprint("Einde")', ok:"Juist! Dubbelpunt en inspringen: dat zijn de twee regels van elke if."}
+  ]},
+  { title:"11.3 De relationele operatoren", html:`<p>Om een bewering te maken, <b>vergelijk</b> je twee waarden met een <b>relationele operator</b>:</p>
+    <table><tr><th>Operator</th><th>Betekenis</th><th>Voorbeeld</th><th>Uitkomst</th></tr>
+    <tr><td><code>&gt;</code></td><td>groter dan</td><td><code>5 &gt; 4</code></td><td>True</td></tr>
+    <tr><td><code>&lt;</code></td><td>kleiner dan</td><td><code>4 &lt; 4</code></td><td>False</td></tr>
+    <tr><td><code>&gt;=</code></td><td>groter dan of gelijk aan</td><td><code>4 &gt;= 4</code></td><td>True</td></tr>
+    <tr><td><code>&lt;=</code></td><td>kleiner dan of gelijk aan</td><td><code>5 &lt;= 4</code></td><td>False</td></tr>
+    <tr><td><code>==</code></td><td>is gelijk aan</td><td><code>5 == 10 / 2</code></td><td>True</td></tr>
+    <tr><td><code>!=</code></td><td>is niet gelijk aan</td><td><code>3 != 5</code></td><td>True</td></tr></table>
+    <div class="box warm"><b>Let op: = of ==?</b><br>Eén gelijkteken <code>=</code> is een <b>toekenning</b>: een variabele krijgt een waarde. Twee gelijktekens <code>==</code> zijn een <b>vergelijking</b>: zijn beide waarden gelijk? In een if gebruik je dus <code>==</code>.<br>Let ook op de volgorde: <code>&gt;=</code> werkt, <code>=&gt;</code> niet.</div>
+    <p>Je kunt ook <b>strings</b> vergelijken. <code>==</code> kijkt of twee teksten precies gelijk zijn, ook de hoofdletters. Met <code>&lt;</code> en <code>&gt;</code> vergelijkt Python alfabetisch, zoals in een woordenboek: <code>"aap" &lt; "beer"</code> is True.</p>`,
+    items:[
+    {id:"h11-fill2", type:"fill", q:"Wat toont <code>print(4 &gt;= 4)</code>?", answers:["True"], explain:"4 is gelijk aan 4, dus ‘groter dan of gelijk aan’ klopt."},
+    {id:"h11-fill3", type:"fill", q:"Wat toont <code>print(3 != 3)</code>?", answers:["False"], explain:"3 is wél gelijk aan 3, dus ‘niet gelijk aan’ klopt niet."},
+    {id:"h11-fill4", type:"fill", q:"Wat toont <code>print(&quot;Sara&quot; == &quot;sara&quot;)</code>?", answers:["False"], explain:"De hoofdletter S verschilt van de kleine s, dus de strings zijn niet gelijk."},
+    {id:"h11-match", type:"match", q:"Welke operator hoort bij welke betekenis?", pairs:[["==","is gelijk aan"],["!=","is niet gelijk aan"],[">=","groter dan of gelijk aan"],["=","krijgt de waarde (toekenning)"]]},
+    {id:"h11-mc4", type:"mc", q:"Welke regel is juist?", options:["if leeftijd = 18:","if leeftijd == 18:","if leeftijd => 18:"], correct:1, explain:"Om te vergelijken gebruik je ==. Eén = is een toekenning, en => bestaat niet (wel >=)."}
+  ]},
+  { title:"11.4 Oefeningen", html:`<p>Ook hier test <b>✓ Controleer</b> je programma met verschillende antwoorden: een keer waarbij de bewering klopt, en een keer waarbij ze niet klopt.</p>`, items:[
+    {id:"h11-code2", type:"code", q:"Schrijf een programma dat de temperatuur vraagt (een geheel getal). Is het <b>warmer dan 25</b> graden, dan toont het <b>Het is warm!</b>. Daarna toont het altijd <b>Einde</b>.", starter:"",
+      tests:[{inputs:["30"],tail:["Het is warm!","Einde"]},{inputs:["20"],last:"Einde",absent:"Het is warm!"},{inputs:["25"],last:"Einde",absent:"Het is warm!"}], stdin:"30",
+      must:[[/if[^\n]*>/,"Gebruik een if met de operator >."]],
+      hint:'temperatuur = int(input("Hoeveel graden is het? "))\nif temperatuur > 25:\n    print("Het is warm!")\nprint("Einde")', ok:"Juist! Bij 25 graden precies is het niet ‘warmer dan 25’."},
+    {id:"h11-code3", type:"code", q:"Schrijf een programma dat om een wachtwoord vraagt. Is het wachtwoord <b>python123</b>, dan toont het <b>Welkom!</b>. Anders toont het niets.", starter:"",
+      tests:[{inputs:["python123"],last:"Welkom!"},{inputs:["abc"],absent:"Welkom!"},{inputs:["Python123"],absent:"Welkom!"}], stdin:"python123",
+      must:[[/==/,"Vergelijk met == (twee gelijktekens)."]],
+      hint:'wachtwoord = input("Wachtwoord? ")\nif wachtwoord == "python123":\n    print("Welkom!")', ok:"Juist! Let op: Python123 met een hoofdletter wordt niet aanvaard."},
+    {id:"h11-code4", type:"code", q:"Uitdaging: schrijf een programma dat vraagt hoe oud de gebruiker is. Is hij <b>18 of ouder</b>, dan toont het <b>Je mag stemmen.</b> Is hij <b>jonger dan 18</b>, dan toont het <b>Je mag nog niet stemmen.</b> (Tip: je mag twee keer een if gebruiken.)", starter:"",
+      tests:[{inputs:["18"],last:"Je mag stemmen.",absent:"Je mag nog niet stemmen."},{inputs:["12"],last:"Je mag nog niet stemmen."},{inputs:["40"],last:"Je mag stemmen.",absent:"Je mag nog niet stemmen."}], stdin:"18",
+      hint:'leeftijd = int(input("Hoe oud ben je? "))\nif leeftijd >= 18:\n    print("Je mag stemmen.")\nif leeftijd < 18:\n    print("Je mag nog niet stemmen.")', ok:"Knap! In het volgende hoofdstuk leer je hoe dit nog korter kan, met else."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h11-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik weet wat een bewering (True/False) is.","Ik ken de relationele operatoren.","Ik ken het verschil tussen = en ==.","Ik kan een if-statement schrijven met een dubbelpunt.","Ik weet welke regels bij de if horen (inspringen)."]},
+    {id:"h11-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h12", short:"12. if/else", title:"Hoofdstuk 12 – if/else en de operatoren or en not",
+  video:"https://youtu.be/eGSGV13-Z7o", videoTitle:"Video 22: Het if-statement (if/else)",
+  video2:"https://youtu.be/NYRbDIlTGlM", video2Title:"Video 23: De booleaanse operatoren or en not",
+  intro:`<p>Met <code>else</code> geef je je programma een <b>tweede keuze</b>: wat moet het doen als de bewering <i>niet</i> klopt? En met <code>or</code> en <code>not</code> maak je slimmere beweringen.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk <b>video 22</b> voor 12.1, en <b>video 23</b> voor 12.2 en 12.3. Maak daarna de oefeningen.</div>`,
+  sections:[
+  { title:"12.1 if/else", html:`<p>Een if voert een codeblok uit als de bewering <b>True</b> is. Met <code>else</code> voeg je een codeblok toe dat wordt uitgevoerd als de bewering <b>False</b> is: <i>als het regent, doe ik mijn jas aan, <b>anders</b> geef ik de planten water</i>.</p>
+    <pre>getal = int(input("Kies een getal: "))
+if getal > 50:
+    print("Je getal is groter dan 50.")
+else:
+    print("Je getal is kleiner dan of gelijk aan 50.")</pre>
+    <ul><li><code>else</code> staat op <b>dezelfde hoogte</b> als <code>if</code>, niet ingesprongen.</li>
+    <li>Na <code>else</code> komt <b>geen bewering</b>, wel een <b>dubbelpunt</b>.</li>
+    <li>Er wordt altijd <b>precies één</b> van de twee codeblokken uitgevoerd.</li></ul>`,
+    items:[
+    {id:"h12-try1", type:"play", q:"Voer uit met 60. Probeer daarna 40 en 50.", starter:'getal = int(input("Kies een getal: "))\nif getal > 50:\n    print("Je getal is groter dan 50.")\nelse:\n    print("Je getal is kleiner dan of gelijk aan 50.")', stdin:"60"},
+    {id:"h12-mc1", type:"mc", q:"Welke regel is juist?", options:["else getal <= 50:","else:","else"], correct:1, explain:"Na else komt geen bewering, wel een dubbelpunt."},
+    {id:"h12-mc2", type:"mc", q:"Hoeveel van de twee codeblokken (if en else) worden uitgevoerd?", options:["Altijd allebei","Altijd precies één","Soms geen enkel"], correct:1, explain:"Is de bewering True, dan het if-blok. Is ze False, dan het else-blok. Nooit allebei."},
+    {id:"h12-code1", type:"code", q:"Schrijf een programma dat een geheel getal vraagt en toont of het <b>even</b> of <b>oneven</b> is. (Tip: weet je nog wat <code>% 2</code> doet?)", starter:"",
+      tests:[{inputs:["4"],last:"even"},{inputs:["7"],last:"oneven"},{inputs:["0"],last:"even"}], stdin:"4",
+      must:[[/else\s*:/,"Gebruik if en else."],[/%\s*2/,"Gebruik % 2 om de rest bij deling door 2 te berekenen."]],
+      hint:'getal = int(input("Geef een getal: "))\nif getal % 2 == 0:\n    print("even")\nelse:\n    print("oneven")', ok:"Juist! Een even getal heeft rest 0 bij deling door 2."},
+    {id:"h12-code2", type:"code", q:"Schrijf een programma dat je score op een toets vraagt (op 20). Bij <b>10 of meer</b> toont het <b>Geslaagd</b>, anders <b>Niet geslaagd</b>.", starter:"",
+      tests:[{inputs:["14"],last:"Geslaagd"},{inputs:["10"],last:"Geslaagd"},{inputs:["9"],last:"Niet geslaagd"}], stdin:"14",
+      must:[[/else\s*:/,"Gebruik if en else."]],
+      hint:'score = int(input("Je score op 20? "))\nif score >= 10:\n    print("Geslaagd")\nelse:\n    print("Niet geslaagd")', ok:"Juist! Let op: met precies 10 ben je geslaagd, dus >= en niet >."}
+  ]},
+  { title:"12.2 De operator or", html:`<p>Met <code>or</code> (‘of’) combineer je twee beweringen. Het geheel is <b>True</b> als <b>minstens één</b> van de twee True is.</p>
+    <table><tr><th>A</th><th>B</th><th>A or B</th></tr>
+    <tr><td>False</td><td>False</td><td><b>False</b></td></tr>
+    <tr><td>False</td><td>True</td><td><b>True</b></td></tr>
+    <tr><td>True</td><td>False</td><td><b>True</b></td></tr>
+    <tr><td>True</td><td>True</td><td><b>True</b></td></tr></table>
+    <p style="margin-top:10px">Zo hoef je dezelfde code niet twee keer te schrijven:</p>
+    <pre>worp = int(input("Wat gooi je? "))
+if worp == 1 or worp == 6:
+    print("Je mag nog eens gooien!")</pre>
+    <div class="box warm"><b>Let op</b><br>Schrijf de volledige bewering aan beide kanten van <code>or</code>: <code>worp == 1 or worp == 6</code>. <code>worp == 1 or 6</code> lijkt hetzelfde, maar werkt niet zoals je verwacht.</div>`,
+    items:[
+    {id:"h12-fill1", type:"fill", q:"Wat toont <code>print(5 &gt; 7 or 2 &lt; 3)</code>?", answers:["True"], explain:"5 > 7 is False, maar 2 < 3 is True. Met or is één True genoeg."},
+    {id:"h12-fill2", type:"fill", q:"Wat toont <code>print(1 &gt; 2 or 3 &gt; 4)</code>?", answers:["False"], explain:"Beide beweringen zijn False, dus het geheel is False."}
+  ]},
+  { title:"12.3 De operator not", html:`<p><code>not</code> (‘niet’) <b>keert</b> een bewering <b>om</b>: True wordt False, en False wordt True.</p>
+    <pre>print(not 3 == 6 / 2)   # 3 == 3.0 is True, dus not maakt er False van</pre>
+    <table><tr><th>A</th><th>not A</th></tr><tr><td>True</td><td><b>False</b></td></tr><tr><td>False</td><td><b>True</b></td></tr></table>`,
+    items:[
+    {id:"h12-fill3", type:"fill", q:"Wat toont <code>print(not 5 &gt; 3)</code>?", answers:["False"], explain:"5 > 3 is True. not keert dat om: False."},
+    {id:"h12-tf1", type:"tf", q:"Is de bewering True (‘Juist’) of False (‘Fout’)?", parts:[
+      {s:"4 > 2 or 1 > 5", a:true, explain:"4 > 2 is True, dus met or is het geheel True."},
+      {s:"not 10 == 10", a:false, explain:"10 == 10 is True, not maakt er False van."},
+      {s:"3 == 4 or 4 == 5", a:false, explain:"Beide zijn False."},
+      {s:"not 2 > 8", a:true, explain:"2 > 8 is False, not maakt er True van."}
+    ]}
+  ]},
+  { title:"12.4 Oefeningen", items:[
+    {id:"h12-code3", type:"code", q:"Schrijf een programma dat vraagt welke dag het is. Is het <b>zaterdag</b> of <b>zondag</b>, dan toont het <b>Weekend!</b>, anders <b>Naar school</b>.", starter:"",
+      tests:[{inputs:["zaterdag"],last:"Weekend!"},{inputs:["zondag"],last:"Weekend!"},{inputs:["dinsdag"],last:"Naar school"}], stdin:"zaterdag",
+      must:[[/\bor\b/,"Gebruik de operator or."],[/else\s*:/,"Gebruik if en else."]],
+      hint:'dag = input("Welke dag is het? ")\nif dag == "zaterdag" or dag == "zondag":\n    print("Weekend!")\nelse:\n    print("Naar school")', ok:"Juist!"},
+    {id:"h12-code4", type:"code", q:"Een film is voor <b>12 jaar en ouder</b>. Schrijf een programma dat de leeftijd vraagt. Gebruik <code>not</code>: is het <b>niet</b> zo dat de kijker 12 of ouder is, dan toont het <b>Te jong voor deze film</b>, anders <b>Veel kijkplezier!</b>", starter:"",
+      tests:[{inputs:["10"],last:"Te jong voor deze film"},{inputs:["12"],last:"Veel kijkplezier!"},{inputs:["30"],last:"Veel kijkplezier!"}], stdin:"10",
+      must:[[/\bnot\b/,"Gebruik de operator not."]],
+      hint:'leeftijd = int(input("Hoe oud ben je? "))\nif not leeftijd >= 12:\n    print("Te jong voor deze film")\nelse:\n    print("Veel kijkplezier!")', ok:"Juist! Eerlijk is eerlijk: leeftijd < 12 is hier eenvoudiger. Maar nu ken je not."},
+    {id:"h12-code5", type:"code", q:"Uitdaging: in een gezelschapsspel mag je nog eens gooien bij een <b>1</b> of een <b>6</b>. Schrijf een programma dat vraagt wat je gooide. Bij 1 of 6 toont het <b>Gooi nog eens!</b>, anders <b>De volgende speler is aan de beurt.</b>", starter:"",
+      tests:[{inputs:["1"],last:"Gooi nog eens!"},{inputs:["6"],last:"Gooi nog eens!"},{inputs:["4"],last:"De volgende speler is aan de beurt."}], stdin:"6",
+      must:[[/\bor\b/,"Gebruik de operator or."]],
+      hint:'worp = int(input("Wat gooide je? "))\nif worp == 1 or worp == 6:\n    print("Gooi nog eens!")\nelse:\n    print("De volgende speler is aan de beurt.")', ok:"Knap!"}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h12-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan if/else gebruiken.","Ik weet dat na else geen bewering komt.","Ik kan twee beweringen combineren met or.","Ik kan een bewering omkeren met not."]},
+    {id:"h12-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h13", short:"13. and", title:"Hoofdstuk 13 – De operator and",
+  video:"https://youtu.be/i7e_RhjIi6g", videoTitle:"Video 24: De booleaanse operator and",
+  intro:`<p>Met <code>or</code> was één ware bewering genoeg. Met <code>and</code> moeten <b>alle</b> beweringen waar zijn.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk eerst het filmpje. Lees daarna elk stukje en maak de oefeningen.</div>`,
+  sections:[
+  { title:"13.1 De operator and", html:`<p>Met <code>and</code> (‘en’) combineer je beweringen. Het geheel is <b>True</b> als <b>alle</b> beweringen True zijn. Is er ook maar één False, dan is het geheel False.</p>
+    <table><tr><th>A</th><th>B</th><th>A and B</th></tr>
+    <tr><td>True</td><td>True</td><td><b>True</b></td></tr>
+    <tr><td>True</td><td>False</td><td><b>False</b></td></tr>
+    <tr><td>False</td><td>True</td><td><b>False</b></td></tr>
+    <tr><td>False</td><td>False</td><td><b>False</b></td></tr></table>
+    <p style="margin-top:10px">Een voorbeeld uit het filmpje: is een getal deelbaar door 3 <b>en</b> door 7? Een getal is deelbaar door 3 als de rest bij deling door 3 gelijk is aan 0.</p>
+    <pre>getal = int(input("Geef een getal: "))
+if getal % 3 == 0 and getal % 7 == 0:
+    print("Het getal is deelbaar door 3 en 7.")</pre>
+    <p>Met <code>and</code> kun je ook controleren of een getal <b>tussen</b> twee grenzen ligt: <code>getal &gt;= 1 and getal &lt;= 10</code>.</p>`,
+    items:[
+    {id:"h13-try1", type:"play", q:"Voer uit met 21. Probeer daarna 25 en 42.", starter:'getal = int(input("Geef een getal: "))\nif getal % 3 == 0 and getal % 7 == 0:\n    print("Het getal is deelbaar door 3 en 7.")\nelse:\n    print("Het getal is niet deelbaar door 3 en 7.")', stdin:"21"},
+    {id:"h13-fill1", type:"fill", q:"Wat toont <code>print(5 &gt; 3 and 2 &gt; 4)</code>?", answers:["False"], explain:"5 > 3 is True, maar 2 > 4 is False. Met and moeten ze allebei True zijn."},
+    {id:"h13-fill2", type:"fill", q:"Wat toont <code>print(15 &gt;= 13 and 15 &lt;= 19)</code>?", answers:["True"], explain:"15 ligt tussen 13 en 19, dus beide beweringen zijn True."},
+    {id:"h13-mc1", type:"mc", q:"Wanneer is <code>A and B</code> True?", options:["Als minstens één van beide True is","Als beide True zijn","Als beide False zijn"], correct:1, explain:"Met and moet alles True zijn. Met or is één True genoeg."}
+  ]},
+  { title:"13.2 and en or samen: gebruik haakjes", html:`<p>Je kunt <code>and</code>, <code>or</code> en <code>not</code> combineren in één bewering. Gebruik dan altijd <b>haakjes</b>, zodat duidelijk is wat bij elkaar hoort. Net zoals bij rekenen!</p>
+    <pre>dag = "woensdag"
+leeftijd = 10
+if dag == "woensdag" and (leeftijd &lt; 12 or leeftijd &gt;= 65):
+    print("Je krijgt korting!")</pre>
+    <p>Hier krijg je korting op woensdag, als je jonger bent dan 12 <b>of</b> 65 of ouder.</p>`,
+    items:[
+    {id:"h13-tf1", type:"tf", q:"Is de bewering True (‘Juist’) of False (‘Fout’)?", parts:[
+      {s:"3 > 1 and 5 > 2", a:true, explain:"Beide zijn True."},
+      {s:"3 > 1 and 5 < 2", a:false, explain:"5 < 2 is False, dus het geheel is False."},
+      {s:"(3 > 1 or 5 < 2) and 4 == 4", a:true, explain:"Tussen haakjes: True or False = True. Dan True and True = True."},
+      {s:"not (2 > 1 and 3 > 2)", a:false, explain:"Tussen haakjes: True and True = True. not maakt er False van."}
+    ]}
+  ]},
+  { title:"13.3 Oefeningen", items:[
+    {id:"h13-code1", type:"code", q:"Schrijf een programma dat de leeftijd vraagt. Is de gebruiker <b>13 tot en met 19</b> jaar, dan toont het <b>Je bent een tiener.</b>, anders <b>Je bent geen tiener.</b>", starter:"",
+      tests:[{inputs:["15"],last:"Je bent een tiener."},{inputs:["13"],last:"Je bent een tiener."},{inputs:["19"],last:"Je bent een tiener."},{inputs:["12"],last:"Je bent geen tiener."},{inputs:["20"],last:"Je bent geen tiener."}], stdin:"15",
+      must:[[/\band\b/,"Gebruik de operator and."]],
+      hint:'leeftijd = int(input("Hoe oud ben je? "))\nif leeftijd >= 13 and leeftijd <= 19:\n    print("Je bent een tiener.")\nelse:\n    print("Je bent geen tiener.")', ok:"Juist! Let op de grenzen: 13 en 19 tellen mee."},
+    {id:"h13-code2", type:"code", q:"Je bent pas geslaagd als je op <b>beide</b> toetsen minstens 10 op 20 haalt. Schrijf een programma dat de twee scores vraagt en <b>Geslaagd</b> of <b>Niet geslaagd</b> toont.", starter:"",
+      tests:[{inputs:["12","15"],last:"Geslaagd"},{inputs:["10","10"],last:"Geslaagd"},{inputs:["18","9"],last:"Niet geslaagd"},{inputs:["4","16"],last:"Niet geslaagd"}], stdin:"12\n15",
+      must:[[/\band\b/,"Gebruik de operator and."]],
+      hint:'toets1 = int(input("Score toets 1? "))\ntoets2 = int(input("Score toets 2? "))\nif toets1 >= 10 and toets2 >= 10:\n    print("Geslaagd")\nelse:\n    print("Niet geslaagd")', ok:"Juist!"},
+    {id:"h13-code3", type:"code", q:"Uitdaging: een pretpark geeft <b>korting</b> aan kinderen jonger dan 12 <b>en</b> aan 65-plussers, maar <b>alleen op woensdag</b>. Schrijf een programma dat de dag en de leeftijd vraagt, en <b>Korting!</b> of <b>Geen korting</b> toont.", starter:"",
+      tests:[{inputs:["woensdag","8"],last:"Korting!"},{inputs:["woensdag","70"],last:"Korting!"},{inputs:["woensdag","30"],last:"Geen korting"},{inputs:["zaterdag","8"],last:"Geen korting"},{inputs:["zaterdag","70"],last:"Geen korting"}], stdin:"woensdag\n8",
+      must:[[/\band\b/,"Gebruik de operator and."],[/\bor\b/,"Gebruik ook de operator or."]],
+      hint:'dag = input("Welke dag is het? ")\nleeftijd = int(input("Hoe oud ben je? "))\nif dag == "woensdag" and (leeftijd < 12 or leeftijd >= 65):\n    print("Korting!")\nelse:\n    print("Geen korting")', ok:"Knap! Dankzij de haakjes klopt je bewering."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h13-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik weet wanneer A and B True is.","Ik kan met and controleren of een getal tussen twee grenzen ligt.","Ik gebruik haakjes als ik and en or combineer."]},
+    {id:"h13-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h14", short:"14. elif", title:"Hoofdstuk 14 – if/elif/else",
+  video:"https://youtu.be/JCO3HQ9sS64", videoTitle:"Video 26: Het if-statement (if/elif/else)",
+  intro:`<p>Met if/else heb je twee keuzes. Maar wat als er <b>meer dan twee</b> mogelijkheden zijn? Daarvoor gebruik je <code>elif</code>.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk eerst het filmpje. Lees daarna elk stukje en maak de oefeningen.</div>`,
+  sections:[
+  { title:"14.1 elif: meer dan twee keuzes", html:`<p><code>elif</code> is een samentrekking van <b>else</b> en <b>if</b>: ‘anders, als …’. Je kunt zoveel <code>elif</code>’s gebruiken als je wilt, en op het einde eventueel een <code>else</code> voor alle andere gevallen.</p>
+    <pre>worp = int(input("Wat gooi je? "))
+if worp == 1:
+    print("Zet je pion 1 vakje vooruit.")
+elif worp == 2:
+    print("Zet je pion 2 vakjes vooruit.")
+elif worp == 3:
+    print("Zet je pion 3 vakjes vooruit.")
+else:
+    print("Er klopt iets niet.")</pre>
+    <p>Python controleert de beweringen <b>van boven naar onder</b>. Zodra er één <b>True</b> is, voert het dat codeblok uit, en slaat het de rest over. Klopt er geen enkele, dan voert het de <code>else</code> uit.</p>
+    <ul><li><code>elif</code> heeft wél een bewering, <code>else</code> niet.</li><li><code>else</code> is niet verplicht, en staat altijd als laatste.</li></ul>`,
+    items:[
+    {id:"h14-try1", type:"play", q:"Voer uit met 2. Probeer daarna 3 en 7.", starter:'worp = int(input("Wat gooi je? "))\nif worp == 1:\n    print("Zet je pion 1 vakje vooruit.")\nelif worp == 2:\n    print("Zet je pion 2 vakjes vooruit.")\nelif worp == 3:\n    print("Zet je pion 3 vakjes vooruit.")\nelse:\n    print("Er klopt iets niet.")', stdin:"2"},
+    {id:"h14-mc1", type:"mc", q:"Hoeveel codeblokken voert een if/elif/else maximaal uit?", options:["Eén","Twee","Alle blokken waarvan de bewering klopt"], correct:0, explain:"Zodra er één bewering True is, wordt dat blok uitgevoerd en wordt de rest overgeslagen."},
+    {id:"h14-mc2", type:"mc", q:"Welke regel is fout?", options:["elif score >= 50:","else:","else score < 50:"], correct:2, explain:"Na else komt nooit een bewering."}
+  ]},
+  { title:"14.2 De volgorde is belangrijk", html:`<p>Omdat Python stopt bij de <b>eerste</b> bewering die klopt, is de volgorde belangrijk. Kijk naar dit programma:</p>
+    <pre>score = 85
+if score >= 50:
+    print("Voldoende")
+elif score >= 80:
+    print("Zeer goed")</pre>
+    <p>Het toont <i>Voldoende</i>, terwijl 85 eigenlijk <i>Zeer goed</i> is! De eerste bewering <code>score &gt;= 50</code> klopt al, dus de tweede wordt nooit gecontroleerd. Zet daarom de <b>strengste</b> voorwaarde eerst.</p>`,
+    items:[
+    {id:"h14-fill1", type:"fill", q:"Wat toont dit programma?<pre>t = 30\nif t > 10:\n    print(\"lauw\")\nelif t > 25:\n    print(\"warm\")\nelse:\n    print(\"koud\")</pre>", answers:["lauw"], explain:"30 > 10 is al True, dus Python toont lauw en controleert de rest niet meer."},
+    {id:"h14-code1", type:"code", q:"Verbeter de volgorde in dit programma, zodat het bij 85 punten <b>Zeer goed</b> toont, en bij 60 punten <b>Voldoende</b>.", starter:'score = int(input("Je score op 100? "))\nif score >= 50:\n    print("Voldoende")\nelif score >= 80:\n    print("Zeer goed")\nelse:\n    print("Onvoldoende")',
+      tests:[{inputs:["85"],last:"Zeer goed"},{inputs:["60"],last:"Voldoende"},{inputs:["30"],last:"Onvoldoende"},{inputs:["80"],last:"Zeer goed"}], stdin:"85",
+      hint:'score = int(input("Je score op 100? "))\nif score >= 80:\n    print("Zeer goed")\nelif score >= 50:\n    print("Voldoende")\nelse:\n    print("Onvoldoende")', ok:"Juist! De strengste voorwaarde staat nu bovenaan."}
+  ]},
+  { title:"14.3 Oefeningen", items:[
+    {id:"h14-code2", type:"code", q:"Schrijf een programma dat de temperatuur vraagt en toont:<br>• onder 0 graden: <b>Het vriest</b><br>• van 0 tot onder 15: <b>Fris</b><br>• van 15 tot onder 25: <b>Aangenaam</b><br>• 25 of meer: <b>Warm</b>", starter:"",
+      tests:[{inputs:["-5"],last:"Het vriest"},{inputs:["0"],last:"Fris"},{inputs:["14"],last:"Fris"},{inputs:["15"],last:"Aangenaam"},{inputs:["25"],last:"Warm"}], stdin:"-5",
+      must:[[/\belif\b/,"Gebruik elif."]],
+      hint:'temperatuur = int(input("Hoeveel graden is het? "))\nif temperatuur < 0:\n    print("Het vriest")\nelif temperatuur < 15:\n    print("Fris")\nelif temperatuur < 25:\n    print("Aangenaam")\nelse:\n    print("Warm")', ok:"Juist! Let op hoe je de grenzen telkens precies goed hebt."},
+    {id:"h14-code3", type:"code", q:"Schrijf een programma dat een score op 100 vraagt en een rapportcode toont:<br>• 80 of meer: <b>A</b><br>• 65 tot 79: <b>B</b><br>• 50 tot 64: <b>C</b><br>• onder 50: <b>D</b>", starter:"",
+      tests:[{inputs:["92"],last:"A"},{inputs:["80"],last:"A"},{inputs:["70"],last:"B"},{inputs:["50"],last:"C"},{inputs:["49"],last:"D"}], stdin:"92",
+      must:[[/\belif\b/,"Gebruik elif."]],
+      hint:'score = int(input("Score op 100? "))\nif score >= 80:\n    print("A")\nelif score >= 65:\n    print("B")\nelif score >= 50:\n    print("C")\nelse:\n    print("D")', ok:"Juist!"},
+    {id:"h14-code4", type:"code", q:"Uitdaging: maak een <b>rekenmachine</b>. Het programma vraagt een eerste getal, een bewerking (<b>+</b>, <b>-</b>, <b>*</b> of <b>/</b>) en een tweede getal, en toont de uitkomst. Typt de gebruiker een andere bewerking, dan toont het <b>Onbekende bewerking</b>.", starter:"",
+      tests:[{inputs:["6","+","3"],last:"9"},{inputs:["6","-","3"],last:"3"},{inputs:["6","*","3"],last:"18"},{inputs:["6","/","3"],last:"2.0"},{inputs:["6","?","3"],last:"Onbekende bewerking"}], stdin:"6\n+\n3",
+      must:[[/\belif\b/,"Gebruik elif."]],
+      hint:'getal1 = int(input("Eerste getal? "))\nbewerking = input("Bewerking (+, -, * of /)? ")\ngetal2 = int(input("Tweede getal? "))\nif bewerking == "+":\n    print(getal1 + getal2)\nelif bewerking == "-":\n    print(getal1 - getal2)\nelif bewerking == "*":\n    print(getal1 * getal2)\nelif bewerking == "/":\n    print(getal1 / getal2)\nelse:\n    print("Onbekende bewerking")', ok:"Knap! Je hebt je eigen rekenmachine gemaakt."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h14-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan if/elif/else gebruiken voor meer dan twee keuzes.","Ik weet dat Python stopt bij de eerste bewering die klopt.","Ik zet de strengste voorwaarde eerst."]},
+    {id:"h14-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h15", short:"15. while", title:"Hoofdstuk 15 – Herhalen: de while-lus",
+  video:"https://youtu.be/DpTNnE-nVQU", videoTitle:"Video 28: Iteraties/herhalingen (introductie)",
+  video2:"https://youtu.be/rEwfYG4Jk5M", video2Title:"Video 29: Iteraties: de while-lus",
+  intro:`<p>Computers zijn heel goed in iets <b>herhalen</b>, en ze worden er nooit moe van. In dit hoofdstuk leer je je programma code laten herhalen met een <b>lus</b>.</p>
+  <div class="box"><b>Zo werk je</b><br>Dit is een groot hoofdstuk: je mag het over <b>twee lessen</b> spreiden. Les 1: video 28 en 29, en 15.1 tot en met 15.4. Les 2: 15.5, extra oefenen.</div>`,
+  sections:[
+  { title:"15.1 Wat is een lus?", html:`<p>Een <b>lus</b> (ook <b>herhaling</b> of <b>iteratie</b>) voert een codeblok meerdere keren uit. Er zijn twee soorten:</p>
+    <table><tr><th>Lus</th><th>Wanneer?</th><th>Voorbeeld uit het filmpje: latje trap</th></tr>
+    <tr><td><b>for</b>-lus</td><td>Het aantal herhalingen ligt <b>vooraf vast</b>.</td><td>Elke speler trapt 10 keer.</td></tr>
+    <tr><td><b>while</b>-lus</td><td>Herhalen <b>zolang</b> een voorwaarde klopt. Je weet vooraf niet hoe vaak.</td><td>Spelen tot iemand 5 keer raak trapt.</td></tr></table>
+    <p style="margin-top:10px">In dit hoofdstuk leer je de <b>while</b>-lus. De for-lus komt in hoofdstuk 16 en 17.</p>`,
+    items:[
+    {id:"h15-mc1", type:"mc", q:"Je wilt de gebruiker getallen laten intypen tot hij 0 typt. Welke lus past het best?", options:["for-lus","while-lus"], correct:1, explain:"Je weet vooraf niet hoe vaak, je herhaalt zolang de gebruiker geen 0 typt: een while-lus."},
+    {id:"h15-mc2", type:"mc", q:"Je wilt 10 keer ‘Hoera!’ tonen. Welke lus past het best?", options:["for-lus","while-lus"], correct:0, explain:"Het aantal herhalingen ligt vast (10), dus een for-lus. (Een while-lus kan ook, maar for is eenvoudiger.)"}
+  ]},
+  { title:"15.2 De while-lus", html:`<p>Een <b>while</b>-lus herhaalt een codeblok <b>zolang</b> een bewering <b>True</b> is. Wil je de getallen 1 tot en met 6 tonen? Dan kun je zes keer <code>print</code> schrijven… of een while-lus gebruiken:</p>
+    <pre>getal = 1
+while getal &lt;= 6:
+    print(getal)
+    getal = getal + 1
+print("De lus is gedaan.")</pre>
+    <p>Zo werkt het:</p>
+    <ol><li>Python controleert de bewering <code>getal &lt;= 6</code>.</li>
+    <li>Is ze <b>True</b>, dan voert het het ingesprongen codeblok uit: het toont het getal, en verhoogt het met 1.</li>
+    <li>Daarna gaat het <b>terug naar de while</b> en controleert het de bewering opnieuw.</li>
+    <li>Is de bewering <b>False</b> (bij getal 7), dan stopt de lus en gaat het programma verder na het codeblok.</li></ol>
+    <p>De regel <code>getal = getal + 1</code> lijkt vreemd, maar weet je nog: Python rekent eerst de rechterkant uit, en kent die uitkomst daarna toe aan de variabele links. Zo wordt <code>getal</code> telkens 1 groter.</p>
+    <p>Wil je tot 600 tellen in plaats van 6? Dan verander je maar één getal!</p>`,
+    items:[
+    {id:"h15-try1", type:"play", q:"Voer uit. Verander daarna 6 in 20 en voer opnieuw uit.", starter:'getal = 1\nwhile getal <= 6:\n    print(getal)\n    getal = getal + 1\nprint("De lus is gedaan.")'},
+    {id:"h15-fill1", type:"fill", q:"Wat is de waarde van <code>getal</code> als de lus hierboven stopt?", answers:["7"], explain:"Bij getal = 7 is de bewering 7 <= 6 False, en stopt de lus."},
+    {id:"h15-fill2", type:"fill", q:"Hoeveel getallen toont dit programma? (Typ een getal.)<pre>x = 0\nwhile x &lt; 5:\n    print(x)\n    x = x + 1</pre>", answers:["5"], explain:"Het toont 0, 1, 2, 3 en 4: vijf getallen."}
+  ]},
+  { title:"15.3 Pas op voor de oneindige lus", html:`<p>Wat gebeurt er als je de regel <code>getal = getal + 1</code> vergeet? Dan blijft <code>getal</code> altijd 1, is de bewering <b>altijd True</b>, en stopt de lus <b>nooit</b>. Dat heet een <b>oneindige lus</b>.</p>
+    <p>Zorg er dus altijd voor dat er in de lus iets verandert, zodat de bewering ooit False wordt. In deze cursus wordt een programma dat te lang loopt na enkele seconden automatisch gestopt.</p>`,
+    items:[
+    {id:"h15-try2", type:"play", q:"Voer uit: dit programma stopt nooit vanzelf. Wacht tot het gestopt wordt.", starter:'getal = 1\nwhile getal <= 6:\n    getal = getal'},
+    {id:"h15-mc3", type:"mc", q:"Waardoor ontstaat een oneindige lus?", options:["Doordat de bewering nooit False wordt","Doordat er te veel regels in de lus staan","Doordat je print() gebruikt in de lus"], correct:0, explain:"Als de bewering altijd True blijft, stopt de lus nooit."}
+  ]},
+  { title:"15.4 Herhalen tot de gebruiker stopt", html:`<p>Met een while-lus kun je de gebruiker getallen laten intypen tot hij een afgesproken <b>stopwaarde</b> typt, bijvoorbeeld <code>-1</code>. Dit programma telt alle getallen op:</p>
+    <pre>som = 0
+getal = int(input("Geef een getal (-1 om te stoppen): "))
+while getal != -1:
+    som = som + getal
+    getal = int(input("Geef een getal (-1 om te stoppen): "))
+print("De som is", som)</pre>
+    <p>Let op: de <code>input</code> staat twee keer in het programma. Een keer vóór de lus (voor het eerste getal), en een keer op het einde van de lus (voor het volgende getal).</p>`,
+    items:[
+    {id:"h15-try3", type:"play", q:"Voer uit met 12, 7, 29 en -1. Probeer daarna andere getallen in het vak Invoer, maar vergeet de -1 op het einde niet!", starter:'som = 0\ngetal = int(input("Geef een getal (-1 om te stoppen): "))\nwhile getal != -1:\n    som = som + getal\n    getal = int(input("Geef een getal (-1 om te stoppen): "))\nprint("De som is", som)', stdin:"12\n7\n29\n-1"},
+    {id:"h15-fill3", type:"fill", q:"Welke som toont het programma bij de invoer 12, 7, 29 en -1?", answers:["48"], explain:"12 + 7 + 29 = 48. De -1 telt niet mee: dat is de stopwaarde."}
+  ]},
+  { title:"15.5 Oefeningen", html:`<p>Probeer elke oefening eerst met ▶ Uitvoeren. Blijft je programma hangen? Dan heb je waarschijnlijk een oneindige lus.</p>`, items:[
+    {id:"h15-code1", type:"code", q:"Schrijf een programma dat met een while-lus <b>aftelt van 10 tot 1</b>, elk getal op een eigen regel. Na de lus toont het <b>Start!</b>", starter:"",
+      expect:["10","9","8","7","6","5","4","3","2","1","Start!"], must:[[/\bwhile\b/,"Gebruik een while-lus."]],
+      hint:'getal = 10\nwhile getal >= 1:\n    print(getal)\n    getal = getal - 1\nprint("Start!")', ok:"Juist! Aftellen doe je met getal = getal - 1."},
+    {id:"h15-code2", type:"code", q:"Schrijf een programma dat een getal vraagt, en daarna met een while-lus alle getallen van <b>1 tot en met dat getal</b> toont, elk op een eigen regel.", starter:"",
+      tests:[{inputs:["3"],tail:["1","2","3"]},{inputs:["5"],tail:["1","2","3","4","5"]}], stdin:"3",
+      must:[[/\bwhile\b/,"Gebruik een while-lus."]],
+      hint:'grens = int(input("Tot welk getal? "))\ngetal = 1\nwhile getal <= grens:\n    print(getal)\n    getal = getal + 1', ok:"Juist!"},
+    {id:"h15-code3", type:"code", q:"Schrijf een programma dat getallen laat intypen tot de gebruiker <b>0</b> typt, en daarna toont hoeveel <b>getallen</b> hij heeft ingetypt (de 0 telt niet mee). Toon alleen het aantal.", starter:"",
+      tests:[{inputs:["5","8","3","0"],last:"3"},{inputs:["4","0"],last:"1"},{inputs:["0"],last:"0"}], stdin:"5\n8\n3\n0",
+      must:[[/\bwhile\b/,"Gebruik een while-lus."]],
+      hint:'aantal = 0\ngetal = int(input("Geef een getal (0 om te stoppen): "))\nwhile getal != 0:\n    aantal = aantal + 1\n    getal = int(input("Geef een getal (0 om te stoppen): "))\nprint(aantal)', ok:"Juist! Zo’n variabele die telt, heet een teller."},
+    {id:"h15-code4", type:"code", q:"Maak een <b>raadspel</b>. Het geheime getal is <b>7</b>. Het programma vraagt een getal, en blijft vragen zolang het fout is. Bij een fout getal toont het <b>Fout, probeer opnieuw.</b> Bij het juiste getal toont het <b>Juist geraden!</b>", starter:'geheim = 7\n',
+      tests:[{inputs:["3","9","7"],last:"Juist geraden!"},{inputs:["7"],last:"Juist geraden!",absent:"Fout"}], stdin:"3\n9\n7",
+      must:[[/\bwhile\b/,"Gebruik een while-lus."],[/geheim\s*=\s*7/,"Laat de regel geheim = 7 staan."]],
+      hint:'geheim = 7\ngok = int(input("Raad het getal: "))\nwhile gok != geheim:\n    print("Fout, probeer opnieuw.")\n    gok = int(input("Raad het getal: "))\nprint("Juist geraden!")', ok:"Knap! Je eerste spelletje."},
+    {id:"h15-code5", type:"code", q:"Uitdaging: je spaart voor iets van een bepaald <b>bedrag</b>, en je legt elke week een vast <b>bedrag</b> opzij. Schrijf een programma dat beide vraagt, en met een while-lus berekent na <b>hoeveel weken</b> je genoeg gespaard hebt. Toon alleen het aantal weken.", starter:"",
+      tests:[{inputs:["100","15"],last:"7"},{inputs:["50","20"],last:"3"},{inputs:["30","10"],last:"3"}], stdin:"100\n15",
+      must:[[/\bwhile\b/,"Gebruik een while-lus."]],
+      hint:'doel = int(input("Hoeveel wil je sparen? "))\nper_week = int(input("Hoeveel spaar je per week? "))\ngespaard = 0\nweken = 0\nwhile gespaard < doel:\n    gespaard = gespaard + per_week\n    weken = weken + 1\nprint(weken)', ok:"Knap! Na 6 weken heb je 90 euro, na 7 weken 105: genoeg voor 100."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h15-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik ken het verschil tussen een for- en een while-lus.","Ik kan een while-lus schrijven.","Ik weet hoe een oneindige lus ontstaat.","Ik kan herhalen tot de gebruiker een stopwaarde typt."]},
+    {id:"h15-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h16", short:"16. for", title:"Hoofdstuk 16 – in en de for-lus over een string",
+  video:"https://youtu.be/j22wyhK87mw", videoTitle:"Video 30: Het gereserveerde woord in",
+  video2:"https://youtu.be/FtvPBNeLADY", video2Title:"Video 31: Iteraties: de for-lus (aan de hand van een string)",
+  intro:`<p>Een string is eigenlijk een <b>rij tekens</b>, netjes na elkaar. In dit hoofdstuk leer je controleren of een teken in een string voorkomt, en hoe je met een <b>for-lus</b> alle tekens één voor één overloopt.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk <b>video 30</b> voor 16.1 en <b>video 31</b> voor 16.2. Maak daarna de oefeningen.</div>`,
+  sections:[
+  { title:"16.1 Komt het erin voor? Het woord in", html:`<p>Met het woord <code>in</code> controleer je of een teken, of een stuk tekst, in een string voorkomt. Het antwoord is <b>True</b> of <b>False</b>.</p>
+    <pre>print("d" in "Abracadabra")      # True
+print("x" in "Abracadabra")      # False
+print("braca" in "Abracadabra")  # True: een stuk tekst mag ook
+print("cabra" in "Abracadabra")  # False: de volgorde moet kloppen</pre>
+    <p>Let op: hoofdletters en kleine letters zijn <b>verschillende</b> tekens. <code>"A" in "abracadabra"</code> is False.</p>
+    <p>Omdat <code>in</code> True of False geeft, kun je het gebruiken in een if:</p>
+    <pre>if "@" in adres:
+    print("Dat lijkt een e-mailadres.")</pre>`,
+    items:[
+    {id:"h16-try1", type:"play", q:"Voer uit. Probeer daarna zelf andere letters of woorden.", starter:'print("d" in "Abracadabra")\nprint("x" in "Abracadabra")\nprint("braca" in "Abracadabra")\nprint("cabra" in "Abracadabra")'},
+    {id:"h16-fill1", type:"fill", q:"Wat toont <code>print(&quot;kast&quot; in &quot;koelkast&quot;)</code>?", answers:["True"], explain:"koelkast bevat het stuk tekst kast."},
+    {id:"h16-fill2", type:"fill", q:"Wat toont <code>print(&quot;P&quot; in &quot;python&quot;)</code>?", answers:["False"], explain:"De hoofdletter P komt niet voor in python, alleen de kleine p."},
+    {id:"h16-code1", type:"code", q:"Schrijf een programma dat een e-mailadres vraagt. Bevat het een <b>@</b>, dan toont het <b>Geldig</b>, anders <b>Ongeldig</b>.", starter:"",
+      tests:[{inputs:["sara@school.be"],last:"Geldig"},{inputs:["sara.school.be"],last:"Ongeldig"}], stdin:"sara@school.be",
+      must:[[/["']@["']\s+in\b/,"Gebruik \"@\" in ... om te controleren of er een @ in staat."]],
+      hint:'adres = input("Je e-mailadres? ")\nif "@" in adres:\n    print("Geldig")\nelse:\n    print("Ongeldig")', ok:"Juist!"}
+  ]},
+  { title:"16.2 De for-lus over een string", html:`<p>Met een <b>for</b>-lus overloop je alle tekens van een string, één voor één:</p>
+    <pre>for letter in "yoghurt":
+    print(letter)
+print("Klaar!")</pre>
+    <p>Zo werkt het:</p>
+    <ul><li>De variabele tussen <code>for</code> en <code>in</code> heet de <b>lusvariabele</b>. Hier heet ze <code>letter</code>, maar je mag zelf een naam kiezen.</li>
+    <li>Bij elke herhaling krijgt de lusvariabele het <b>volgende teken</b>: eerst <code>y</code>, dan <code>o</code>, dan <code>g</code>, …</li>
+    <li>Na het laatste teken stopt de lus vanzelf. Het aantal herhalingen ligt dus <b>vooraf vast</b>: zoveel als er tekens zijn.</li>
+    <li>Net zoals bij if en while: een <b>dubbelpunt</b> en een <b>ingesprongen</b> codeblok.</li></ul>
+    <p>In plaats van een vaste tekst kun je ook een variabele gebruiken: <code>for letter in woord:</code></p>`,
+    items:[
+    {id:"h16-try2", type:"play", q:"Voer uit. Verander daarna yoghurt in je eigen naam.", starter:'for letter in "yoghurt":\n    print(letter)\nprint("Klaar!")'},
+    {id:"h16-fill3", type:"fill", q:"Hoe vaak wordt het codeblok uitgevoerd bij <code>for teken in &quot;Python&quot;:</code>? (Typ een getal.)", answers:["6"], explain:"Python telt 6 tekens, dus 6 herhalingen."},
+    {id:"h16-mc1", type:"mc", q:"Welke waarde heeft <code>letter</code> bij de derde herhaling van <code>for letter in &quot;koala&quot;:</code>?", options:["o","a","k"], correct:1, explain:"Eerst k, dan o, dan a."}
+  ]},
+  { title:"16.3 Oefeningen", items:[
+    {id:"h16-code2", type:"code", q:"Schrijf een programma dat een woord vraagt, en elke letter van dat woord op een eigen regel toont.", starter:"",
+      tests:[{inputs:["kat"],tail:["k","a","t"]},{inputs:["python"],tail:["p","y","t","h","o","n"]}], stdin:"kat",
+      must:[[/\bfor\b/,"Gebruik een for-lus."]],
+      hint:'woord = input("Geef een woord: ")\nfor letter in woord:\n    print(letter)', ok:"Juist!"},
+    {id:"h16-code3", type:"code", q:"Schrijf een programma dat een woord vraagt en telt hoeveel <b>klinkers</b> (a, e, i, o, u) erin staan. Toon alleen het aantal. (Tip: combineer de for-lus met <code>in</code> en een teller.)", starter:"",
+      tests:[{inputs:["banaan"],last:"3"},{inputs:["python"],last:"1"},{inputs:["ei"],last:"2"},{inputs:["strand"],last:"1"}], stdin:"banaan",
+      must:[[/\bfor\b/,"Gebruik een for-lus."]],
+      hint:'woord = input("Geef een woord: ")\naantal = 0\nfor letter in woord:\n    if letter in "aeiou":\n        aantal = aantal + 1\nprint(aantal)', ok:"Knap! Zie je dat de if dubbel inspringt? Hij staat in de for-lus."},
+    {id:"h16-code4", type:"code", q:"Uitdaging: schrijf een programma dat een woord vraagt en het <b>achterstevoren</b> toont. Bij <b>python</b> toont het <b>nohtyp</b>. (Tip: begin met een lege string <code>omgekeerd = &quot;&quot;</code> en plak elke letter er telkens <b>vooraan</b> aan.)", starter:"",
+      tests:[{inputs:["python"],last:"nohtyp"},{inputs:["koala"],last:"alaok"}], stdin:"python",
+      must:[[/\bfor\b/,"Gebruik een for-lus."]],
+      hint:'woord = input("Geef een woord: ")\nomgekeerd = ""\nfor letter in woord:\n    omgekeerd = letter + omgekeerd\nprint(omgekeerd)', ok:"Knap! Elke nieuwe letter komt vooraan, zo draai je het woord om."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h16-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan met in controleren of iets in een string voorkomt.","Ik weet dat hoofdletters en kleine letters verschillen.","Ik kan met een for-lus alle tekens van een string overlopen.","Ik weet wat een lusvariabele is."]},
+    {id:"h16-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h17", short:"17. range()", title:"Hoofdstuk 17 – De for-lus met range()",
+  video:"https://youtu.be/pu5Z2aFV2ds", videoTitle:"Video 32: Iteraties: de for-lus & de functie range()",
+  intro:`<p>Wil je iets 100 keer herhalen met een for-lus, dan heb je een string van 100 tekens nodig… Dat kan slimmer, met de functie <code>range()</code>. Die maakt een <b>reeks getallen</b> voor je.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk eerst het filmpje. Lees daarna elk stukje en maak de oefeningen.</div>`,
+  sections:[
+  { title:"17.1 range() met één getal", html:`<p><code>range(7)</code> maakt de reeks getallen <b>0, 1, 2, 3, 4, 5, 6</b>. Dat zijn 7 getallen, maar let op: het begint bij <b>0</b>, en het getal 7 zelf zit er <b>niet</b> in!</p>
+    <pre>for i in range(7):
+    print(i)</pre>
+    <p>Wil je gewoon iets 5 keer herhalen? Dan schrijf je <code>for i in range(5):</code>. De lusvariabele hoef je dan zelfs niet te gebruiken.</p>`,
+    items:[
+    {id:"h17-try1", type:"play", q:"Voer uit.", starter:'for i in range(7):\n    print(i)\n\nfor i in range(3):\n    print("Hoera!")'},
+    {id:"h17-fill1", type:"fill", q:"Wat is het <b>laatste</b> getal dat <code>for i in range(10): print(i)</code> toont?", answers:["9"], explain:"range(10) gaat van 0 tot en met 9. Het getal 10 zelf zit er niet in."}
+  ]},
+  { title:"17.2 Start, stop en stap", html:`<p>Je kunt <code>range()</code> ook twee of drie getallen geven:</p>
+    <table><tr><th>Code</th><th>Getallen</th><th>Uitleg</th></tr>
+    <tr><td><code>range(7)</code></td><td>0, 1, 2, 3, 4, 5, 6</td><td>van 0 tot (niet met) 7</td></tr>
+    <tr><td><code>range(3, 7)</code></td><td>3, 4, 5, 6</td><td><b>start</b> bij 3, <b>stop</b> vóór 7</td></tr>
+    <tr><td><code>range(5, 18, 3)</code></td><td>5, 8, 11, 14, 17</td><td>start 5, stop vóór 18, <b>stap</b> 3</td></tr>
+    <tr><td><code>range(10, 0, -1)</code></td><td>10, 9, 8, …, 1</td><td>aftellen met een negatieve stap</td></tr>
+    <tr><td><code>range(3, 3)</code></td><td>(niets)</td><td>start en stop zijn gelijk: lege reeks</td></tr></table>
+    <div class="box"><b>Onthoud</b><br>De <b>stopwaarde</b> wordt <b>nooit</b> bereikt. Wil je tot en met 10 tellen, dan schrijf je <code>range(1, 11)</code>. Weet je nog, uit hoofdstuk 2? Daar zat precies zo’n range in het maaltafelprogramma!</div>`,
+    items:[
+    {id:"h17-try2", type:"play", q:"Voer uit en vergelijk met de tabel.", starter:'for i in range(3, 7):\n    print(i)\nprint("---")\nfor i in range(5, 18, 3):\n    print(i)\nprint("---")\nfor i in range(10, 0, -1):\n    print(i)'},
+    {id:"h17-mc1", type:"mc", q:"Welke getallen maakt <code>range(2, 6)</code>?", options:["2, 3, 4, 5, 6","2, 3, 4, 5","3, 4, 5, 6"], correct:1, explain:"Start bij 2, stop vóór 6."},
+    {id:"h17-mc2", type:"mc", q:"Welke range geeft de getallen 1 tot en met 10?", options:["range(10)","range(1, 10)","range(1, 11)"], correct:2, explain:"De stopwaarde wordt niet bereikt, dus je stopt bij 11."},
+    {id:"h17-fill2", type:"fill", q:"Hoeveel getallen maakt <code>range(0, 20, 5)</code>? (Typ een getal.)", answers:["4"], explain:"0, 5, 10 en 15: vier getallen. 20 is de stopwaarde en zit er niet in."}
+  ]},
+  { title:"17.3 Oefeningen", items:[
+    {id:"h17-code1", type:"code", q:"Toon met een for-lus en <code>range()</code> alle <b>even getallen van 2 tot en met 20</b>, elk op een eigen regel.", starter:"",
+      expect:["2","4","6","8","10","12","14","16","18","20"], must:[[/\bfor\b[\s\S]*range\(/,"Gebruik een for-lus met range()."]],
+      hint:'for getal in range(2, 21, 2):\n    print(getal)', ok:"Juist! Met een stap van 2 sla je de oneven getallen over."},
+    {id:"h17-code2", type:"code", q:"Bereken met een for-lus de <b>som van alle getallen van 1 tot en met 100</b>, en toon die. (Tip: begin met <code>som = 0</code> en tel er bij elke herhaling de lusvariabele bij.)", starter:"",
+      expect:["5050"], must:[[/\bfor\b[\s\S]*range\(/,"Gebruik een for-lus met range()."],[/som\s*=\s*som\s*\+/,"Tel bij elke herhaling het getal bij de som: som = som + ..."]],
+      hint:'som = 0\nfor getal in range(1, 101):\n    som = som + getal\nprint(som)', ok:"Juist! Volgens een bekend verhaal rekende de wiskundige Gauss dit als kind uit het hoofd uit."},
+    {id:"h17-code3", type:"code", q:"Schrijf een programma dat een getal vraagt en de <b>maaltafel</b> van dat getal toont, van 1 tot en met 10. Bij <b>7</b> ziet de eerste regel er zo uit: <b>1 x 7 = 7</b>", starter:"",
+      tests:[{inputs:["7"],tail:["1 x 7 = 7","2 x 7 = 14","3 x 7 = 21","4 x 7 = 28","5 x 7 = 35","6 x 7 = 42","7 x 7 = 49","8 x 7 = 56","9 x 7 = 63","10 x 7 = 70"]},{inputs:["3"],tail:["1 x 3 = 3","2 x 3 = 6","3 x 3 = 9","4 x 3 = 12","5 x 3 = 15","6 x 3 = 18","7 x 3 = 21","8 x 3 = 24","9 x 3 = 27","10 x 3 = 30"]}], stdin:"7",
+      must:[[/\bfor\b[\s\S]*range\(/,"Gebruik een for-lus met range()."]],
+      hint:'getal = int(input("Welke maaltafel? "))\nfor i in range(1, 11):\n    print(i, "x", getal, "=", i * getal)', ok:"Knap! Nu begrijp je het programma uit hoofdstuk 2 helemaal."},
+    {id:"h17-code4", type:"code", q:"Uitdaging: schrijf een programma dat aftelt met <code>range()</code>. Het vraagt vanaf welk getal, telt af tot en met 1 (elk getal op een eigen regel), en toont daarna <b>Start!</b>", starter:"",
+      tests:[{inputs:["3"],tail:["3","2","1","Start!"]},{inputs:["5"],tail:["5","4","3","2","1","Start!"]}], stdin:"3",
+      must:[[/range\([^)]*,\s*-1\s*\)/,"Gebruik range() met een negatieve stap -1."]],
+      hint:'start = int(input("Aftellen vanaf? "))\nfor i in range(start, 0, -1):\n    print(i)\nprint("Start!")', ok:"Knap! Een negatieve stap telt af."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h17-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan een for-lus met range() schrijven.","Ik weet dat range() bij 0 begint als je geen start geeft.","Ik weet dat de stopwaarde nooit bereikt wordt.","Ik kan een start, stop en stap gebruiken, ook om af te tellen."]},
+    {id:"h17-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h18", short:"18. len() en indexing", title:"Hoofdstuk 18 – len() en string indexing",
+  video:"https://youtu.be/7krSoGswpdc", videoTitle:"Video 38: De functie len()",
+  video2:"https://youtu.be/Dm5919ECzYs", video2Title:"Video 39: String indexing (oplopende nummering)",
+  video3:"https://youtu.be/5VlB8VMQEkU", video3Title:"Video 40: String indexing (aflopende nummering)",
+  intro:`<p>In dit laatste hoofdstuk leer je hoeveel tekens een string telt, en hoe je één bepaald teken uit een string haalt.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk <b>video 38</b> voor 18.1, <b>video 39</b> voor 18.2 en <b>video 40</b> voor 18.3. Maak daarna de oefeningen.</div>
+  <div class="box warm"><b>Let op</b><br>In video 38 komen ook lijsten (lists) voor. Die horen niet bij onze leerstof: je mag dat stukje overslaan.</div>`,
+  sections:[
+  { title:"18.1 De lengte van een string: len()", html:`<p>De functie <code>len()</code> (van <i>length</i>, lengte) telt hoeveel <b>tekens</b> een string heeft. Spaties en leestekens tellen ook mee!</p>
+    <pre>print(len("Tom"))            # 3
+muis = "Jerry"
+print(len(muis))             # 5: Python telt de waarde, niet de naam van de variabele
+print(len("hallo wereld"))   # 12: de spatie telt mee</pre>
+    <p><code>len()</code> geeft altijd een <b>geheel getal</b> (int) terug. Een getal zelf heeft geen lengte: <code>len(5)</code> geeft een foutmelding.</p>`,
+    items:[
+    {id:"h18-fill1", type:"fill", q:"Wat toont <code>print(len(&quot;Python&quot;))</code>?", answers:["6"], explain:"P-y-t-h-o-n: 6 tekens."},
+    {id:"h18-fill2", type:"fill", q:"Wat toont <code>print(len(&quot;Ik ben 15&quot;))</code>?", answers:["9"], explain:"Ook de twee spaties tellen mee: 9 tekens."}
+  ]},
+  { title:"18.2 Eén teken opvragen: indexing", html:`<p>Elk teken in een string heeft een <b>positie</b>, de <b>index</b>. Met <b>vierkante haakjes</b> vraag je het teken op een bepaalde positie op. Let op: Python begint te tellen bij <b>0</b>!</p>
+    <table><tr><th>Teken</th><td>F</td><td>o</td><td>r</td><td>r</td><td>e</td><td>s</td><td>t</td><td>&nbsp;</td><td>G</td><td>u</td><td>m</td><td>p</td></tr>
+    <tr><th>Index</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td></tr></table>
+    <pre style="margin-top:10px">personage = "Forrest Gump"
+print(personage[0])    # F
+print(personage[8])    # G</pre>
+    <p>Deze string telt 12 tekens, dus de <b>laatste index is 11</b>: altijd één minder dan de lengte. Vraag je een positie die niet bestaat, zoals <code>personage[20]</code>, dan krijg je een <b>IndexError</b>.</p>`,
+    items:[
+    {id:"h18-try1", type:"play", q:"Voer uit. Probeer daarna personage[20].", starter:'personage = "Forrest Gump"\nprint(personage[0])\nprint(personage[8])\nprint(len(personage))'},
+    {id:"h18-fill3", type:"fill", q:"Wat toont <code>print(&quot;Python&quot;[1])</code>?", answers:["y"], explain:"Index 0 is P, index 1 is y."},
+    {id:"h18-mc1", type:"mc", q:"Een string telt 8 tekens. Wat is de index van het laatste teken?", options:["8","7","-8"], correct:1, explain:"Omdat Python bij 0 begint, is de laatste index altijd de lengte min 1."}
+  ]},
+  { title:"18.3 Achteraan beginnen: negatieve index", html:`<p>Je kunt ook <b>achteraan</b> beginnen tellen, met <b>negatieve</b> getallen. Het laatste teken heeft index <b>-1</b>, het voorlaatste <b>-2</b>, enzovoort.</p>
+    <table><tr><th>Teken</th><td>F</td><td>o</td><td>r</td><td>r</td><td>e</td><td>s</td><td>t</td><td>&nbsp;</td><td>G</td><td>u</td><td>m</td><td>p</td></tr>
+    <tr><th>Index</th><td>-12</td><td>-11</td><td>-10</td><td>-9</td><td>-8</td><td>-7</td><td>-6</td><td>-5</td><td>-4</td><td>-3</td><td>-2</td><td>-1</td></tr></table>
+    <pre style="margin-top:10px">print(personage[-1])   # p: het laatste teken
+print(personage[-4])   # G: hetzelfde als personage[8]</pre>
+    <p>Dat is handig: met <code>[-1]</code> vind je altijd het laatste teken, zonder dat je de lengte moet kennen.</p>`,
+    items:[
+    {id:"h18-fill4", type:"fill", q:"Wat toont <code>print(&quot;koala&quot;[-1])</code>?", answers:["a"], explain:"-1 is altijd het laatste teken."},
+    {id:"h18-fill5", type:"fill", q:"Wat toont <code>print(&quot;koala&quot;[-2])</code>?", answers:["l"], explain:"-2 is het voorlaatste teken."},
+    {id:"h18-match", type:"match", q:"Welke code geeft welk teken uit <code>woord = &quot;python&quot;</code>?", pairs:[["woord[0]","p"],["woord[-1]","n"],["woord[2]","t"],["woord[-2]","o"]]}
+  ]},
+  { title:"18.4 Oefeningen", items:[
+    {id:"h18-code1", type:"code", q:"Schrijf een programma dat je naam vraagt en toont hoeveel letters ze telt. Bij <b>Sara</b> toont het: <b>Je naam telt 4 letters.</b>", starter:"",
+      tests:[{inputs:["Sara"],last:"Je naam telt 4 letters."},{inputs:["Mohamed"],last:"Je naam telt 7 letters."}], stdin:"Sara",
+      must:[[/len\(/,"Gebruik len()."]],
+      hint:'naam = input("Hoe heet je? ")\nprint("Je naam telt", len(naam), "letters.")', ok:"Juist!"},
+    {id:"h18-code2", type:"code", q:"Schrijf een programma dat een woord vraagt, en daarna de <b>eerste</b> en de <b>laatste</b> letter toont, elk op een eigen regel.", starter:"",
+      tests:[{inputs:["python"],tail:["p","n"]},{inputs:["koala"],tail:["k","a"]}], stdin:"python",
+      must:[[/\[\s*0\s*\]/,"Gebruik [0] voor de eerste letter."],[/\[\s*-\s*1\s*\]|len\(/,"Gebruik [-1] voor de laatste letter."]],
+      hint:'woord = input("Geef een woord: ")\nprint(woord[0])\nprint(woord[-1])', ok:"Juist!"},
+    {id:"h18-code3", type:"code", q:"Schrijf een programma dat je voornaam en je achternaam vraagt, en je <b>initialen</b> toont. Bij <b>Sara</b> en <b>Peeters</b> toont het: <b>S.P.</b>", starter:"",
+      tests:[{inputs:["Sara","Peeters"],last:"S.P."},{inputs:["Jan","Janssens"],last:"J.J."}], stdin:"Sara\nPeeters",
+      must:[[/\[\s*0\s*\]/,"Gebruik [0] om de eerste letter op te vragen."]],
+      hint:'voornaam = input("Voornaam? ")\nachternaam = input("Achternaam? ")\nprint(voornaam[0] + "." + achternaam[0] + ".")', ok:"Juist!"},
+    {id:"h18-code4", type:"code", q:"Uitdaging: een <b>palindroom</b> is een woord dat je van voor naar achter en van achter naar voor hetzelfde leest, zoals <b>lepel</b> of <b>kayak</b>. Schrijf een programma dat een woord vraagt en <b>Palindroom!</b> of <b>Geen palindroom</b> toont. (Tip: draai het woord om zoals in hoofdstuk 16, en vergelijk.)", starter:"",
+      tests:[{inputs:["lepel"],last:"Palindroom!"},{inputs:["kayak"],last:"Palindroom!"},{inputs:["python"],last:"Geen palindroom"},{inputs:["lepels"],last:"Geen palindroom"}], stdin:"lepel",
+      hint:'woord = input("Geef een woord: ")\nomgekeerd = ""\nfor letter in woord:\n    omgekeerd = letter + omgekeerd\nif woord == omgekeerd:\n    print("Palindroom!")\nelse:\n    print("Geen palindroom")', ok:"Knap! In dit programma combineer je een for-lus, een if/else en strings: alles wat je dit jaar geleerd hebt."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h18-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan de lengte van een string opvragen met len().","Ik weet dat de index bij 0 begint.","Ik kan één teken opvragen met vierkante haakjes.","Ik kan met een negatieve index achteraan beginnen tellen.","Ik weet wanneer ik een IndexError krijg."]},
+    {id:"h18-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
 }
 ];
 
@@ -844,6 +1349,13 @@ const CHECKS = {
 };
 function testCheck(tc,out){
   const lines=out.replace(/\r/g,"").split("\n").map(l=>l.trim().replace(/\s+/g," ")).filter(l=>l);
+  const inv=tc.inputs.length?`Met de invoer ${tc.inputs.map(x=>"‘"+x+"’").join(", ")}`:"Je programma";
+  if(tc.absent!==undefined && out.includes(tc.absent)) return [false,`${inv} mag ‘${tc.absent}’ niet verschijnen, maar je programma toont het toch.`];
+  if(tc.tail){ if(lines.length<tc.tail.length) return [false,`${inv} toont je programma te weinig regels. Verwacht werd:\n${tc.tail.join("\n")}`];
+    const got=lines.slice(-tc.tail.length);
+    for(let i=0;i<tc.tail.length;i++){ const w=tc.tail[i].trim().replace(/\s+/g," "); if(got[i]!==w) return [false,`${inv} klopt de uitvoer nog niet. Op de plaats van ‘${w}’ toont je programma ‘${got[i]}’.`]; }
+    return [true]; }
+  if(tc.last===undefined) return [true];
   const last=lines.length?lines[lines.length-1]:"";
   const want=tc.last.trim().replace(/\s+/g," ");
   if(last===want) return [true];
@@ -891,7 +1403,14 @@ function friendlyError(raw){
   const m2=last.match(/\(detected at line (\d+)\)/); if(m2) ln=ln||m2[1];
   if(/^EOFError/.test(last)) return {line:ln,text:"Je programma vraagt om invoer, maar er is (niet genoeg) invoer ingevuld. Vul het vak ‘Invoer’ aan: één antwoord per regel.",type:"EOFError"};
   let extra="";
-  if(/could not convert string to float/.test(last)) extra="\n→ float() kan alleen een getal omzetten, zoals \"3.5\". Gebruik een punt, geen komma!";
+  if(/expected ':'/.test(last)) extra="\n→ Vergeet de dubbelpunt : niet, op het einde van de regel met if, elif, else, while of for.";
+  else if(/^IndentationError: expected an indented block/.test(last)) extra="\n→ De regel(s) na de dubbelpunt moeten inspringen: zet er 4 spaties (of één Tab) voor.";
+  else if(/^IndentationError: unexpected indent/.test(last)) extra="\n→ Deze regel springt in, maar dat mag hier niet. Haal de spaties vooraan weg.";
+  else if(/^IndentationError/.test(last)) extra="\n→ De inspringing klopt niet. Regels in hetzelfde blok moeten precies even ver inspringen.";
+  else if(/Maybe you meant '==' /.test(last)) extra="\n→ Om te vergelijken gebruik je == (twee gelijktekens). Eén = is een toekenning.";
+  else if(/string index out of range/.test(last)) extra="\n→ Die positie bestaat niet in deze string. Het eerste teken heeft index 0, het laatste index len(...) - 1 of -1.";
+  else if(/name 'true' is not defined|name 'false' is not defined/.test(last)) extra="\n→ True en False schrijf je met een hoofdletter.";
+  else if(/could not convert string to float/.test(last)) extra="\n→ float() kan alleen een getal omzetten, zoals \"3.5\". Gebruik een punt, geen komma!";
   else if(/leading zeros in decimal integer literals/.test(last)) extra="\n→ Een getal mag niet met een 0 beginnen. Bewaar zo’n nummer als string, tussen aanhalingstekens.";
   else if(/invalid literal for int\(\)/.test(last)) extra="\n→ int() kan alleen een geheel getal omzetten, zoals \"15\". Tekst of een kommagetal lukt niet.";
   else if(/can only concatenate str \(not "(int|float)"\) to str/.test(last)) extra="\n→ Je probeert tekst en een getal aan elkaar te plakken met +. Dat kan niet.";
@@ -1107,6 +1626,7 @@ function renderItem(it,n){
       else if(!r.err&&useTests){ let bad=null; for(const [re,msg] of (it.must||[])) if(!re.test(code)){bad=msg;break}
         if(!bad) bad=failMsg;
         if(bad){const f=fb(box);f.className="fb bad";f.innerHTML="✘ "+esc(bad)+tipH} else {a.locked=true;a.score=1;a.msg=it.ok||"Juist!"} }
+      else if(r.err&&r.err.type==="Tijd"){const f=fb(box);f.className="fb bad";f.innerHTML="✘ Je programma stopt niet: waarschijnlijk zit er een oneindige lus in. Verandert er iets in je lus, zodat de bewering ooit False wordt?"+tipH}
       else if(r.err){const f=fb(box);f.className="fb bad";f.innerHTML="✘ Je code geeft een foutmelding"+(r.err.line?" op regel "+r.err.line:"")+". Lees ze rustig en verbeter je code."+(a.attempts>=3&&(it.hint||CODE_HINT[it.check])?`<div class="ex">Tip – zo kan het:<pre style="margin:6px 0 0">${esc(it.hint||CODE_HINT[it.check])}</pre></div>`:"")}
       else{const [ok,msg]=(it.check?CHECKS[it.check]:genericCheck(it))(r.out||"",code); if(ok){a.locked=true;a.score=1;a.msg=msg} else {const f=fb(box);f.className="fb bad";f.innerHTML="✘ "+esc(msg)+(a.attempts>=3&&(it.hint||CODE_HINT[it.check])?`<div class="ex">Tip – zo kan het:<pre style="margin:6px 0 0">${esc(it.hint||CODE_HINT[it.check])}</pre></div>`:"")}}
       if(a.attempts===1)a.first=!!a.locked; save(); paint(); }
