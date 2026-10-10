@@ -384,6 +384,32 @@ const CHAPTERS = [
   ]}
   ]
 },
+{ id:"om1", kind:"om", short:"Oefenmoment 1", topic:"herhaling H3 en H4", title:"Oefenmoment 1 – Herhaling H3 en H4",
+  intro:`<div class="box warm"><b>Oefenmoment thuis</b><br>⏱ Duur: <b>± 20 minuten</b><br>📅 Maak dit vóór <b>lesuur 4</b>. Kijk in je planning voor de juiste datum.<br>📚 Leerstof: H3 Rekenen met gehele getallen, H4 print() en strings</div>
+  <p>Dit oefenmoment maak je thuis, als huiswerk. Er is geen nieuwe leerstof: je oefent wat je al geleerd hebt. Twijfel je? Kijk dan gerust terug in het hoofdstuk. Stuur na afloop je rapport naar je leerkracht via <b>Mijn resultaat</b>.</p>`,
+  sections:[
+  { title:"Vragen", items:[
+    {id:"om1-fill1", type:"fill", q:"Wat toont <code>print(8 * 7)</code>?", answers:["56"], explain:"8 x 7 = 56"},
+    {id:"om1-fill2", type:"fill", q:"Wat toont <code>print(20 / 8)</code>?", answers:["2.5"], explain:"Een deling geeft een float: 2.5."},
+    {id:"om1-mc1", type:"mc", q:"Welke regel toont de <b>tekst</b> 3 + 4 op het scherm, en niet de uitkomst?", options:["print(3 + 4)","print(\"3 + 4\")","print(3 \"+\" 4)"], correct:1, explain:"Tussen aanhalingstekens is het een string: Python toont de tekst letterlijk."},
+    {id:"om1-tf1", type:"tf", q:"Juist of fout?", parts:[
+      {s:"print(10 / 2) toont 5.", a:false, explain:"Een deling geeft altijd een float: 5.0."},
+      {s:"print() zonder iets tussen de haakjes toont een lege regel.", a:true, explain:"Zonder argument toont print() een lege regel."},
+      {s:"print(Hallo) toont het woord Hallo.", a:false, explain:"Zonder aanhalingstekens geeft dit een NameError."}
+    ]}
+  ]},
+  { title:"Codeoefeningen", items:[
+    {id:"om1-code1", type:"code", q:"In een klas zitten 24 leerlingen. Elke leerling krijgt 3 schriften. Laat Python berekenen hoeveel schriften er in totaal nodig zijn.", starter:"",
+      expect:["72"], must:[[/24\s*\*\s*3|3\s*\*\s*24/,"Laat Python zelf rekenen: gebruik een vermenigvuldiging met 24 en 3."]],
+      hint:'print(24 * 3)', ok:"Juist! 72 schriften."},
+    {id:"om1-code2", type:"code", q:"Laat het programma precies dit tonen: eerst <b>Mijn rapport</b>, dan een <b>lege regel</b>, dan <b>Python: 18/20</b>.", starter:"",
+      expect:["Mijn rapport","","Python: 18/20"], exact:true, hint:'print("Mijn rapport")\nprint()\nprint("Python: 18/20")', ok:"Juist!"},
+    {id:"om1-code3", type:"code", q:"In dit programma zitten drie fouten. Verbeter ze, zodat het <i>Welkom bij Python</i>, <i>15</i> en <i>Klaar</i> toont. Python moet de 15 zelf uitrekenen!", starter:'print("Welkom bij Python)\nprint(5 x 3)\nprint(Klaar)',
+      expect:["Welkom bij Python","15","Klaar"], must:[[/5\s*\*\s*3/,"Laat Python 5 * 3 uitrekenen: vermenigvuldigen doe je met *."]],
+      hint:'print("Welkom bij Python")\nprint(5 * 3)\nprint("Klaar")', ok:"Knap! Alle drie de fouten gevonden."}
+  ]}
+  ]
+},
 { id:"h5", short:"5. Variabelen", title:"Hoofdstuk 5 – Variabelen en de toekenning",
   video:"https://youtu.be/rKFJ8tRvqFk", videoTitle:"Video 5: Variabelen en lades",
   video2:"https://youtu.be/V58gHCwSxrw", video2Title:"Video 6: De toekenning (assignment statement)",
@@ -671,6 +697,33 @@ print("Je saldo is " + str(saldo) + " euro")</pre>
   ]}
   ]
 },
+{ id:"om2", kind:"om", short:"Oefenmoment 2", topic:"herhaling H5 tot en met H8", title:"Oefenmoment 2 – Herhaling H5 tot en met H8",
+  intro:`<div class="box warm"><b>Oefenmoment thuis</b><br>⏱ Duur: <b>± 30 minuten</b><br>📅 Maak dit vóór <b>lesuur 7</b>. Kijk in je planning voor de juiste datum.<br>📚 Leerstof: H5 Variabelen, H6 Expressies, H7 input() en int(), H8 type(), str() en float()</div>
+  <p>Dit oefenmoment maak je thuis, als huiswerk. Er is geen nieuwe leerstof: je oefent wat je al geleerd hebt. Twijfel je? Kijk dan gerust terug in het hoofdstuk. Stuur na afloop je rapport naar je leerkracht via <b>Mijn resultaat</b>.</p>`,
+  sections:[
+  { title:"Vragen", items:[
+    {id:"om2-mc1", type:"mc", q:"Welke variabelenaam is <b>geldig</b>?", options:["mijn punten","3punten","punten_wiskunde"], correct:2, explain:"Geen spaties en niet beginnen met een cijfer: punten_wiskunde is goed."},
+    {id:"om2-fill1", type:"fill", q:"Wat toont dit programma?<pre>a = 5\nb = a * 2\na = 1\nprint(b)</pre>", answers:["10"], explain:"b kreeg de waarde 5 * 2 = 10 op het moment van de toekenning. Dat a later 1 wordt, verandert b niet meer."},
+    {id:"om2-fill2", type:"fill", q:"Wat toont <code>print(&quot;4&quot; + &quot;4&quot;)</code>?", answers:["44"], explain:"Twee strings worden aan elkaar geplakt."},
+    {id:"om2-fill3", type:"fill", q:"Wat toont <code>print(type(7 / 7))</code>?", answers:["<class 'float'>","float"], explain:"Een deling geeft altijd een float, ook als de uitkomst 1.0 is."},
+    {id:"om2-match", type:"match", q:"Welke functie heb je nodig?", pairs:[["\"3.5\" omzetten naar een kommagetal","float()"],["\"12\" omzetten naar een geheel getal","int()"],["12 in een zin plakken met +","str()"]]}
+  ]},
+  { title:"Codeoefeningen", items:[
+    {id:"om2-code1", type:"code", q:"Schrijf een programma dat de lengte en de breedte van een rechthoek vraagt (gehele getallen), en de <b>omtrek</b> toont. Toon alleen het getal. (De omtrek is 2 keer de lengte plus 2 keer de breedte.)", starter:"",
+      tests:[{inputs:["8","5"],last:"26"},{inputs:["3","3"],last:"12"}], stdin:"8\n5",
+      must:[[/(^|[^a-z_])int\(/,"Zet de antwoorden om naar getallen met int()."]],
+      hint:'lengte = int(input("Lengte? "))\nbreedte = int(input("Breedte? "))\nomtrek = 2 * lengte + 2 * breedte\nprint(omtrek)', ok:"Juist!"},
+    {id:"om2-code2", type:"code", q:"Schrijf een programma dat vraagt in welk jaar de gebruiker geboren is, en in een zin toont hoe oud hij in 2027 wordt. Bij <b>2012</b> toont het: <b>In 2027 word je 15 jaar.</b>", starter:"",
+      tests:[{inputs:["2012"],last:"In 2027 word je 15 jaar."},{inputs:["2010"],last:"In 2027 word je 17 jaar."}], stdin:"2012",
+      must:[[/(^|[^a-z_])int\(/,"Zet het geboortejaar om naar een getal met int()."],[/(^|[^a-z_])str\(/,"Gebruik str() om de leeftijd in de zin te plakken."]],
+      hint:'jaar = int(input("In welk jaar ben je geboren? "))\nleeftijd = 2027 - jaar\nprint("In 2027 word je " + str(leeftijd) + " jaar.")', ok:"Juist!"},
+    {id:"om2-code3", type:"code", q:"Schrijf een programma voor een tankstation. Het vraagt hoeveel <b>liter</b> je tankt en de <b>prijs per liter</b> (allebei kommagetallen), en toont de totale prijs. Toon alleen de uitkomst.", starter:"",
+      tests:[{inputs:["10","1.5"],last:"15.0"},{inputs:["2.5","2"],last:"5.0"}], stdin:"10\n1.5",
+      must:[[/(^|[^a-z_])float\(/,"Gebruik float(), want het kunnen kommagetallen zijn."]],
+      hint:'liter = float(input("Hoeveel liter? "))\nprijs = float(input("Prijs per liter? "))\nprint(liter * prijs)', ok:"Juist!"}
+  ]}
+  ]
+},
 { id:"h9", short:"9. Rekenen", title:"Hoofdstuk 9 – Rekenen: machten, voorrang, // en %",
   video:"https://youtu.be/yymBPl5lF3A", videoTitle:"Video 13: De machtsverheffing",
   video2:"https://youtu.be/N2N80yazET4", video2Title:"Video 14: De voorrangsregels",
@@ -814,6 +867,33 @@ print("Ik ben " + str(leeftijd) + " jaar")   # met + en str()</pre>
   { title:"Terugblik", items:[
     {id:"h10-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan een string afbakenen met enkele of dubbele aanhalingstekens.","Ik kan aanhalingstekens in een string zetten.","Ik weet wanneer ik een getal beter als string bewaar.","Ik kan meerdere waarden printen met komma’s.","Ik weet waar ik de Python-documentatie vind."]},
     {id:"h10-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"om3", kind:"om", short:"Oefenmoment 3", topic:"toetsvoorbereiding H1–H10", title:"Oefenmoment 3 – Toetsvoorbereiding H1 tot en met H10",
+  intro:`<div class="box warm"><b>Oefenmoment thuis</b><br>⏱ Duur: <b>± 30 minuten</b><br>📅 Maak dit vóór <b>toets 1</b>. Kijk in je planning voor de juiste datum.<br>📚 Leerstof: H1 tot en met H10</div>
+  <p>Dit oefenmoment maak je thuis, als huiswerk. Er is geen nieuwe leerstof: je oefent wat je al geleerd hebt. Twijfel je? Kijk dan gerust terug in het hoofdstuk. Lukt een vraag niet? Noteer dan welk hoofdstuk je nog eens moet bekijken voor de toets. Stuur na afloop je rapport naar je leerkracht via <b>Mijn resultaat</b>.</p>`,
+  sections:[
+  { title:"Vragen", items:[
+    {id:"om3-fill1", type:"fill", q:"Wat toont <code>print(2 + 3 * 4)</code>?", answers:["14"], explain:"Eerst vermenigvuldigen: 3 * 4 = 12. Dan 2 + 12 = 14."},
+    {id:"om3-fill2", type:"fill", q:"Wat toont <code>print(17 % 5)</code>?", answers:["2"], explain:"17 = 3 x 5 + 2. De rest is 2."},
+    {id:"om3-fill3", type:"fill", q:"Wat toont <code>print(2 ** 4)</code>?", answers:["16"], explain:"2 x 2 x 2 x 2 = 16"},
+    {id:"om3-fill4", type:"fill", q:"Wat toont <code>print(7 // 2)</code>?", answers:["3"], explain:"In 7 passen 3 volledige groepen van 2."},
+    {id:"om3-fill5", type:"fill", q:"Wat toont <code>print(&quot;Ik ben&quot;, 15)</code>?", answers:["Ik ben 15"], explain:"Met een komma zet Python er een spatie tussen."},
+    {id:"om3-mc1", type:"mc", q:"Welke regel geeft <b>geen</b> foutmelding?", options:["print('It's mine')","print(\"It's mine\")","print(\"It's mine')"], correct:1, explain:"Met dubbele aanhalingstekens als afbakening kan het apostrofje erin."},
+    {id:"om3-mc2", type:"mc", q:"Welke foutmelding krijg je bij <code>int(&quot;3.5&quot;)</code>?", options:["TypeError","ValueError","NameError"], correct:1, explain:"int() kan geen kommagetal omzetten: ValueError."}
+  ]},
+  { title:"Codeoefeningen", items:[
+    {id:"om3-code1", type:"code", q:"Schrijf een programma dat drie toetsscores vraagt (gehele getallen) en het <b>gemiddelde</b> toont. Toon alleen de uitkomst.", starter:"",
+      tests:[{inputs:["15","12","9"],last:"12.0"},{inputs:["10","13","16"],last:"13.0"}], stdin:"15\n12\n9",
+      hint:'a = int(input("Score 1? "))\nb = int(input("Score 2? "))\nc = int(input("Score 3? "))\nprint((a + b + c) / 3)', ok:"Juist! Vergeet de haakjes niet."},
+    {id:"om3-code2", type:"code", q:"Een pizza is in stukken gesneden. Schrijf een programma dat het aantal <b>stukken</b> en het aantal <b>personen</b> vraagt, en toont hoeveel stukken iedereen krijgt, en hoeveel er overblijven. Bij <b>8</b> stukken en <b>3</b> personen toont het:<br><b>Iedereen krijgt 2 stukken, er blijven 2 over.</b>", starter:"",
+      tests:[{inputs:["8","3"],last:"Iedereen krijgt 2 stukken, er blijven 2 over."},{inputs:["12","4"],last:"Iedereen krijgt 3 stukken, er blijven 0 over."}], stdin:"8\n3",
+      must:[[/\/\//,"Gebruik // voor het aantal stukken per persoon."],[/%/,"Gebruik % voor de stukken die overblijven."]],
+      hint:'stukken = int(input("Hoeveel stukken? "))\npersonen = int(input("Hoeveel personen? "))\nprint("Iedereen krijgt", stukken // personen, "stukken, er blijven", stukken % personen, "over.")', ok:"Knap!"},
+    {id:"om3-code3", type:"code", q:"Schrijf een programma dat een aantal <b>uren</b> vraagt en toont hoeveel minuten dat is. Bij <b>2</b> toont het: <b>2 uur = 120 minuten</b>", starter:"",
+      tests:[{inputs:["2"],last:"2 uur = 120 minuten"},{inputs:["5"],last:"5 uur = 300 minuten"}], stdin:"2",
+      hint:'uren = int(input("Hoeveel uren? "))\nprint(uren, "uur =", uren * 60, "minuten")', ok:"Juist!"}
   ]}
   ]
 },
@@ -961,6 +1041,32 @@ if worp == 1 or worp == 6:
   ]}
   ]
 },
+{ id:"om4", kind:"om", short:"Oefenmoment 4", topic:"herhaling H11 en H12", title:"Oefenmoment 4 – Herhaling H11 en H12",
+  intro:`<div class="box warm"><b>Oefenmoment thuis</b><br>⏱ Duur: <b>± 20 minuten</b><br>📅 Maak dit vóór <b>lesuur 14</b>. Kijk in je planning voor de juiste datum.<br>📚 Leerstof: H11 Het if-statement, H12 if/else, or en not</div>
+  <p>Dit oefenmoment maak je thuis, als huiswerk. Er is geen nieuwe leerstof: je oefent wat je al geleerd hebt. Twijfel je? Kijk dan gerust terug in het hoofdstuk. Stuur na afloop je rapport naar je leerkracht via <b>Mijn resultaat</b>.</p>`,
+  sections:[
+  { title:"Vragen", items:[
+    {id:"om4-fill1", type:"fill", q:"Wat toont <code>print(7 &gt;= 7)</code>?", answers:["True"], explain:"7 is gelijk aan 7, dus ‘groter dan of gelijk aan’ klopt."},
+    {id:"om4-fill2", type:"fill", q:"Wat toont <code>print(not 4 &lt; 2)</code>?", answers:["True"], explain:"4 < 2 is False, not maakt er True van."},
+    {id:"om4-fill3", type:"fill", q:"Wat toont <code>print(3 == 4 or 5 != 5)</code>?", answers:["False"], explain:"Beide beweringen zijn False, dus ook het geheel."},
+    {id:"om4-mc1", type:"mc", q:"Welk programma is <b>juist</b> geschreven?", options:["<code style=\"white-space:pre\">if x == 3\n    print(x)</code>","<code style=\"white-space:pre\">if x = 3:\n    print(x)</code>","<code style=\"white-space:pre\">if x == 3:\n    print(x)</code>"], correct:2, explain:"Een vergelijking met ==, een dubbelpunt en een ingesprongen regel."}
+  ]},
+  { title:"Codeoefeningen", items:[
+    {id:"om4-code1", type:"code", q:"Schrijf een programma dat een geheel getal vraagt. Is het kleiner dan 0, dan toont het <b>negatief</b>, anders <b>positief of nul</b>.", starter:"",
+      tests:[{inputs:["-3"],last:"negatief"},{inputs:["0"],last:"positief of nul"},{inputs:["8"],last:"positief of nul"}], stdin:"-3",
+      must:[[/else\s*:/,"Gebruik if en else."]],
+      hint:'getal = int(input("Geef een getal: "))\nif getal < 0:\n    print("negatief")\nelse:\n    print("positief of nul")', ok:"Juist!"},
+    {id:"om4-code2", type:"code", q:"Schrijf een programma dat een geheel getal vraagt en toont of het <b>deelbaar door 5</b> is: <b>deelbaar door 5</b> of <b>niet deelbaar door 5</b>.", starter:"",
+      tests:[{inputs:["25"],last:"deelbaar door 5"},{inputs:["0"],last:"deelbaar door 5"},{inputs:["12"],last:"niet deelbaar door 5"}], stdin:"25",
+      must:[[/%\s*5/,"Gebruik % 5: is de rest 0, dan is het getal deelbaar door 5."]],
+      hint:'getal = int(input("Geef een getal: "))\nif getal % 5 == 0:\n    print("deelbaar door 5")\nelse:\n    print("niet deelbaar door 5")', ok:"Juist!"},
+    {id:"om4-code3", type:"code", q:"Schrijf een programma dat één letter vraagt. Is het een <b>a</b>, <b>e</b>, <b>i</b>, <b>o</b> of <b>u</b>, dan toont het <b>klinker</b>, anders <b>medeklinker</b>.", starter:"",
+      tests:[{inputs:["a"],last:"klinker"},{inputs:["u"],last:"klinker"},{inputs:["b"],last:"medeklinker"}], stdin:"a",
+      must:[[/\bor\b/,"Gebruik de operator or."]],
+      hint:'letter = input("Geef een letter: ")\nif letter == "a" or letter == "e" or letter == "i" or letter == "o" or letter == "u":\n    print("klinker")\nelse:\n    print("medeklinker")', ok:"Juist! Je mag or ook meer dan één keer gebruiken."}
+  ]}
+  ]
+},
 { id:"h13", short:"13. and", title:"Hoofdstuk 13 – De operator and",
   video:"https://youtu.be/i7e_RhjIi6g", videoTitle:"Video 24: De booleaanse operator and",
   intro:`<p>Met <code>or</code> was één ware bewering genoeg. Met <code>and</code> moeten <b>alle</b> beweringen waar zijn.</p>
@@ -1072,6 +1178,33 @@ elif score >= 80:
   ]}
   ]
 },
+{ id:"om5", kind:"om", short:"Oefenmoment 5", topic:"herhaling H13 en H14", title:"Oefenmoment 5 – Herhaling H13 en H14",
+  intro:`<div class="box warm"><b>Oefenmoment thuis</b><br>⏱ Duur: <b>± 20 minuten</b><br>📅 Maak dit vóór <b>lesuur 16</b>. Kijk in je planning voor de juiste datum.<br>📚 Leerstof: H13 De operator and, H14 if/elif/else</div>
+  <p>Dit oefenmoment maak je thuis, als huiswerk. Er is geen nieuwe leerstof: je oefent wat je al geleerd hebt. Twijfel je? Kijk dan gerust terug in het hoofdstuk. Stuur na afloop je rapport naar je leerkracht via <b>Mijn resultaat</b>.</p>`,
+  sections:[
+  { title:"Vragen", items:[
+    {id:"om5-tf1", type:"tf", q:"Is de bewering True (‘Juist’) of False (‘Fout’)?", parts:[
+      {s:"5 > 2 and 3 > 1", a:true, explain:"Beide zijn True."},
+      {s:"5 > 2 and 3 > 4", a:false, explain:"3 > 4 is False, dus met and is het geheel False."},
+      {s:"(1 > 2 or 2 > 1) and not 3 == 4", a:true, explain:"Tussen haakjes: True. not 3 == 4 is True. True and True = True."}
+    ]},
+    {id:"om5-fill1", type:"fill", q:"Wat toont dit programma?<pre>x = 15\nif x &gt; 20:\n    print(\"groot\")\nelif x &gt; 10:\n    print(\"middel\")\nelse:\n    print(\"klein\")</pre>", answers:["middel"], explain:"15 > 20 is False, 15 > 10 is True: middel."}
+  ]},
+  { title:"Codeoefeningen", items:[
+    {id:"om5-code1", type:"code", q:"Een toetsscore op 20 is alleen <b>geldig</b> als ze tussen 0 en 20 ligt (0 en 20 mogen ook). Schrijf een programma dat een score vraagt en <b>Geldige score</b> of <b>Ongeldige score</b> toont.", starter:"",
+      tests:[{inputs:["14"],last:"Geldige score"},{inputs:["0"],last:"Geldige score"},{inputs:["20"],last:"Geldige score"},{inputs:["21"],last:"Ongeldige score"},{inputs:["-1"],last:"Ongeldige score"}], stdin:"14",
+      must:[[/\band\b/,"Gebruik de operator and."]],
+      hint:'score = int(input("Score? "))\nif score >= 0 and score <= 20:\n    print("Geldige score")\nelse:\n    print("Ongeldige score")', ok:"Juist!"},
+    {id:"om5-code2", type:"code", q:"Schrijf een programma dat de leeftijd vraagt en de categorie toont:<br>• jonger dan 12: <b>kind</b><br>• 12 tot en met 17: <b>jongere</b><br>• 18 tot en met 64: <b>volwassene</b><br>• 65 of ouder: <b>senior</b>", starter:"",
+      tests:[{inputs:["5"],last:"kind"},{inputs:["12"],last:"jongere"},{inputs:["17"],last:"jongere"},{inputs:["18"],last:"volwassene"},{inputs:["64"],last:"volwassene"},{inputs:["65"],last:"senior"}], stdin:"5",
+      must:[[/\belif\b/,"Gebruik elif."]],
+      hint:'leeftijd = int(input("Leeftijd? "))\nif leeftijd < 12:\n    print("kind")\nelif leeftijd < 18:\n    print("jongere")\nelif leeftijd < 65:\n    print("volwassene")\nelse:\n    print("senior")', ok:"Juist!"},
+    {id:"om5-code3", type:"code", q:"Uitdaging: een <b>schrikkeljaar</b> is een jaar dat deelbaar is door 4, maar <b>niet</b> door 100. Uitzondering: jaren die deelbaar zijn door 400, zijn wél schrikkeljaren. Schrijf een programma dat een jaar vraagt en <b>Schrikkeljaar</b> of <b>Geen schrikkeljaar</b> toont.", starter:"",
+      tests:[{inputs:["2024"],last:"Schrikkeljaar"},{inputs:["2023"],last:"Geen schrikkeljaar"},{inputs:["1900"],last:"Geen schrikkeljaar"},{inputs:["2000"],last:"Schrikkeljaar"}], stdin:"2024",
+      hint:'jaar = int(input("Welk jaar? "))\nif (jaar % 4 == 0 and jaar % 100 != 0) or jaar % 400 == 0:\n    print("Schrikkeljaar")\nelse:\n    print("Geen schrikkeljaar")', ok:"Knap! Dit is een echte puzzel met and, or en haakjes."}
+  ]}
+  ]
+},
 { id:"h15", short:"15. while", title:"Hoofdstuk 15 – Herhalen: de while-lus",
   video:"https://youtu.be/DpTNnE-nVQU", videoTitle:"Video 28: Iteraties/herhalingen (introductie)",
   video2:"https://youtu.be/rEwfYG4Jk5M", video2Title:"Video 29: Iteraties: de while-lus",
@@ -1147,6 +1280,28 @@ print("De som is", som)</pre>
   { title:"Terugblik", items:[
     {id:"h15-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik ken het verschil tussen een for- en een while-lus.","Ik kan een while-lus schrijven.","Ik weet hoe een oneindige lus ontstaat.","Ik kan herhalen tot de gebruiker een stopwaarde typt."]},
     {id:"h15-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"om6", kind:"om", short:"Oefenmoment 6", topic:"herhaling H15", title:"Oefenmoment 6 – Herhaling H15: de while-lus",
+  intro:`<div class="box warm"><b>Oefenmoment thuis</b><br>⏱ Duur: <b>± 25 minuten</b><br>📅 Maak dit vóór <b>lesuur 18</b>. Kijk in je planning voor de juiste datum.<br>📚 Leerstof: H15 De while-lus</div>
+  <p>Dit oefenmoment maak je thuis, als huiswerk. Er is geen nieuwe leerstof: je oefent wat je al geleerd hebt. Twijfel je? Kijk dan gerust terug in het hoofdstuk. Stuur na afloop je rapport naar je leerkracht via <b>Mijn resultaat</b>.</p>`,
+  sections:[
+  { title:"Vragen", items:[
+    {id:"om6-fill1", type:"fill", q:"Hoeveel getallen toont dit programma? (Typ een getal.)<pre>x = 3\nwhile x &gt; 0:\n    print(x)\n    x = x - 1</pre>", answers:["3"], explain:"Het toont 3, 2 en 1. Bij x = 0 stopt de lus."},
+    {id:"om6-mc1", type:"mc", q:"Waarom stopt deze lus nooit?<pre>x = 1\nwhile x &lt; 5:\n    print(x)</pre>", options:["Omdat x nooit verandert","Omdat er een print in de lus staat","Omdat 5 te groot is"], correct:0, explain:"x blijft altijd 1, dus x < 5 blijft altijd True: een oneindige lus."}
+  ]},
+  { title:"Codeoefeningen", items:[
+    {id:"om6-code1", type:"code", q:"Toon met een while-lus de <b>oneven getallen van 1 tot en met 15</b>, elk op een eigen regel.", starter:"",
+      expect:["1","3","5","7","9","11","13","15"], must:[[/\bwhile\b/,"Gebruik een while-lus."]],
+      hint:'getal = 1\nwhile getal <= 15:\n    print(getal)\n    getal = getal + 2', ok:"Juist! Je telt telkens 2 bij."},
+    {id:"om6-code2", type:"code", q:"Je begint met 1 euro en <b>verdubbelt</b> telkens je bedrag. Na hoeveel keer verdubbelen heb je <b>meer dan 1000</b> euro? Laat Python het berekenen met een while-lus en toon alleen het aantal keer.", starter:"",
+      expect:["10"], must:[[/\bwhile\b/,"Gebruik een while-lus."]],
+      hint:'bedrag = 1\naantal = 0\nwhile bedrag <= 1000:\n    bedrag = bedrag * 2\n    aantal = aantal + 1\nprint(aantal)', ok:"Juist! Na 10 keer heb je 1024 euro."},
+    {id:"om6-code3", type:"code", q:"Schrijf een programma dat getallen laat intypen tot de gebruiker <b>0</b> typt, en daarna het <b>grootste</b> getal toont. (Tip: onthoud in een variabele het grootste getal tot nu toe, en vergelijk elk nieuw getal ermee.)", starter:"",
+      tests:[{inputs:["4","9","2","0"],last:"9"},{inputs:["5","0"],last:"5"},{inputs:["3","8","15","0"],last:"15"}], stdin:"4\n9\n2\n0",
+      must:[[/\bwhile\b/,"Gebruik een while-lus."]],
+      hint:'getal = int(input("Geef een getal (0 om te stoppen): "))\ngrootste = getal\nwhile getal != 0:\n    if getal > grootste:\n        grootste = getal\n    getal = int(input("Geef een getal (0 om te stoppen): "))\nprint(grootste)', ok:"Knap! Een if in een while-lus: dat is echt programmeren."}
   ]}
   ]
 },
@@ -1321,6 +1476,36 @@ print(personage[-4])   # G: hetzelfde als personage[8]</pre>
     {id:"h18-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
   ]}
   ]
+},{ id:"om7", kind:"om", short:"Oefenmoment 7", topic:"toetsvoorbereiding H11–H18", title:"Oefenmoment 7 – Toetsvoorbereiding H11 tot en met H18",
+  intro:`<div class="box warm"><b>Oefenmoment thuis</b><br>⏱ Duur: <b>± 30 minuten</b><br>📅 Maak dit vóór <b>toets 2</b>. Kijk in je planning voor de juiste datum.<br>📚 Leerstof: H11 tot en met H18</div>
+  <p>Dit oefenmoment maak je thuis, als huiswerk. Er is geen nieuwe leerstof: je oefent wat je al geleerd hebt. Twijfel je? Kijk dan gerust terug in het hoofdstuk. Lukt een vraag niet? Noteer dan welk hoofdstuk je nog eens moet bekijken voor de toets. Stuur na afloop je rapport naar je leerkracht via <b>Mijn resultaat</b>.</p>`,
+  sections:[
+  { title:"Vragen", items:[
+    {id:"om7-fill1", type:"fill", q:"Hoeveel getallen maakt <code>range(4)</code>? (Typ een getal.)", answers:["4"], explain:"0, 1, 2 en 3."},
+    {id:"om7-fill2", type:"fill", q:"Wat toont <code>print(&quot;banaan&quot;[2])</code>?", answers:["n"], explain:"b is index 0, a index 1, n index 2."},
+    {id:"om7-fill3", type:"fill", q:"Wat toont <code>print(len(&quot;hallo daar&quot;))</code>?", answers:["10"], explain:"De spatie telt mee: 10 tekens."},
+    {id:"om7-fill4", type:"fill", q:"Wat toont <code>print(&quot;Python&quot;[-1])</code>?", answers:["n"], explain:"-1 is altijd het laatste teken."},
+    {id:"om7-fill5", type:"fill", q:"Wat toont <code>print(&quot;ana&quot; in &quot;banaan&quot;)</code>?", answers:["True"], explain:"b-ana-an: het stuk ana komt erin voor."},
+    {id:"om7-mc1", type:"mc", q:"Welke range geeft de getallen 5, 10, 15, …, 50?", options:["range(5, 50, 5)","range(5, 51, 5)","range(0, 50, 5)"], correct:1, explain:"Start 5, stap 5, en de stopwaarde moet groter zijn dan 50."}
+  ]},
+  { title:"Codeoefeningen", items:[
+    {id:"om7-code1", type:"code", q:"Toon met een for-lus en <code>range()</code> de getallen <b>5, 10, 15, … tot en met 50</b>, elk op een eigen regel.", starter:"",
+      expect:["5","10","15","20","25","30","35","40","45","50"], must:[[/\bfor\b[\s\S]*range\(/,"Gebruik een for-lus met range()."]],
+      hint:'for getal in range(5, 51, 5):\n    print(getal)', ok:"Juist!"},
+    {id:"om7-code2", type:"code", q:"Schrijf een programma dat een getal vraagt en met een for-lus de <b>som</b> van alle getallen van 1 tot en met dat getal toont. Toon alleen de uitkomst.", starter:"",
+      tests:[{inputs:["10"],last:"55"},{inputs:["3"],last:"6"},{inputs:["100"],last:"5050"}], stdin:"10",
+      must:[[/\bfor\b/,"Gebruik een for-lus."]],
+      hint:'grens = int(input("Tot welk getal? "))\nsom = 0\nfor getal in range(1, grens + 1):\n    som = som + getal\nprint(som)', ok:"Juist!"},
+    {id:"om7-code3", type:"code", q:"Schrijf een programma dat een woord vraagt en telt hoeveel keer de letter <b>e</b> erin voorkomt. Toon alleen het aantal.", starter:"",
+      tests:[{inputs:["telefoon"],last:"2"},{inputs:["python"],last:"0"},{inputs:["eeuw"],last:"2"}], stdin:"telefoon",
+      must:[[/\bfor\b/,"Gebruik een for-lus."]],
+      hint:'woord = input("Geef een woord: ")\naantal = 0\nfor letter in woord:\n    if letter == "e":\n        aantal = aantal + 1\nprint(aantal)', ok:"Juist!"},
+    {id:"om7-code4", type:"code", q:"Uitdaging: een wachtwoord is <b>sterk</b> als het minstens <b>8 tekens</b> telt <b>en</b> een <b>!</b> of een <b>@</b> bevat. Schrijf een programma dat een wachtwoord vraagt en <b>Sterk wachtwoord</b> of <b>Zwak wachtwoord</b> toont.", starter:"",
+      tests:[{inputs:["python!23"],last:"Sterk wachtwoord"},{inputs:["kat@huis"],last:"Sterk wachtwoord"},{inputs:["python123"],last:"Zwak wachtwoord"},{inputs:["ab!"],last:"Zwak wachtwoord"}], stdin:"python!23",
+      must:[[/len\(/,"Gebruik len() om het aantal tekens te tellen."]],
+      hint:'wachtwoord = input("Wachtwoord? ")\nif len(wachtwoord) >= 8 and ("!" in wachtwoord or "@" in wachtwoord):\n    print("Sterk wachtwoord")\nelse:\n    print("Zwak wachtwoord")', ok:"Knap! len(), in, and, or en haakjes in één bewering."}
+  ]}
+  ]
 }
 ];
 
@@ -1472,9 +1657,10 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 function shuffleFixed(arr,seed){const a=arr.map((x,i)=>[x,i]); let s=seed; for(let i=a.length-1;i>0;i--){s=(s*9301+49297)%233280; const j=Math.floor(s/233280*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a}
 function seedOf(id){let h=7;for(const c of id)h=(h*31+c.charCodeAt(0))%100000;return h+1}
 
-const GROUPS=[["Basis",["h1","h2","h3","h4"]],["Variabelen",["h5","h6","h7","h8"]],["Rekenen en tekst",["h9","h10"]],["Beslissingen",["h11","h12","h13","h14"]],["Herhalingen",["h15","h16","h17"]],["Strings",["h18"]]];
+const GROUPS=[["Basis",["h1","h2","h3","h4","om1"]],["Variabelen",["h5","h6","h7","h8","om2"]],["Rekenen en tekst",["h9","h10","om3"]],["Beslissingen",["h11","h12","om4","h13","h14","om5"]],["Herhalingen",["h15","om6","h16","h17"]],["Strings",["h18","om7"]]];
 function chProgress(ch){const its=allItems(ch); return [its.filter(isDone).length,its.length]}
-function chLabel(ch){const n=ch.short.split(".")[0]; return n+". "+ch.title.replace(/^Hoofdstuk \d+ – /,"")}
+function chLabel(ch){ if(ch.kind==="om") return "🏠 "+ch.short+": "+ch.topic; const n=ch.short.split(".")[0]; return n+". "+ch.title.replace(/^Hoofdstuk \d+ – /,"")}
+function chCode(ch){ return ch.kind==="om" ? ch.short.replace("Oefenmoment ","OM") : "H"+ch.short.split(".")[0] }
 function chapterList(onPick){
   const box=$(`<div class="chlist"></div>`);
   GROUPS.forEach(([g,ids])=>{const chs=ids.map(id=>CHAPTERS.find(c=>c.id===id)).filter(Boolean); if(!chs.length) return;
@@ -1533,8 +1719,8 @@ function renderScratch(m){
 
 function renderChapter(m,ch){
   let n=0;
-  m.appendChild($(`<div class="card"><div class="kicker">Cursus Python</div><h2>${esc(ch.title)}</h2>
-   <p style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn secondary" href="${ch.video}" target="_blank" rel="noopener">▶ ${esc(ch.videoTitle)}</a>${ch.video2?`<a class="btn secondary" href="${ch.video2}" target="_blank" rel="noopener">▶ ${esc(ch.video2Title)}</a>`:""}${ch.video3?`<a class="btn secondary" href="${ch.video3}" target="_blank" rel="noopener">▶ ${esc(ch.video3Title)}</a>`:""}</p>${ch.intro}</div>`));
+  m.appendChild($(`<div class="card"><div class="kicker">${ch.kind==="om"?"Oefenmoment thuis":"Cursus Python"}</div><h2>${esc(ch.title)}</h2>
+   ${ch.video?`<p style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn secondary" href="${ch.video}" target="_blank" rel="noopener">▶ ${esc(ch.videoTitle)}</a>${ch.video2?`<a class="btn secondary" href="${ch.video2}" target="_blank" rel="noopener">▶ ${esc(ch.video2Title)}</a>`:""}${ch.video3?`<a class="btn secondary" href="${ch.video3}" target="_blank" rel="noopener">▶ ${esc(ch.video3Title)}</a>`:""}</p>`:""}${ch.intro}</div>`));
   ch.sections.forEach(sec=>{
     const card=$(`<div class="card"><h3>${esc(sec.title)}</h3>${sec.html||""}</div>`);
     sec.items.forEach(it=>{n++; card.appendChild(renderItem(it,n))});
@@ -1542,8 +1728,8 @@ function renderChapter(m,ch){
   });
   const idx=CHAPTERS.indexOf(ch);
   const nb=$(`<div class="navbtns"></div>`);
-  nb.appendChild(idx>0?Object.assign($(`<button class="btn secondary">← Vorig hoofdstuk</button>`),{onclick:()=>go(CHAPTERS[idx-1].id)}):$("<span></span>"));
-  nb.appendChild(Object.assign($(`<button class="btn">${idx<CHAPTERS.length-1?"Volgend hoofdstuk →":"Naar mijn resultaat →"}</button>`),{onclick:()=>go(idx<CHAPTERS.length-1?CHAPTERS[idx+1].id:"rapport")}));
+  nb.appendChild(idx>0?Object.assign($(`<button class="btn secondary">← Vorige</button>`),{onclick:()=>go(CHAPTERS[idx-1].id)}):$("<span></span>"));
+  nb.appendChild(Object.assign($(`<button class="btn">${idx<CHAPTERS.length-1?"Volgende →":"Naar mijn resultaat →"}</button>`),{onclick:()=>go(idx<CHAPTERS.length-1?CHAPTERS[idx+1].id:"rapport")}));
   m.appendChild(nb);
 }
 
@@ -1700,14 +1886,14 @@ function renderReport(m){
   S.sent=S.sent||{};
   const list=send.querySelector("#chlist");
   CHAPTERS.forEach(ch=>{const st=chapterStats(ch); const sig=chapterSig(ch); const prev=S.sent[ch.id];
-    const active=st.done>0; const changed=!prev||prev.sig!==sig;
+    const active=allItems(ch).some(it=>{const x=S.answers[it.id]; return x&&((x.attempts||0)>0||x.ran||(typeof x.value==="string"&&x.value.trim()&&it.type!=="code"&&it.type!=="play")||(Array.isArray(x.value)&&x.value.length)||(it.type==="tf"||it.type==="match")&&x.value&&Object.keys(x.value).length)}); const changed=!prev||prev.sig!==sig;
     const row=$(`<label class="check"><input type="checkbox" value="${ch.id}"><span><b>${esc(ch.title)}</b><br><span style="font-size:14px;color:var(--muted)">${st.sc}/${st.mx} punten • ${st.done} van ${st.total} onderdelen afgewerkt${prev?` • al doorgestuurd op ${esc(prev.at)}${changed?" (sindsdien verder gewerkt)":""}`:""}</span></span></label>`);
     const cb=row.querySelector("input"); cb.checked=active&&changed; list.appendChild(row)});
   const sel=()=>[...list.querySelectorAll("input:checked")].map(i=>i.value);
   const sf=send.querySelector("#sendfb");
   const need=()=>{const ids=sel(); if(!ids.length){sf.className="fb info";sf.textContent="Vink eerst minstens één les aan.";return null} return ids};
   const markSent=(ids)=>{const at=new Date().toLocaleDateString("nl-BE"); ids.forEach(id=>{S.sent[id]={sig:chapterSig(CHAPTERS.find(c=>c.id===id)),at}}); save()};
-  const subject=(ids)=>"Resultaat cursus Python – "+(S.name||"leerling")+" – "+ids.map(id=>CHAPTERS.find(c=>c.id===id).short.split(".")[0]).map(n=>"H"+n).join(", ");
+  const subject=(ids)=>"Resultaat cursus Python – "+(S.name||"leerling")+" – "+ids.map(id=>chCode(CHAPTERS.find(c=>c.id===id))).join(", ");
   send.querySelector("#outlook").onclick=()=>{const ids=need(); if(!ids)return; let body=reportText(ids); if(body.length>6000) body=body.slice(0,6000)+"\n…(ingekort – stuur ook het gedownloade bestand mee)";
     const url=`https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(TEACHER_EMAIL)}&subject=${encodeURIComponent(subject(ids))}&body=${encodeURIComponent(body)}`;
     window.open(url,"_blank","noopener"); markSent(ids);
