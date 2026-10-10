@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python Oefeningen</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#1d2433; --muted:#5b6475; --line:#dde2ea;
+  --brand:#1f4e79; --brand-soft:#e3edf7; --accent:#d66028;
+  --ok:#1e7a46; --ok-soft:#e3f4ea; --bad:#b3261e; --bad-soft:#fbe7e5; --warn-soft:#fff3e3;
+  --code-bg:#f1f3f6; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --card:#1d222b; --ink:#e7eaf0; --muted:#a2abbb; --line:#323947;
+    --brand:#8cb8e6; --brand-soft:#22344a; --accent:#f08a55;
+    --ok:#6fd39b; --ok-soft:#1c3427; --bad:#ff9a90; --bad-soft:#3d2020; --warn-soft:#3a2d1c;
+    --code-bg:#262c37;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --card:#1d222b; --ink:#e7eaf0; --muted:#a2abbb; --line:#323947;
+  --brand:#8cb8e6; --brand-soft:#22344a; --accent:#f08a55;
+  --ok:#6fd39b; --ok-soft:#1c3427; --bad:#ff9a90; --bad-soft:#3d2020; --warn-soft:#3a2d1c;
+  --code-bg:#262c37;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top{max-width:900px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.top h1{font-size:18px;margin:0;color:var(--brand);flex:1;min-width:160px;cursor:pointer}
+.top button.theme{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--ink);cursor:pointer}
+main{max-width:900px;margin:0 auto;padding:20px 16px 80px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:0 0 16px}
+h2{color:var(--brand);font-size:24px;margin:4px 0 6px;line-height:1.25}
+h3{color:var(--brand);font-size:19px;margin:0 0 8px}
+.kicker{font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.box{border-radius:10px;padding:12px 16px;margin:12px 0;background:var(--brand-soft)}
+.box.warm{background:var(--warn-soft)}
+.box b:first-child{color:var(--brand)}
+code,pre{font-family:ui-monospace,Consolas,"DejaVu Sans Mono",monospace;font-size:14.5px}
+code{background:var(--code-bg);padding:1px 5px;border-radius:5px}
+pre{background:var(--code-bg);padding:12px 14px;border-radius:8px;overflow-x:auto;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--brand-soft)}
+.btn{display:inline-block;border:0;border-radius:8px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer;background:var(--brand);color:var(--card);text-decoration:none}
+.btn.secondary{background:var(--brand-soft);color:var(--brand)}
+.btn.hint{background:var(--warn-soft);color:var(--accent);border:1px solid var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fb{margin-top:10px;padding:10px 12px;border-radius:8px;display:none}
+.fb.ok{display:block;background:var(--ok-soft);color:var(--ok)}
+.fb.bad{display:block;background:var(--bad-soft);color:var(--bad)}
+.fb.info{display:block;background:var(--brand-soft);color:var(--ink)}
+.fb .ex{color:var(--ink);margin-top:6px}
+.out{white-space:pre-wrap;background:#0f1720;color:#d6e2f0;border-radius:8px;padding:10px 12px;margin-top:10px;font-family:ui-monospace,Consolas,monospace;font-size:14px;display:none;max-height:300px;overflow:auto}
+.out .errl{color:#ffb4a8}
+.ed{display:flex;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);overflow:hidden}
+.ed:focus-within{border-color:var(--brand)}
+.gut{padding:10px 8px 10px 10px;text-align:right;color:var(--muted);user-select:none;min-width:2.6em;white-space:pre;overflow:hidden;font:14.5px/1.55 ui-monospace,Consolas,"DejaVu Sans Mono",monospace;border-right:1px solid var(--line)}
+.ed textarea{flex:1;border:0;border-radius:0;background:transparent;color:var(--ink);padding:10px;min-height:140px;resize:vertical;white-space:pre;overflow:auto;font:14.5px/1.55 ui-monospace,Consolas,"DejaVu Sans Mono",monospace;tab-size:4;outline:none}
+.stdin{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--brand-soft);display:none}
+.stdin textarea{width:100%;min-height:56px;font:14px ui-monospace,Consolas,monospace;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+select,input[type=text]{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin:6px 0;cursor:pointer}
+.opt input{margin-top:5px}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.step{border-left:4px solid var(--line);padding-left:14px}
+.step.done{border-left-color:var(--ok)}
+.hintbox{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--warn-soft);border:1px solid var(--accent)}
+.hintbox b{color:var(--accent)}
+.score{font-size:44px;font-weight:700;color:var(--brand);line-height:1}
+.line{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:15px}
+.line span:last-child{margin-left:auto;white-space:nowrap;font-weight:600}
+.exlist button{display:flex;width:100%;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--card);padding:12px 14px;border-radius:10px;font:inherit;color:var(--ink);cursor:pointer;margin:8px 0}
+.exlist button:hover:not(:disabled){border-color:var(--brand)}
+.exlist button:disabled{opacity:.55;cursor:default}
+.exlist .t{flex:1;font-weight:600}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.mid{background:var(--warn-soft);color:var(--accent)}
+.pill.off{background:var(--line);color:var(--muted)}
+.formrow{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin:10px 0}
+.formrow label{display:flex;flex-direction:column;gap:4px;font-weight:600}
+ul.stijl{margin:6px 0 0;padding-left:20px;color:var(--ink);font-size:15px}
+ul.stijl li{margin:3px 0}
+details.afspraken{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:var(--card)}
+details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
+.afspr{font-size:15px}
+.afspr li{margin:6px 0}
+.afspr .ok,.afspr .nok{display:inline-block;font-family:ui-monospace,Consolas,monospace;font-size:13.5px;padding:1px 6px;border-radius:5px;margin:2px 4px 0 0}
+.afspr .ok{background:var(--ok-soft);color:var(--ok)}
+.afspr .nok{background:var(--bad-soft);color:var(--bad);text-decoration:line-through}
+@media (max-width:560px){ h2{font-size:21px} .card{padding:14px} }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1 id="home">Python Oefeningen</h1>
+    <span id="who" style="color:var(--muted);font-size:14px"></span>
+    <a href="index.html" title="Terug naar de startpagina met beide cursussen" style="text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap">⌂ Alle cursussen</a>
+    <button class="theme" id="themeBtn" title="Licht of donker scherm">◐ Thema</button>
+  </div>
+</header>
+<main id="main"></main>
+
+<script>
+/* ================================================================
+   INSTELLINGEN VOOR DE LEERKRACHT  (deze mag je aanpassen)
+   ================================================================ */
+
+/* 1. Plak hier de vooringevulde link van je Microsoft Form
+      (zie de handleiding). Laat leeg ("") om te testen zonder Form. */
+const FORM_URL = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=wH3qjxKF_Eq-VW1TfMsk0dTXxUbVzpNFlRWpZdO0ecpUN1ZCVEo2TTExTElaNUxQRjZaMjZCMzBUSi4u&r38660ea944524f2bac9ef35efdc59ec3=LEERLING&rf068bb189b904608b9a1e55be09b1cf4=KLAS&rcf46e0f630c04fcd9de98520ab8a7ccc=OEFENING&rc72604d9b84649799a53b6aa6ce0459a=CIJFER&reb5b7fd9cc634d77be3a975443f53db1=POGINGEN&ra00453ae2d994b73878c27014adf51b6=HULP&r704c9be2cf624a608ea7d01e50d267e6=AFSPRAKEN&rc59ebabb22614d9eaabb34c110582972=CONTROLE&rae8b95dfc0cf49228d1685029f9b15f0=CODE";
+
+/* 2. Klassen. Vul de namen in als je wilt dat leerlingen hun naam
+      uit een lijst kiezen (aangeraden: dan zijn er geen tikfouten).
+      Laat de lijst leeg [] om leerlingen hun naam zelf te laten typen.
+      Gebruik dezelfde schrijfwijze als in je Excel-klaslijst. */
+const KLASSEN = {
+  "403": [],
+  "423": []
+};
+
+/* 3. Cijferregels */
+const CIJFER = {
+  start: 10,              // elke oefening start op 10
+  gratisControles: 2,     // de eerste 2 keer "Controleer" zijn gratis
+  perExtraControle: 0.5,  // daarna kost elke poging 0,5
+  maxAftrekPogingen: 3,   // maximaal 3 punten aftrek voor pogingen
+  hulpKost: [1, 1.5, 2],  // kost van hulp 1, hulp 2 en hulp 3 (opgeteld)
+  perAfspraak: 0.25,      // aftrek per overtreding van de klasafspraken
+  minimum: 4,             // wie correct eindigt, krijgt minstens dit
+  bonusExtra: 1,          // extra uitdaging correct = + dit
+  maximum: 10
+};
+
+/* 4. Klasafspraken voor het schrijven van code.
+      true  = "✓ Controleer" keurt pas goed als de code de afspraken volgt.
+      false = de afspraken worden niet nagekeken. */
+const KLASAFSPRAKEN = true;
+
+const APP_ID = "python-oefeningen-v1";
+/* ================================================================ */
+
+
+/* ---------------- OEFENINGEN ----------------
+   Elke oefening: titel (exact zoals in het Excel-overzicht), opdracht,
+   stappen, hoofdopdracht met tests en hulp, en een extra uitdaging. */
+const ZO_WERK_JE=`<div class="box"><b>Zo werk je</b><br>Volg de stappen hieronder. Met <b>▶ Uitvoeren</b> probeer je je code uit, zo vaak je wilt. Met <b>✓ Controleer</b> laat je ze nakijken. Lukt het niet? Vraag dan <b>💡 hulp</b>. Hulp en veel pogingen kosten een beetje punten, maar je komt altijd tot een correct programma.</div>`;
+const OEFENINGEN = [
+{ id:"3.1", titel:"3.1 De Magische Rekenmachine", klaar:false },
+{ id:"4.1", titel:"4.1 De Korte Vragenlijst", klaar:false },
+{ id:"4.2", titel:"4.2 De Slimme Winkelwagen", klaar:false },
+{ id:"4.3", titel:"4.3 De Kassabon", klaar:true,
+  opdracht:`<p>Schrijf een Python-programma dat de gebruiker vraagt naar de <b>prijs</b> van een product en het <b>aantal</b> gekochte stuks. Het programma berekent de totale prijs en toont die netjes op het scherm.</p>
+  <div class="box"><b>Zo werk je</b><br>Volg de stappen hieronder. Met <b>▶ Uitvoeren</b> probeer je je code uit, zo vaak je wilt. Met <b>✓ Controleer</b> laat je ze nakijken. Lukt het niet? Vraag dan <b>💡 hulp</b>. Hulp en veel pogingen kosten een beetje punten, maar je komt altijd tot een correct programma.</div>`,
+  stappen:[
+    { titel:"Stap 1 – Herken het probleem", type:"probeer",
+      html:`<p>Hieronder staat een eerste versie. Het programma vraagt de prijs en het aantal met <code>input()</code> en vermenigvuldigt ze. In het vak <b>Invoer</b> staat al wat de gebruiker intypt: <code>2.50</code> en <code>3</code>.</p><p>Klik op <b>▶ Uitvoeren</b> en lees de foutmelding.</p>`,
+      starter:'prijs = input("Wat is de prijs van één product? ")\naantal = input("Hoeveel producten heb je gekocht? ")\ntotaal = prijs * aantal\nprint(totaal)',
+      invoer:"2.50\n3",
+      vraag:{ q:"Waarom krijg je een foutmelding?", opties:[
+        "Omdat input() altijd tekst (een string) teruggeeft, en je tekst niet met tekst kunt vermenigvuldigen",
+        "Omdat 2.50 met een punt geschreven is",
+        "Omdat je in Python niet mag vermenigvuldigen met *"], juist:0,
+        uitleg:"Juist: input() geeft altijd een string. \"2.50\" * \"3\" lukt niet. Je moet de tekst eerst omzetten naar een getal: dat heet typeconversie." } }
+  ],
+  hoofd:{ titel:"Stap 2 – Schrijf het werkende programma",
+    html:`<p>Los het probleem op met <b>typeconversie</b>:</p>
+    <ul><li>Vraag de prijs met <code>input("Wat is de prijs van één product? ")</code> en sla ze op in <code>prijs</code>.</li>
+    <li>Vraag het aantal met <code>input("Hoeveel producten heb je gekocht? ")</code> en sla het op in <code>aantal</code>.</li>
+    <li>Zet de prijs om naar een <b>kommagetal</b> en het aantal naar een <b>geheel getal</b>. Je mag nieuwe namen gebruiken, zoals <code>prijs_getal</code> en <code>aantal_getal</code>.</li>
+    <li>Bereken de totale prijs in een variabele <code>totaal_prijs</code>.</li>
+    <li>Toon een duidelijke boodschap met de totale prijs.</li></ul>
+    <p>Voorbeeld van de uitvoer:</p><pre>Wat is de prijs van één product? 2.50
+Hoeveel producten heb je gekocht? 3
+-------------------------
+De totale prijs is 7.5 euro.
+-------------------------</pre>
+    <div class="box warm"><b>Hoe wordt dit nagekeken?</b><br>Bij <b>✓ Controleer</b> voert de computer je programma drie keer uit, telkens met andere getallen (bv. prijs 4 en aantal 5). Je programma moet dus echt rekenen met wat de gebruiker intypt. Daarna kijkt de computer of je code de <b>klasafspraken</b> volgt.</div>`,
+    starter:'prijs = input("Wat is de prijs van één product? ")\naantal = input("Hoeveel producten heb je gekocht? ")\n',
+    invoer:"2.50\n3",
+    tests:[ {invoer:["2.50","3"], getallen:[7.5]}, {invoer:["4","5"], getallen:[20]}, {invoer:["1.99","2"], getallen:[3.98]} ],
+    invoerNamen:["prijs","aantal"],
+    moet:[
+      [/input\s*\([\s\S]*input\s*\(/, "Je programma moet twee keer input() gebruiken: één keer voor de prijs en één keer voor het aantal."],
+      [/float\s*\(/, "Zet de prijs om naar een kommagetal met float()."],
+      [/int\s*\(/, "Zet het aantal om naar een geheel getal met int()."],
+      [/totaal_prijs\s*=/, "Bereken de totale prijs in een variabele met de naam totaal_prijs."]
+    ],
+    fouten:[
+      [/can't multiply sequence/, "Je vermenigvuldigt nog tekst met tekst. Zet prijs en aantal eerst om naar getallen."],
+      [/invalid literal for int\(\)/, "Je zet een kommagetal om met int(). Dat lukt niet: gebruik float() voor de prijs en int() voor het aantal."],
+      [/can only concatenate str/, "Je plakt tekst en een getal aan elkaar met +. Gebruik in print() liever komma's: print(\"De totale prijs is\", totaal_prijs, \"euro.\")."]
+    ],
+    hulp:[
+      "Kijk nog eens naar de foutmelding van stap 1. Welk datatype geeft <code>input()</code> altijd terug? Kun je daarmee rekenen?",
+      "Zet de antwoorden om naar getallen. De prijs wordt een kommagetal met <code>float()</code>, het aantal een geheel getal met <code>int()</code>. Bijvoorbeeld: <code>prijs_getal = float(prijs)</code>. Daarna kun je ze vermenigvuldigen.",
+      "Zo kan het:<pre># {NAAM}\nprijs = input(\"Wat is de prijs van één product? \")\naantal = input(\"Hoeveel producten heb je gekocht? \")\nprijs_getal = float(prijs)\naantal_getal = int(aantal)\n\n# Bereken de totale prijs\ntotaal_prijs = prijs_getal * aantal_getal\nprint(\"-------------------------\")\nprint(\"De totale prijs is\", totaal_prijs, \"euro.\")\nprint(\"-------------------------\")</pre>"
+    ],
+    ok:"Je programma rekent correct met elke invoer!" },
+  extra:{ titel:"Extra uitdaging (optioneel, +1 punt)",
+    html:`<p>Breid je programma uit met <b>21% btw</b>. Toon:</p><ul><li>de prijs <b>exclusief</b> btw (de totale prijs van hierboven),</li><li>het <b>btw-bedrag</b> (21% van die prijs),</li><li>de prijs <b>inclusief</b> btw.</li></ul><p>Tip: 21% van een bedrag bereken je met <code>bedrag * 0.21</code>. Je mag afronden met <code>round(getal, 2)</code>. Ook hier gelden de klasafspraken, bv. <code>print("Het btw-bedrag is", btw, "euro.")</code></p>`,
+    tests:[ {invoer:["2.50","3"], getallen:[7.5,1.575,9.075]}, {invoer:["4","5"], getallen:[20,4.2,24.2]} ],
+    moet:[[/0?\.21|1\.21|21\s*\/\s*100/, "Bereken de btw met 21%: bijvoorbeeld totaal_prijs * 0.21."]],
+    ok:"Prima! Je kassabon toont nu ook de btw." }
+},
+{ id:"5.1", titel:"5.1 Bioscoopticket met Korting", klaar:true,
+  opdracht:`<p>Schrijf een Python-programma dat de prijs van een bioscoopticket berekent. De bioscoop hanteert de volgende regels:</p>
+  <ul><li>Kinderen van <b>12 jaar of jonger</b> krijgen <b>50% korting</b>.</li><li>Iedereen die <b>ouder is dan 12</b> betaalt de <b>volle prijs</b>.</li></ul>
+  <div class="box"><b>Zo werk je</b><br>Volg de stappen hieronder. Met <b>▶ Uitvoeren</b> probeer je je code uit, zo vaak je wilt. Met <b>✓ Controleer</b> laat je ze nakijken. Lukt het niet? Vraag dan <b>💡 hulp</b>. Hulp en veel pogingen kosten een beetje punten, maar je komt altijd tot een correct programma.</div>`,
+  stappen:[
+    { titel:"Stap 1 – Kleiner dan, of kleiner dan of gelijk aan?", type:"probeer",
+      html:`<p>Kinderen van <b>12 jaar of jonger</b> krijgen korting. Python heeft twee vergelijkingen die hierop lijken:</p>
+      <ul><li><code>&lt;</code> betekent <i>kleiner dan</i></li><li><code>&lt;=</code> betekent <i>kleiner dan of gelijk aan</i></li></ul>
+      <p>Klik op <b>▶ Uitvoeren</b>. Wat geven beide vergelijkingen voor leeftijd 12? Verander daarna <code>12</code> eens in <code>10</code> en in <code>15</code>, en voer opnieuw uit.</p>`,
+      starter:'leeftijd = 12\nprint(leeftijd < 12)\nprint(leeftijd <= 12)',
+      invoer:"",
+      vraag:{ q:"Welke voorwaarde zorgt ervoor dat een kind van precies 12 jaar óók korting krijgt?", opties:[
+        "leeftijd < 12",
+        "leeftijd <= 12",
+        "leeftijd > 12"], juist:1,
+        uitleg:"Juist: leeftijd <= 12 geeft True voor 12 en voor alle leeftijden eronder. Met < 12 zou een kind van precies 12 jaar geen korting krijgen. Zo'n grensgeval test de computer straks ook." } }
+  ],
+  hoofd:{ titel:"Stap 2 – Schrijf het programma",
+    html:`<ol>
+    <li>Vraag de gebruiker met <code>input()</code> naar de <b>standaardprijs</b> van een ticket.</li>
+    <li>Vraag de gebruiker met <code>input()</code> naar zijn of haar <b>leeftijd</b>.</li>
+    <li>Zet de prijs om naar een <b>kommagetal</b> met <code>float()</code>.</li>
+    <li>Zet de leeftijd om naar een <b>geheel getal</b> met <code>int()</code>.</li>
+    <li>Gebruik een <b>if-else</b>:<ul><li><b>if</b> de leeftijd 12 of kleiner is: bereken de prijs met 50% korting;</li><li><b>else</b>: de prijs zonder korting.</li></ul></li>
+    <li>Toon met <code>print()</code> duidelijk de uiteindelijke prijs.</li></ol>
+    <p>Voorbeelden:</p>
+    <table style="max-width:420px"><tr><th>Invoer</th><th>Uitvoer</th></tr><tr><td>prijs 12.50, leeftijd 10</td><td>6.25</td></tr><tr><td>prijs 12.50, leeftijd 15</td><td>12.5</td></tr></table>
+    <pre>Wat is de standaardprijs van een ticket? 12.50
+Hoe oud ben je? 10
+Je ticket kost 6.25 euro.</pre>
+    <div class="box warm"><b>Let op</b><br>Typ kommagetallen in met een <b>punt</b>: <code>12.50</code>, niet <code>12,50</code>.<br>Bij <b>✓ Controleer</b> test de computer je programma met vijf verschillende prijzen en leeftijden, ook met een kind van <b>precies 12</b>. Daarna kijkt hij of je code de <b>klasafspraken</b> volgt.</div>`,
+    starter:'',
+    invoer:"12.50\n10",
+    invoerNamen:["prijs","leeftijd"],
+    tests:[
+      {invoer:["12.50","10"], getallen:[6.25], tip:"Een kind van 10 krijgt 50% korting."},
+      {invoer:["12.50","15"], getallen:[12.5], verboden:[6.25], tip:"Iemand van 15 is ouder dan 12 en betaalt de volle prijs."},
+      {invoer:["10","5"], getallen:[5], tip:"Een kind van 5 krijgt 50% korting op de prijs die de gebruiker intypt (hier 10). Rekent je programma met de ingetypte prijs?"},
+      {invoer:["9.90","13"], getallen:[9.9], verboden:[4.95], tip:"Iemand van 13 is ouder dan 12 en betaalt de volle prijs."},
+      {invoer:["8","12"], getallen:[4], verboden:[8], tip:"Een kind van precies 12 jaar krijgt óók korting. Kijk naar je vergelijking: < of <= ?"}
+    ],
+    moet:[
+      [/input\s*\([\s\S]*input\s*\(/, "Je programma moet twee keer input() gebruiken: één keer voor de prijs en één keer voor de leeftijd."],
+      [/float\s*\(/, "Zet de prijs om naar een kommagetal met float()."],
+      [/int\s*\(/, "Zet de leeftijd om naar een geheel getal met int()."],
+      [/^\s*if\b/m, "Gebruik een if om te controleren of de persoon 12 jaar of jonger is."],
+      [/^\s*else\b/m, "Gebruik een else voor iedereen die ouder is dan 12."]
+    ],
+    fouten:[
+      [/not supported between instances of 'str'/, "Je vergelijkt tekst met een getal. Zet de leeftijd eerst om met int() voordat je ze vergelijkt met 12."]
+    ],
+    hulp:[
+      "Er zijn twee situaties: <b>wel</b> of <b>geen</b> korting. Met welke opdracht laat je Python kiezen tussen twee mogelijkheden? En hoe schrijf je in Python <i>12 jaar of jonger</i>? Kijk terug naar stap 1.",
+      "Gebruik een if-else:<pre>if leeftijd_getal &lt;= 12:\n    eindprijs = ...\nelse:\n    eindprijs = ...</pre>Vergeet de dubbelpunt <code>:</code> niet en laat de regels eronder 4 spaties inspringen. 50% korting bereken je met <code>prijs_getal * 0.5</code>.",
+      "Zo kan het:<pre># {NAAM}\nprijs = input(\"Wat is de standaardprijs van een ticket? \")\nleeftijd = input(\"Hoe oud ben je? \")\nprijs_getal = float(prijs)\nleeftijd_getal = int(leeftijd)\n\n# Bereken de prijs met of zonder korting\nif leeftijd_getal &lt;= 12:\n    eindprijs = prijs_getal * 0.5\nelse:\n    eindprijs = prijs_getal\nprint(\"Je ticket kost\", eindprijs, \"euro.\")</pre>"
+    ],
+    ok:"Je programma geeft bij elke leeftijd de juiste prijs, ook bij precies 12 jaar!" }
+},
+{ id:"5.2", titel:"5.2 Budgetplanner voor de Week", klaar:true,
+  opdracht:`<p>Schrijf een Python-programma dat je helpt om je uitgaven bij te houden en te controleren of je binnen je <b>wekelijkse budget</b> blijft. Je koopt deze week <b>3 producten</b>.</p>${ZO_WERK_JE}`,
+  stappen:[
+    { titel:"Stap 1 – Wat blijft er over?", type:"probeer",
+      html:`<p>Je hebt een budget van 100 euro en koopt 3 producten van 30.50, 50 en 10 euro. Klik op <b>▶ Uitvoeren</b> en vergelijk de twee berekeningen.</p>`,
+      starter:'budget = 100\ntotaal = 30.50 + 50 + 10\nprint(budget - totaal)\nprint(totaal - budget)',
+      invoer:"",
+      vraag:{ q:"Welke berekening toont hoeveel geld je nog over hebt?", opties:[
+        "budget - totaal",
+        "totaal - budget",
+        "budget + totaal"], juist:0,
+        uitleg:"Juist: budget - totaal geeft 9.5, het geld dat je nog over hebt. Geef je méér uit dan je budget, dan bereken je met totaal - budget hoeveel je erover gaat." } }
+  ],
+  hoofd:{ titel:"Stap 2 – Schrijf het programma",
+    html:`<ol>
+    <li>Heet de gebruiker welkom met <code>print()</code>.</li>
+    <li>Vraag met <code>input()</code> het <b>wekelijkse budget</b> en zet het om naar een kommagetal (<code>float()</code>).</li>
+    <li>Je kocht <b>3 producten</b>. Vraag met <code>input()</code> de prijs van het <b>eerste</b>, het <b>tweede</b> en het <b>derde product</b>. Sla ze op in drie variabelen, bv. <code>prijs1</code>, <code>prijs2</code> en <code>prijs3</code>, en zet elke prijs om naar een kommagetal (<code>float()</code>).</li>
+    <li>Bereken de <b>totale uitgaven</b> van de drie producten.</li>
+    <li>Gebruik een <b>if-else</b>:<ul><li><b>if</b> de totale uitgaven kleiner dan of gelijk aan het budget zijn: toon dat je <b>binnen je budget</b> bent gebleven en hoeveel geld je <b>nog over</b> hebt;</li><li><b>else</b>: toon dat je je budget hebt <b>overschreden</b> en met hoeveel.</li></ul></li></ol>
+    <p>Voorbeelden:</p>
+    <table style="max-width:560px"><tr><th>Invoer</th><th>Uitvoer</th></tr>
+    <tr><td>budget 100.00; prijzen 30.50, 50.00 en 10.00</td><td>Je bent binnen je budget gebleven! Je hebt nog 9.5 euro over.</td></tr>
+    <tr><td>budget 100.00; prijzen 60.00, 50.00 en 5.00</td><td>Je hebt je budget met 15.0 euro overschreden!</td></tr></table>
+    <div class="box warm"><b>Let op</b><br>Typ kommagetallen in met een <b>punt</b>: <code>30.50</code>. Bij <b>✓ Controleer</b> test de computer je programma met vijf verschillende budgetten en prijzen, ook als je <b>precies</b> je budget uitgeeft. Daarna kijkt hij of je code de <b>klasafspraken</b> volgt.</div>`,
+    starter:'',
+    invoer:"100\n30.50\n50\n10",
+    invoerNamen:["budget","prijs 1","prijs 2","prijs 3"],
+    tests:[
+      {invoer:["100","30.50","50","10"], getallen:[9.5], nietWoorden:["overschreden"], tip:"Je geeft 90.5 euro uit van de 100 euro: je blijft binnen je budget en hebt nog 9.5 euro over. Tel je alle drie de prijzen op?"},
+      {invoer:["100","60","50","5"], getallen:[15], woorden:[["overschreden","over je budget","over het budget","te veel","teveel"]], tip:"Je geeft 115 euro uit van de 100 euro: toon dat je je budget met 15 euro hebt overschreden."},
+      {invoer:["75.50","20.25","10","5"], getallen:[40.25], nietWoorden:["overschreden"], tip:"Rekent je programma met de bedragen die de gebruiker intypt?"},
+      {invoer:["40","25.50","30","4.50"], getallen:[20], woorden:[["overschreden","over je budget","over het budget","te veel","teveel"]], tip:"Je geeft 60 euro uit van de 40 euro: dat is 20 euro te veel."},
+      {invoer:["50","20","20","10"], getallen:[0], nietWoorden:["overschreden"], tip:"Geef je precies je budget uit, dan blijf je nog net binnen je budget (je hebt 0 euro over). Kijk naar je vergelijking: < of <= ?"}
+    ],
+    moet:[
+      [/^(?:(?!\binput\s*\()[\s\S])*\bprint\s*\(/, "Heet de gebruiker eerst welkom met print(), vóór je de eerste vraag stelt."],
+      [/(?:\binput\s*\([\s\S]*?){4}/, "Je programma moet vier keer input() gebruiken: het budget en de prijzen van de drie producten."],
+      [/float\s*\(/, "Zet het budget en de prijzen om naar kommagetallen met float()."],
+      [/^\s*if\b/m, "Gebruik een if om te controleren of je binnen je budget blijft."],
+      [/^\s*else\b/m, "Gebruik een else voor als je je budget overschrijdt."]
+    ],
+    hulp:[
+      "Hoe bereken je de <b>totale uitgaven</b> van de drie producten? En welk vergelijkingsteken betekent <i>kleiner dan of gelijk aan</i>? Kijk ook terug naar stap 1: welke berekening geeft het geld dat overblijft?",
+      "Bereken eerst <code>totaal = prijs1 + prijs2 + prijs3</code>. Gebruik daarna een if-else:<pre>if totaal &lt;= budget:\n    over = budget - totaal\n    print(...)\nelse:\n    teveel = totaal - budget\n    print(...)</pre>",
+      "Zo kan het:<pre># {NAAM}\nprint(\"Welkom bij de budgetplanner!\")\nbudget = float(input(\"Wat is je wekelijkse budget? \"))\nprijs1 = float(input(\"Wat is de prijs van het eerste product? \"))\nprijs2 = float(input(\"Wat is de prijs van het tweede product? \"))\nprijs3 = float(input(\"Wat is de prijs van het derde product? \"))\n\n# Bereken de totale uitgaven\ntotaal = prijs1 + prijs2 + prijs3\nif totaal &lt;= budget:\n    over = budget - totaal\n    print(\"Je bent binnen je budget gebleven! Je hebt nog\", over, \"euro over.\")\nelse:\n    teveel = totaal - budget\n    print(\"Je hebt je budget met\", teveel, \"euro overschreden!\")</pre>"
+    ],
+    ok:"Je budgetplanner werkt, ook als je precies je budget uitgeeft!" }
+},
+{ id:"5.3", titel:"5.3 Het Filmrecensieprogramma", klaar:true,
+  opdracht:`<p>Schrijf een Python-programma dat de gemiddelde score van een film verwerkt en bepaalt of de film een <b>hit</b> of een <b>flop</b> is.</p>${ZO_WERK_JE}`,
+  stappen:[
+    { titel:"Stap 1 – Tekst of getal?", type:"probeer",
+      html:`<p><code>input()</code> geeft altijd tekst terug. Hieronder staat de score als tekst <code>"8.9"</code>. Klik op <b>▶ Uitvoeren</b>: de eerste vergelijking lukt, de tweede geeft een foutmelding.</p>`,
+      starter:'score = "8.9"\nprint(float(score) >= 7.0)\nprint(score >= 7.0)',
+      invoer:"",
+      vraag:{ q:"Welke van de drie antwoorden (titel, aantal recensies, score) laat je als tekst staan?", opties:[
+        "De titel van de film",
+        "Het aantal recensies",
+        "De gemiddelde score"], juist:0,
+        uitleg:"Juist: met de titel moet je niet rekenen of vergelijken, die blijft tekst. Het aantal recensies wordt een geheel getal met int() en de score een kommagetal met float(), anders kun je ze niet met 7.0 vergelijken." } }
+  ],
+  hoofd:{ titel:"Stap 2 – Schrijf het programma",
+    html:`<ol>
+    <li>Heet de gebruiker welkom met <code>print()</code>.</li>
+    <li>Vraag met <code>input()</code> de <b>titel</b> van de film.</li>
+    <li>Vraag met <code>input()</code> het <b>aantal recensies</b> en zet het om naar een geheel getal (<code>int()</code>).</li>
+    <li>Vraag met <code>input()</code> de <b>gemiddelde score</b> (1 tot 10) en zet ze om naar een kommagetal (<code>float()</code>).</li>
+    <li>Gebruik een <b>if-else</b>:<ul><li><b>if</b> de score hoger dan of gelijk aan <b>7.0</b> is: noem de film een <b>absolute hit</b> en vermeld hoeveel recensies de film kreeg;</li><li><b>else</b>: noem de film een <b>flop</b> en zeg dat er ruimte voor verbetering is.</li></ul></li></ol>
+    <p>Voorbeelden:</p>
+    <table style="max-width:560px"><tr><th>Invoer</th><th>Uitvoer</th></tr>
+    <tr><td>Oppenheimer, 500, 8.9</td><td>De film Oppenheimer is een absolute hit met 500 recensies!</td></tr>
+    <tr><td>Cats, 100, 3.1</td><td>De film Cats is helaas een flop. Er is ruimte voor verbetering.</td></tr></table>
+    <div class="box warm"><b>Let op</b><br>Bij <b>✓ Controleer</b> test de computer je programma met vijf films, ook met een score van <b>precies 7.0</b>. Daarna kijkt hij of je code de <b>klasafspraken</b> volgt.</div>`,
+    starter:'',
+    invoer:"Oppenheimer\n500\n8.9",
+    invoerNamen:["titel","recensies","score"],
+    tests:[
+      {invoer:["Oppenheimer","500","8.9"], woorden:[["hit"],["oppenheimer"]], getallen:[500], nietWoorden:["flop"], tip:"Een score van 8.9 is een hit. Vermeld de titel en het aantal recensies."},
+      {invoer:["Cats","100","3.1"], woorden:[["flop"]], nietWoorden:["hit"], tip:"Een score van 3.1 is een flop."},
+      {invoer:["Barbie","250","7.5"], woorden:[["hit"],["barbie"]], getallen:[250], nietWoorden:["flop"], tip:"Gebruik je de titel en het aantal recensies die de gebruiker intypt?"},
+      {invoer:["Dune","80","6.9"], woorden:[["flop"]], nietWoorden:["hit"], tip:"Een score van 6.9 is lager dan 7.0: een flop."},
+      {invoer:["Wonka","120","7.0"], woorden:[["hit"]], getallen:[120], nietWoorden:["flop"], tip:"Een score van precies 7.0 is óók een hit. Kijk naar je vergelijking: > of >= ?"}
+    ],
+    moet:[
+      [/^(?:(?!\binput\s*\()[\s\S])*\bprint\s*\(/, "Heet de gebruiker eerst welkom met print(), vóór je de eerste vraag stelt."],
+      [/(?:\binput\s*\([\s\S]*?){3}/, "Je programma moet drie keer input() gebruiken: titel, aantal recensies en score."],
+      [/int\s*\(/, "Zet het aantal recensies om naar een geheel getal met int()."],
+      [/float\s*\(/, "Zet de score om naar een kommagetal met float()."],
+      [/^\s*if\b/m, "Gebruik een if om te controleren of de film een hit is."],
+      [/^\s*else\b/m, "Gebruik een else voor een flop."]
+    ],
+    hulp:[
+      "Welke score is de grens tussen hit en flop? Hoe schrijf je in Python <i>hoger dan of gelijk aan</i>? En welke antwoorden moet je eerst omzetten naar een getal (kijk naar stap 1)?",
+      "Gebruik een if-else:<pre>if score &gt;= 7.0:\n    print(... hit ... aantal ...)\nelse:\n    print(... flop ...)</pre>Zet het aantal om met <code>int()</code> en de score met <code>float()</code>. De titel blijft tekst.",
+      "Zo kan het:<pre># {NAAM}\nprint(\"Welkom bij het recensieprogramma!\")\ntitel = input(\"Wat is de titel van de film? \")\naantal = int(input(\"Hoeveel recensies heeft de film gekregen? \"))\nscore = float(input(\"Wat is de gemiddelde score (1 tot 10)? \"))\n\n# Bepaal of de film een hit of een flop is\nif score &gt;= 7.0:\n    print(\"De film\", titel, \"is een absolute hit met\", aantal, \"recensies!\")\nelse:\n    print(\"De film\", titel, \"is helaas een flop. Er is ruimte voor verbetering.\")</pre>"
+    ],
+    ok:"Je programma herkent elke hit en flop, ook bij een score van precies 7.0!" }
+},
+{ id:"5.4", titel:"5.4 De BMI-calculator", klaar:true,
+  opdracht:`<p>Schrijf een Python-programma dat de <b>BMI</b> (Body Mass Index) van een persoon berekent en een beoordeling geeft op basis van die waarde. De formule is: <code>gewicht / (lengte * lengte)</code>.</p>${ZO_WERK_JE}`,
+  stappen:[
+    { titel:"Stap 1 – Let op de haakjes", type:"probeer",
+      html:`<p>Iemand is 1.75 m groot en weegt 70 kg. Klik op <b>▶ Uitvoeren</b> en vergelijk de twee berekeningen.</p>`,
+      starter:'lengte = 1.75\ngewicht = 70\nprint(gewicht / lengte * lengte)\nprint(gewicht / (lengte * lengte))',
+      invoer:"",
+      vraag:{ q:"Welke regel berekent de BMI juist?", opties:[
+        "print(gewicht / lengte * lengte)",
+        "print(gewicht / (lengte * lengte))",
+        "Beide geven hetzelfde resultaat"], juist:1,
+        uitleg:"Juist: zonder haakjes deelt Python eerst door de lengte en vermenigvuldigt daarna weer met de lengte, zodat je gewoon 70 terugkrijgt. Met haakjes berekent Python eerst lengte * lengte en deelt dan: BMI ≈ 22.86." } }
+  ],
+  hoofd:{ titel:"Stap 2 – Schrijf het programma",
+    html:`<ol>
+    <li>Heet de gebruiker welkom met <code>print()</code>.</li>
+    <li>Vraag met <code>input()</code> de <b>lengte</b> in meter (met een punt, bv. <code>1.75</code>) en zet ze om naar een kommagetal (<code>float()</code>).</li>
+    <li>Vraag met <code>input()</code> het <b>gewicht</b> in kilogram en zet het om naar een kommagetal (<code>float()</code>).</li>
+    <li>Bereken de BMI met de formule.</li>
+    <li>Gebruik een <b>if-elif-else</b>:<ul><li><b>if</b> de BMI kleiner is dan <b>18.5</b>: <b>ondergewicht</b>;</li><li><b>elif</b> de BMI hoger dan of gelijk aan <b>25.0</b> is: <b>overgewicht</b>;</li><li><b>else</b>: een <b>normaal gewicht</b>.</li></ul></li>
+    <li>Toon de BMI én de categorie duidelijk met <code>print()</code>. Je mag de BMI afronden met <code>round(bmi, 2)</code>.</li></ol>
+    <p>Voorbeelden:</p>
+    <table style="max-width:560px"><tr><th>Invoer</th><th>Uitvoer</th></tr>
+    <tr><td>lengte 1.75, gewicht 70.0</td><td>Je BMI is 22.86 en je hebt een normaal gewicht.</td></tr>
+    <tr><td>lengte 1.80, gewicht 55.0</td><td>Je BMI is 16.98 en je hebt ondergewicht.</td></tr>
+    <tr><td>lengte 1.65, gewicht 80.0</td><td>Je BMI is 29.38 en je hebt overgewicht.</td></tr></table>
+    <div class="box warm"><b>Let op</b><br>Bij <b>✓ Controleer</b> test de computer je programma met vijf personen, ook met een BMI van <b>precies 18.5</b> en <b>precies 25.0</b>. Daarna kijkt hij of je code de <b>klasafspraken</b> volgt.</div>`,
+    starter:'',
+    invoer:"1.75\n70",
+    invoerNamen:["lengte","gewicht"],
+    tol:0.06,
+    getalTip:"Klopt je berekening? De BMI is gewicht / (lengte * lengte). Vergeet de haakjes niet.",
+    tests:[
+      {invoer:["1.75","70"], getallen:[22.86], woorden:[["normaal"]], nietWoorden:["ondergewicht","overgewicht"], tip:"Een BMI van 22.86 is een normaal gewicht."},
+      {invoer:["1.80","55"], getallen:[16.98], woorden:[["ondergewicht"]], nietWoorden:["overgewicht","normaal"], tip:"Een BMI van 16.98 is ondergewicht (kleiner dan 18.5)."},
+      {invoer:["1.65","80"], getallen:[29.38], woorden:[["overgewicht"]], nietWoorden:["ondergewicht","normaal"], tip:"Een BMI van 29.38 is overgewicht (25.0 of meer)."},
+      {invoer:["2","100"], getallen:[25], woorden:[["overgewicht"]], nietWoorden:["ondergewicht","normaal"], tip:"Een BMI van precies 25.0 is óók overgewicht. Kijk naar je vergelijking: > of >= ?"},
+      {invoer:["2","74"], getallen:[18.5], woorden:[["normaal"]], nietWoorden:["ondergewicht","overgewicht"], tip:"Een BMI van precies 18.5 is een normaal gewicht: alleen een BMI kleiner dan 18.5 is ondergewicht."}
+    ],
+    moet:[
+      [/^(?:(?!\binput\s*\()[\s\S])*\bprint\s*\(/, "Heet de gebruiker eerst welkom met print(), vóór je de eerste vraag stelt."],
+      [/(?:\binput\s*\([\s\S]*?){2}/, "Je programma moet twee keer input() gebruiken: lengte en gewicht."],
+      [/float\s*\([\s\S]*float\s*\(/, "Zet zowel de lengte als het gewicht om naar een kommagetal met float()."],
+      [/^\s*if\b/m, "Gebruik een if voor ondergewicht."],
+      [/^\s*elif\b/m, "Gebruik een elif voor overgewicht."],
+      [/^\s*else\b/m, "Gebruik een else voor een normaal gewicht."]
+    ],
+    hulp:[
+      "Er zijn <b>drie</b> mogelijkheden: ondergewicht, normaal gewicht en overgewicht. Welke opdracht gebruik je om uit meer dan twee mogelijkheden te kiezen? Kijk ook naar de haakjes in de formule (stap 1).",
+      "Bereken <code>bmi = gewicht / (lengte * lengte)</code>. Gebruik daarna:<pre>if bmi &lt; 18.5:\n    print(...)\nelif bmi &gt;= 25.0:\n    print(...)\nelse:\n    print(...)</pre>Afronden kan met <code>round(bmi, 2)</code>.",
+      "Zo kan het:<pre># {NAAM}\nprint(\"Welkom bij de BMI-calculator!\")\nlengte = float(input(\"Wat is je lengte in meter? \"))\ngewicht = float(input(\"Wat is je gewicht in kilogram? \"))\nbmi = round(gewicht / (lengte * lengte), 2)\n\n# Bepaal de categorie\nif bmi &lt; 18.5:\n    print(\"Je BMI is\", bmi, \"en je hebt ondergewicht.\")\nelif bmi &gt;= 25.0:\n    print(\"Je BMI is\", bmi, \"en je hebt overgewicht.\")\nelse:\n    print(\"Je BMI is\", bmi, \"en je hebt een normaal gewicht.\")</pre>"
+    ],
+    ok:"Je BMI-calculator geeft altijd de juiste categorie, ook op de grenzen 18.5 en 25.0!" }
+}
+];
+
+/* ---------------- Python in een worker ---------------- */
+let worker=null, pyReady=null;
+function startWorker(){
+  const src=`importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js");
+  let py=null;
+  const ready=loadPyodide().then(p=>{py=p;postMessage({type:"ready"});}).catch(e=>postMessage({type:"loadfail",msg:String(e)}));
+  onmessage=async(e)=>{await ready; if(!py) return; let out=""; const q=(e.data.inputs||[]).slice(); const echo=e.data.echo; const dec=new TextDecoder();
+    py.setStdout({write:b=>{out+=dec.decode(b,{stream:true});return b.length}});
+    py.setStderr({write:b=>{out+=dec.decode(b,{stream:true});return b.length}});
+    py.setStdin({stdin:()=>{if(!q.length)return undefined; const v=q.shift(); if(echo) out+=v+"\\n"; else out+="\\n\\u0007"; return v;}});
+    try{ py.runPython("for _k in [k for k in list(globals()) if not k.startswith('_')]: del globals()[_k]");
+      await py.runPythonAsync(e.data.code); postMessage({type:"done",out,err:null}); }
+    catch(err){ postMessage({type:"done",out,err:String(err.message||err)}); }
+  };`;
+  worker=new Worker(URL.createObjectURL(new Blob([src],{type:"text/javascript"})));
+  pyReady=new Promise((res,rej)=>{worker.onmessage=e=>{if(e.data.type==="ready")res();if(e.data.type==="loadfail")rej(e.data.msg)}; worker.onerror=()=>rej("worker")});
+}
+function friendlyError(raw){
+  if(!raw) return null;
+  const lines=raw.trim().split("\n"), last=lines[lines.length-1];
+  let ln=null; for(const l of lines){const m=l.match(/File "<exec>", line (\d+)/); if(m) ln=m[1]}
+  const m2=last.match(/\(detected at line (\d+)\)/); if(m2) ln=ln||m2[1];
+  if(/^EOFError/.test(last)) return {line:ln,text:"Je programma vraagt om invoer, maar er is niet genoeg invoer ingevuld. Vul het vak ‘Invoer’ aan: één antwoord per regel.",type:"EOFError"};
+  let uitleg=null; for(const [re,f] of UITLEG){const m=last.match(re); if(m){uitleg=f(m);break}}
+  return {line:ln,text:last,uitleg,type:(last.match(/^(\w+(Error|Exception))/)||[])[1]||"Fout"};
+}
+/* Uitleg in gewone taal bij veelvoorkomende foutmeldingen */
+const UITLEG=[
+  [/^NameError: name '(.+)' is not defined/, m=>`Python kent de naam ‘${m[1]}’ niet. Is het een tikfout? Of gebruik je de variabele voordat je ze gemaakt hebt? Tekst zet je tussen aanhalingstekens.`],
+  [/expected ':'/, ()=>"Na if, elif en else moet een dubbelpunt : staan."],
+  [/expected an indented block/, ()=>"De regels onder een regel met een dubbelpunt moeten inspringen (4 spaties)."],
+  [/unexpected indent/, ()=>"Deze regel springt in, maar dat mag hier niet. Haal de spaties vooraan weg."],
+  [/unindent does not match/, ()=>"Het inspringen klopt niet. Gebruik telkens precies 4 spaties."],
+  [/unterminated string literal|EOL while scanning/, ()=>"Je bent een aanhalingsteken vergeten om de tekst af te sluiten."],
+  [/'\(' was never closed/, ()=>"Je bent een sluithaakje ) vergeten."],
+  [/Maybe you meant '=='/, ()=>"Wil je vergelijken? Gebruik dan == (twee isgelijktekens). Eén = geeft een variabele een waarde."],
+  [/could not convert string to float: '(.*)'/, m=>m[1].includes(",")?"Typ kommagetallen met een punt: 12.50 in plaats van 12,50.":"float() kan deze tekst niet omzetten naar een getal. Typ een getal in."],
+  [/invalid literal for int\(\) with base 10: '(.*)'/, m=>/[.,]/.test(m[1])?"int() kan geen kommagetal omzetten. Gebruik float() of typ een geheel getal.":"int() kan deze tekst niet omzetten naar een getal. Typ een geheel getal in."],
+  [/not supported between instances of '(str|int|float)' and '(str|int|float)'/, ()=>"Je vergelijkt tekst met een getal. Zet de invoer eerst om met int() of float()."],
+  [/can't multiply sequence by non-int|unsupported operand type\(s\).*'str'/, ()=>"Je rekent met tekst. Zet de invoer eerst om naar een getal met int() of float()."],
+  [/can only concatenate str/, ()=>"Je plakt tekst en een getal aan elkaar met +. Gebruik in print() komma's: print(\"Tekst\", getal, \".\")."],
+  [/invalid syntax/, ()=>"Python begrijpt deze regel niet. Kijk naar haakjes, aanhalingstekens en dubbelpunten."]
+];
+
+/* ---------------- Klasafspraken ---------------- */
+const PY_KEYWORDS=new Set("False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield".split(" "));
+const OPS=["**=","//=",">>=","<<=","**","//","==","!=","<=",">=","+=","-=","*=","/=","%=","->","<<",">>",":=","+","-","*","/","%","=","<",">","(",")","[","]","{","}",",",":",".",";","@","&","|","^","~","!"];
+const BINAIR=new Set(["+","-","*","/","//","%","**","=","==","!=","<",">","<=",">=","+=","-=","*=","/=","//=","%=","**="]);
+function tokenize(code){
+  const toks=[]; let i=0; const n=code.length;
+  const reStr=/(?:[rRbBuUfF]|[rR][bBfF]|[bBfF][rR])?(?:'''|"""|'|")/y;
+  const reNaam=/[A-Za-z_\u00C0-\uFFFF][\w\u00C0-\uFFFF]*/y;
+  const reGetal=/(?:0[xXoObB][\da-fA-F_]+|(?:\d[\d_]*(?:\.[\d_]*)?|\.\d[\d_]*)(?:[eE][+-]?\d+)?[jJ]?)/y;
+  while(i<n){
+    const ch=code[i];
+    if(ch===" "||ch==="\t"||ch==="\r"){i++;continue}
+    if(ch==="\n"){toks.push({t:"nl",v:"\n",s:i,e:i+1});i++;continue}
+    if(ch==="\\"&&(code[i+1]==="\n"||code[i+1]==="\r")){i+=2;continue}
+    if(ch==="#"){let j=code.indexOf("\n",i); if(j<0)j=n; toks.push({t:"comment",v:code.slice(i,j).replace(/\r$/,""),s:i,e:j}); i=j; continue}
+    reStr.lastIndex=i; let m=reStr.exec(code);
+    if(m){ const q=m[0].replace(/^[a-zA-Z]+/,""), pre=m[0].length-q.length; let j=i+m[0].length, dicht=false;
+      while(j<n){ if(code[j]==="\\"){j+=2;continue} if(code.startsWith(q,j)){j+=q.length;dicht=true;break} if(q.length===1&&code[j]==="\n")break; j++ }
+      j=Math.min(j,n); const v=code.slice(i,j);
+      toks.push({t:"str",v,s:i,e:j,inhoud:v.slice(pre+q.length, dicht?v.length-q.length:v.length)}); i=j; continue }
+    reGetal.lastIndex=i;
+    if(/\d/.test(ch)||(ch==="."&&/\d/.test(code[i+1]||""))){ m=reGetal.exec(code); if(m){toks.push({t:"num",v:m[0],s:i,e:i+m[0].length}); i+=m[0].length; continue} }
+    reNaam.lastIndex=i; m=reNaam.exec(code);
+    if(m){toks.push({t:"name",v:m[0],s:i,e:i+m[0].length}); i+=m[0].length; continue}
+    const op=OPS.find(o=>code.startsWith(o,i));
+    if(op){toks.push({t:"op",v:op,s:i,e:i+op.length}); i+=op.length; continue}
+    i++;
+  }
+  return toks;
+}
+/* Geeft een lijst {line, msg} met alles wat niet volgens de klasafspraken is. */
+function klasafspraken(code,naam){
+  code=code.replace(/\r/g,"");
+  const fouten=[], gezien=new Set();
+  const starts=[0]; for(let k=0;k<code.length;k++) if(code[k]==="\n") starts.push(k+1);
+  const lijnVan=s=>{let lo=0,hi=starts.length-1; while(lo<hi){const mid=(lo+hi+1)>>1; if(starts[mid]<=s)lo=mid; else hi=mid-1} return lo+1};
+  const add=(s,msg)=>{const line=typeof s==="number"?lijnVan(s):1, key=line+"|"+msg; if(!gezien.has(key)){gezien.add(key);fouten.push({line,msg})}};
+  const regels=code.split("\n");
+  const toks=tokenize(code);
+  const norm=s=>String(s||"").normalize("NFC").toLowerCase().replace(/\s+/g," ").trim();
+  const isKlein=c=>c && c!==c.toUpperCase() && c===c.toLowerCase();
+
+  /* Afspraak 1-3: commentaar */
+  const comments=toks.filter(t=>t.t==="comment");
+  if(!comments.length) fouten.push({line:1,msg:`Zet je naam als commentaar op de eerste regel: # ${naam}`});
+  else { const tekst=comments[0].v.replace(/^#\s*/,"").trim();
+    if(norm(tekst)!==norm(naam)){
+      if(/voornaam\s+naam/i.test(tekst)) add(comments[0].s,`Vervang ‘Voornaam Naam’ door je eigen naam: # ${naam}`);
+      else if(lijnVan(comments[0].s)>1) fouten.push({line:1,msg:`Zet je naam als commentaar op de eerste regel: # ${naam}`});
+      else add(comments[0].s,`De eerste commentaarregel is altijd je naam: # ${naam}`) } }
+  for(const c of comments){
+    const body=c.v.slice(1); if(!body.trim()) continue;
+    if(body[0]!==" ") add(c.s,"Zet een spatie na het #-teken: # Tekst");
+    if(isKlein(body.trim()[0])) add(c.s,"Een commentaarregel begint met een hoofdletter.");
+    const ln=lijnVan(c.s);
+    if(ln>5 && regels[ln-1].trim().startsWith("#")){
+      const vorige=(regels[ln-2]||"").trim();
+      if(vorige!=="" && !vorige.startsWith("#")) add(c.s,"Zet een lege regel boven deze commentaarregel (zo spraken we af voor commentaar na regel 5).") } }
+
+  /* Afspraak 5-7: operatoren, haakjes en komma's */
+  const st=toks.filter(t=>t.t!=="comment");
+  const ws=c=>c===" "||c==="\t";
+  let diepte=0;
+  st.forEach((t,k)=>{
+    if(t.t!=="op") return;
+    const vorige=st[k-1];
+    if(t.v==="("){
+      if(vorige&&vorige.t==="name"&&!PY_KEYWORDS.has(vorige.v)&&vorige.e<t.s&&/^[ \t]+$/.test(code.slice(vorige.e,t.s)))
+        add(t.s,`Geen spatie vóór het haakje: schrijf ${vorige.v}( en niet ${vorige.v} (`) }
+    if("([{".includes(t.v)){diepte++;return}
+    if(")]}".includes(t.v)){diepte=Math.max(0,diepte-1);return}
+    if(t.v===","){
+      if(ws(code[t.s-1])) add(t.s,"Geen spatie vóór een komma: print(\"Tekst\", naam, \".\")");
+      const na=code[t.e]; if(na!==undefined && !/[ \t\n)\]}]/.test(na)) add(t.s,"Zet een spatie ná een komma: print(\"Tekst\", naam, \".\")");
+      return }
+    if(!BINAIR.has(t.v)) return;
+    if((t.v==="-"||t.v==="+") && (!vorige||vorige.t==="nl"||(vorige.t==="op"&&!")]}".includes(vorige.v))||(vorige.t==="name"&&PY_KEYWORDS.has(vorige.v)&&!["True","False","None"].includes(vorige.v)))) return; // min-teken van een negatief getal
+    if((t.v==="*"||t.v==="**") && vorige && vorige.t==="op" && "(,".includes(vorige.v)) return;
+    if(t.v==="=" && diepte>0) return; // bv. sep="" of end=""
+    const voor=code[t.s-1], na=code[t.e];
+    const okVoor=voor===undefined||voor==="\n"||ws(voor), okNa=na===undefined||na==="\n"||ws(na);
+    if(!okVoor||!okNa) add(t.s,`Zet een spatie vóór en ná ${t.v}`);
+  });
+
+  /* Afspraak 4: zinnen in print() en input() */
+  st.forEach((t,k)=>{
+    if(t.t!=="name"||(t.v!=="print"&&t.v!=="input")||!st[k+1]||st[k+1].v!=="(") return;
+    let d=0, args=[[]];
+    for(let j=k+1;j<st.length;j++){ const u=st[j];
+      if(u.t==="op"&&"([{".includes(u.v)){d++; if(d===1) continue}
+      else if(u.t==="op"&&")]}".includes(u.v)){d--; if(d===0) break}
+      if(u.t==="nl") continue;
+      if(d===1&&u.t==="op"&&u.v===","){args.push([]);continue}
+      args[args.length-1].push(u) }
+    args=args.filter(a=>a.length && !(a[0].t==="name"&&a[1]&&a[1].v==="="));
+    if(!args.length) return;
+    const heeftZin=args.flat().some(u=>u.t==="str"&&/[A-Za-zÀ-ÿ]/.test(u.inhoud.replace(/\{[^}]*\}/g,"")));
+    if(!heeftZin) return;
+    const eerste=args[0][0];
+    if(eerste.t==="str"){ const c=eerste.inhoud.replace(/^(\s|\\[nt])+/,""); if(c[0]!=="{"&&isKlein(c[0])) add(eerste.s,`De zin bij ${t.v}() begint met een hoofdletter.`) }
+    const laatste=args[args.length-1], lt=laatste[laatste.length-1];
+    if(lt.t==="str"){ const c=lt.inhoud.replace(/(\s|\\[nt])+$/,""); if(!/[.!?:;…]$/.test(c)) add(lt.s,`De zin bij ${t.v}() eindigt met een leesteken (. ! ? of :).`) }
+    else { const wat=code.slice(laatste[0].s,lt.e);
+      add(t.s,`De zin bij ${t.v}() eindigt met een leesteken. Staat er een variabele op het einde, zet er dan nog een leesteken achter: ${t.v}(…, ${wat}, ".")`) }
+  });
+  return fouten.sort((a,b)=>a.line-b.line);
+}
+function runPython(code,inputs,echo){
+  if(!worker) startWorker();
+  return pyReady.then(()=>new Promise(res=>{
+    const t=setTimeout(()=>{worker.terminate();worker=null;res({out:"",err:{line:null,text:"Je programma bleef te lang lopen en werd gestopt.",type:"Tijd"}})},8000);
+    worker.onmessage=e=>{if(e.data.type==="done"){clearTimeout(t);res({out:e.data.out,err:friendlyError(e.data.err)})}};
+    worker.postMessage({code,inputs:inputs||[],echo:echo!==false});
+  }));
+}
+
+/* ---------------- Nakijken ---------------- */
+function getallenIn(txt){ return (txt.match(/-?\d+(?:[.,]\d+)?/g)||[]).map(s=>parseFloat(s.replace(",","."))) }
+function bevat(out,verwacht,tol){ const g=getallenIn(out); return verwacht.every(v=>g.some(x=>Math.abs(x-v)<=tol)) }
+function fmt(n){ return String(n).replace(".",",") }
+/* geeft {ok, msg, toon:{invoer,out,err}} */
+async function nakijken(code,deel,namen){
+  const stijl=KLASAFSPRAKEN?klasafspraken(code,S.naam):[];
+  for(const [re,msg] of (deel.moet||[])) if(!re.test(code)) return {ok:false,msg};
+  for(const t of deel.tests){
+    const r=await runPython(code,t.invoer,true);
+    const toon={invoer:t.invoer,out:r.out,err:r.err};
+    if(r.err){ for(const [re,msg] of (deel.fouten||[])) if(re.test(r.err.text)) return {ok:false,msg,toon};
+      return {ok:false,toon,msg:"Je programma geeft een foutmelding"+(r.err.line?" op regel "+r.err.line:"")+". "+(r.err.uitleg||"Lees ze rustig en verbeter je code.")} }
+    // getallen zoeken in de uitvoer zonder de invoer-echo's
+    const zonder=await runPython(code,t.invoer,false);
+    const na=zonder.out.split("\u0007").pop(), laag=na.toLowerCase(), tol=t.tol??deel.tol??0.006;
+    const delen=(namen||[]).map((n,i)=>n+" = "+t.invoer[i]);
+    const wat=delen.length?(delen.length>1?delen.slice(0,-1).join(", ")+" en "+delen[delen.length-1]:delen[0]):"invoer "+t.invoer.join(", ");
+    if(t.getallen && !bevat(na,t.getallen,tol))
+      return {ok:false,toon,msg:`Getest met ${wat}: ik vind ${t.getallen.length>1?"de getallen":"het getal"} ${t.getallen.join(", ")} niet in de uitvoer. `+(deel.getalTip||t.tip||"Rekent je programma met wat de gebruiker intypt?")};
+    if(t.woorden) for(const groep of t.woorden) if(!groep.some(w=>laag.includes(w)))
+      return {ok:false,toon,msg:`Getest met ${wat}: ik vind ${groep.length>1?"geen van deze woorden: ‘"+groep.join("’, ‘")+"’":"het woord ‘"+groep[0]+"’ niet"} in de uitvoer. `+(t.tip||"")};
+    if(t.nietWoorden){ const fout=t.nietWoorden.find(w=>laag.includes(w));
+      if(fout) return {ok:false,toon,msg:`Getest met ${wat}: in de uitvoer staat ‘${fout}’, maar dat klopt hier niet. `+(t.tip||"")} }
+    if(t.verboden && getallenIn(na).some(x=>t.verboden.some(v=>Math.abs(x-v)<=0.006)))
+      return {ok:false,toon,msg:`Getest met ${wat}: in de uitvoer staat ook ${t.verboden.join(", ")}, maar dat is hier niet de juiste prijs. Toon alleen de prijs die deze persoon moet betalen.`};
+  }
+  if(stijl.length) return {ok:false,stijlFout:true,stijl,msg:"Je programma werkt, maar je code volgt nog niet alle klasafspraken:"};
+  return {ok:true,msg:deel.ok||"Juist!"};
+}
+function toonFb(f,r,extra){
+  f.className="fb "+(r.ok?"ok":"bad");
+  let h=(r.ok?"✔ ":"✘ ")+esc(r.msg)+(extra||"");
+  if(!r.ok&&r.stijl&&r.stijl.length){
+    h+=(r.stijlFout?"":`<div class="ex" style="margin-top:8px"><b>Let ook op de klasafspraken:</b></div>`)
+      +`<ul class="stijl">`+r.stijl.slice(0,10).map(s=>`<li><b>Regel ${s.line}:</b> ${esc(s.msg)}</li>`).join("")
+      +(r.stijl.length>10?`<li>… en nog ${r.stijl.length-10} andere.</li>`:"")+`</ul>` }
+  f.innerHTML=h;
+}
+
+/* ---------------- Cijfer ---------------- */
+function berekenCijfer(a){
+  const C=CIJFER, controles=a.controles||0, hulp=a.hulp||0;
+  const aftrekPog=Math.min(C.maxAftrekPogingen, Math.max(0,controles-C.gratisControles)*C.perExtraControle);
+  let aftrekHulp=0; for(let i=0;i<hulp;i++) aftrekHulp+=C.hulpKost[i]||0;
+  const aftrekAfspr=(a.afspraken||0)*C.perAfspraak;
+  let basis=Math.max(C.minimum, C.start-aftrekPog-aftrekHulp-aftrekAfspr);
+  const bonus=a.extraOk?C.bonusExtra:0;
+  const cijfer=Math.min(C.maximum, basis+bonus);
+  return {cijfer:Math.round(cijfer*100)/100, aftrekPog, aftrekHulp, aftrekAfspr, bonus, basis};
+}
+function controleCode(leerling,oefening,cijfer,pogingen,hulp){
+  const n=Math.round(cijfer*100)*37 + pogingen*11 + hulp*23 + leerling.length*7 + oefening.length*5 + 59;
+  return n%97;
+}
+
+/* ---------------- Opslag ---------------- */
+let S={naam:"",klas:"",oef:{},huidig:"start"};
+try{const raw=localStorage.getItem(APP_ID); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(APP_ID,JSON.stringify(S))}catch(e){}; toonWie()}
+const O=id=>S.oef[id]||(S.oef[id]={stap:{},code:null,extraCode:null,controles:0,hulp:0,ok:false,extraOk:false});
+function toonWie(){document.getElementById("who").textContent=S.naam?("👤 "+S.naam+(S.klas?" ("+S.klas+")":"")):""}
+
+/* ---------------- Hulpfuncties UI ---------------- */
+const $=(h)=>{const t=document.createElement("template");t.innerHTML=h.trim();return t.content.firstChild};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function editor(waarde,onChange){
+  const ed=$(`<div class="ed"><div class="gut">1</div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Typ hier je code"></textarea></div>`);
+  const ta=ed.querySelector("textarea"), gut=ed.querySelector(".gut");
+  const nums=()=>{const n=Math.max(ta.value.split("\n").length,6); gut.textContent=Array.from({length:n},(_,i)=>i+1).join("\n"); ta.rows=Math.min(n,22)};
+  ta.value=waarde||""; nums();
+  ta.addEventListener("scroll",()=>{gut.scrollTop=ta.scrollTop});
+  ta.addEventListener("input",()=>{nums();onChange(ta.value)});
+  ta.addEventListener("keydown",e=>{
+    if(e.key==="Tab"&&!e.shiftKey){e.preventDefault();ins("    ")}
+    else if(e.key==="Enter"){const s=ta.selectionStart, line=ta.value.slice(0,s).split("\n").pop(); let ind=(line.match(/^ */)||[""])[0]; if(/:\s*$/.test(line)) ind+="    "; e.preventDefault(); ins("\n"+ind)}
+  });
+  function ins(txt){const s=ta.selectionStart; ta.value=ta.value.slice(0,s)+txt+ta.value.slice(ta.selectionEnd); ta.selectionStart=ta.selectionEnd=s+txt.length; nums(); onChange(ta.value)}
+  ed.ta=ta; ed.zet=(v)=>{ta.value=v;nums()}; return ed;
+}
+function invoerVak(waarde,onChange,getCode){
+  const box=$(`<div class="stdin"><label style="font-size:14px"><b>Invoer</b> – wat typt de gebruiker in als je programma iets vraagt? Eén antwoord per regel. (Alleen voor ▶ Uitvoeren.)</label><textarea></textarea></div>`);
+  const ta=box.querySelector("textarea"); ta.value=waarde||""; ta.oninput=()=>onChange(ta.value);
+  box.ververs=()=>{box.style.display=/input\s*\(/.test(getCode())?"block":"none"};
+  box.regels=()=>ta.value===""?[]:ta.value.replace(/\r/g,"").split("\n");
+  return box;
+}
+function toonUit(el,r){el.style.display="block"; el.innerHTML="";
+  const o=document.createElement("div"); o.textContent=r.out||(r.err?"":"(je programma toonde niets)"); el.appendChild(o);
+  if(r.err){const e=document.createElement("div"); e.className="errl"; e.textContent=(r.out?"\n":"")+"⚠ Foutmelding"+(r.err.line?" op regel "+r.err.line:"")+":\n"+r.err.text+(r.err.uitleg?"\n💡 "+r.err.uitleg:""); el.appendChild(e)}}
+
+const AFSPRAKEN_HTML=`<ol class="afspr">
+<li>De eerste commentaarregel is altijd je naam.<br><span class="ok"># Sara Peeters</span></li>
+<li>Na <code>#</code> komt een spatie en het commentaar begint met een hoofdletter.<br><span class="ok"># Bereken de prijs</span><span class="nok">#bereken de prijs</span></li>
+<li>Schrijf je na regel 5 nog een commentaarregel, dan staat er een lege regel boven.</li>
+<li>Een zin bij <code>print()</code> of <code>input()</code> begint met een hoofdletter en eindigt met een leesteken.<br><span class="ok">input("Hoe oud ben je? ")</span><span class="nok">input("hoe oud ben je ")</span></li>
+<li>Voor en na een operator (<code>=</code> <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>&lt;=</code> …) staat een spatie.<br><span class="ok">totaal = prijs * aantal</span><span class="nok">totaal=prijs*aantal</span></li>
+<li>Geen spatie vóór het haakje van een functie.<br><span class="ok">print("Naam.")</span><span class="nok">print ("Naam.")</span></li>
+<li>Geen spatie vóór een komma, wel erna.<br><span class="ok">print("Jouw naam is dus", naam, ".")</span><span class="nok">print("Jouw naam is dus" ,naam,".")</span></li>
+</ol>`;
+function fbVak(box){let f=box.querySelector(":scope > .fb"); if(!f){f=$(`<div class="fb"></div>`);box.appendChild(f)} return f}
+
+/* code-blok met Uitvoeren (+ optioneel Controleer) */
+function codeBlok({waarde,onCode,invoer,onInvoer,controleer}){
+  const wrap=$(`<div></div>`);
+  const ed=editor(waarde,v=>{onCode(v);iv.ververs()}); wrap.appendChild(ed);
+  const iv=invoerVak(invoer,onInvoer,()=>ed.ta.value); wrap.appendChild(iv); iv.ververs();
+  const act=$(`<div class="actions"><button class="btn secondary run">▶ Uitvoeren</button>${controleer?'<button class="btn chk">✓ Controleer</button>':""}<span class="st" style="color:var(--muted);font-size:14px"></span></div>`);
+  wrap.appendChild(act); const out=$(`<div class="out"></div>`); wrap.appendChild(out);
+  const st=act.querySelector(".st"), knoppen=()=>[...act.querySelectorAll("button")];
+  const bezig=(b)=>{knoppen().forEach(k=>k.disabled=b||k.dataset.lock==="1"); st.textContent=b?(worker?"Bezig…":"Python wordt geladen (de eerste keer duurt dit even)…"):""};
+  act.querySelector(".run").onclick=async()=>{ if(!ed.ta.value.trim()) return; bezig(true);
+    try{ const r=await runPython(ed.ta.value,iv.regels(),true); toonUit(out,r); wrap.onRun&&wrap.onRun(r) }
+    catch(e){ out.style.display="block"; out.textContent="Python kon niet geladen worden. Controleer je internetverbinding."; worker=null }
+    bezig(false) };
+  if(controleer) act.querySelector(".chk").onclick=async()=>{ if(!ed.ta.value.trim()) return; bezig(true);
+    try{ await controleer(ed.ta.value,out) } catch(e){ out.style.display="block"; out.textContent="Python kon niet geladen worden. Controleer je internetverbinding."; worker=null }
+    bezig(false) };
+  wrap.ed=ed; wrap.act=act; wrap.out=out;
+  wrap.vergrendel=()=>{ed.ta.readOnly=true; const c=act.querySelector(".chk"); if(c){c.dataset.lock="1";c.disabled=true}};
+  return wrap;
+}
+
+/* ---------------- Schermen ---------------- */
+function go(id){S.huidig=id;save();render();window.scrollTo(0,0)}
+function render(){const m=document.getElementById("main"); m.innerHTML="";
+  const oef=OEFENINGEN.find(o=>o.id===S.huidig&&o.klaar);
+  if(oef && S.naam && S.klas) return renderOef(m,oef);
+  renderStart(m)}
+
+function renderStart(m){
+  const c=$(`<div class="card"><div class="kicker">Welkom</div><h2>Python oefeningen</h2>
+  <p>Hier maak je de Python-oefeningen. Je schrijft je code rechtstreeks in de app en krijgt meteen feedback. Ben je klaar, dan stuur je je resultaat met één klik naar je leerkracht.</p>
+  <div class="formrow"><label>Klas<select id="klas"><option value="">— kies —</option>${Object.keys(KLASSEN).map(k=>`<option ${S.klas===k?"selected":""}>${k}</option>`).join("")}</select></label><label id="naamwrap" style="flex:1;min-width:220px"></label></div>
+  <div class="fb" id="startfb"></div></div>`);
+  m.appendChild(c);
+  const kl=c.querySelector("#klas"), nw=c.querySelector("#naamwrap");
+  const tekenNaam=()=>{ const lijst=KLASSEN[S.klas]||[];
+    if(lijst.length){ nw.innerHTML=`Naam<select id="naam"><option value="">— kies je naam —</option>${lijst.map(n=>`<option ${S.naam===n?"selected":""}>${esc(n)}</option>`).join("")}</select>`; nw.querySelector("select").onchange=e=>{S.naam=e.target.value;save()} }
+    else { nw.innerHTML=`Voornaam en familienaam<input type="text" id="naam" placeholder="bv. Sara Peeters" value="${esc(S.naam)}">`; nw.querySelector("input").oninput=e=>{S.naam=e.target.value.replace(/\s+/g," ").trimStart();save()} } };
+  kl.onchange=()=>{S.klas=kl.value; if((KLASSEN[S.klas]||[]).length&&!KLASSEN[S.klas].includes(S.naam)) S.naam=""; save(); tekenNaam()};
+  tekenNaam();
+
+  const lijst=$(`<div class="card"><h3>Oefeningen</h3><div class="exlist"></div></div>`); m.appendChild(lijst);
+  const ex=lijst.querySelector(".exlist");
+  OEFENINGEN.forEach(o=>{ const a=S.oef[o.id]; let pill;
+    if(!o.klaar) pill='<span class="pill off">binnenkort</span>';
+    else if(a&&a.verstuurd) pill=`<span class="pill ok">verstuurd • ${fmt(a.verstuurd.cijfer)}/10</span>`;
+    else if(a&&a.ok) pill='<span class="pill mid">klaar, nog versturen</span>';
+    else if(a&&(a.controles||a.code)) pill='<span class="pill mid">bezig</span>';
+    else pill="";
+    const b=$(`<button ${o.klaar?"":"disabled"}><span class="t">${esc(o.titel)}</span>${pill}</button>`);
+    b.onclick=()=>{ const f=c.querySelector("#startfb");
+      if(!S.klas||!S.naam.trim()){f.className="fb info";f.textContent="Kies eerst je klas en vul je naam in.";c.scrollIntoView({behavior:"smooth"});return}
+      S.naam=S.naam.trim(); go(o.id)};
+    ex.appendChild(b)});
+  if(KLASAFSPRAKEN) m.appendChild($(`<div class="card"><h3>📏 Klasafspraken voor je code</h3><p style="margin-top:0">Bij <b>✓ Controleer</b> kijkt de app ook na of je code deze afspraken volgt. Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</div>`));
+}
+
+function renderOef(m,oef){
+  const a=O(oef.id);
+  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Alle oefeningen</button></div><div class="kicker">Oefening</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${KLASAFSPRAKEN?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
+  m.querySelector("#terug").onclick=()=>go("start");
+
+  /* stappen (probeer + vraag) */
+  oef.stappen.forEach((st,k)=>{ const sa=a.stap[k]||(a.stap[k]={});
+    const card=$(`<div class="card step ${sa.vraagOk!==undefined?"done":""}"><h3>${esc(st.titel)}</h3>${st.html}</div>`);
+    const blok=codeBlok({waarde:sa.code??st.starter, onCode:v=>{sa.code=v;save()}, invoer:sa.invoer??st.invoer, onInvoer:v=>{sa.invoer=v;save()}});
+    card.appendChild(blok);
+    if(st.vraag){ const v=st.vraag; const q=$(`<div style="margin-top:14px"><b>${esc(v.q)}</b></div>`);
+      v.opties.forEach((t,i)=>{const o=$(`<label class="opt"><input type="radio" name="v${k}" value="${i}"><span>${esc(t)}</span></label>`); q.appendChild(o)});
+      const act=$(`<div class="actions"><button class="btn">Controleer</button></div>`); q.appendChild(act);
+      const verf=()=>{ if(sa.vraagOk===undefined) return;
+        q.querySelectorAll(".opt").forEach(o=>{const i=+o.querySelector("input").value; o.querySelector("input").disabled=true; if(i===v.juist)o.classList.add("right"); else if(i===sa.keuze)o.classList.add("wrong"); if(i===sa.keuze)o.querySelector("input").checked=true});
+        act.remove(); const f=fbVak(q); f.className="fb "+(sa.vraagOk?"ok":"info"); f.innerHTML=(sa.vraagOk?"✔ ":"Het juiste antwoord is groen aangeduid. ")+esc(v.uitleg); card.classList.add("done") };
+      act.querySelector("button").onclick=()=>{const s=q.querySelector("input:checked"); if(!s){const f=fbVak(q);f.className="fb info";f.textContent="Kies eerst een antwoord.";return}
+        sa.keuze=+s.value; sa.vraagOk=(sa.keuze===v.juist); save(); verf()};
+      verf(); card.appendChild(q) }
+    m.appendChild(card) });
+
+  /* hoofdopdracht */
+  const h=oef.hoofd;
+  const hc=$(`<div class="card step ${a.ok?"done":""}"><h3>${esc(h.titel)}</h3>${h.html}</div>`);
+  const blok=codeBlok({waarde:a.code??h.starter, onCode:v=>{a.code=v;save()}, invoer:a.invoer??h.invoer, onInvoer:v=>{a.invoer=v;save()},
+    controleer:async(code,out)=>{
+      const r=await nakijken(code,h,h.invoerNamen);
+      const werktNu=r.ok||r.stijlFout;
+      // Afspraken verbeteren nadat het programma al werkte, kost geen pogingen meer.
+      if(!(a.werkt&&werktNu)) a.controles++;
+      let eerste="";
+      if(werktNu&&!a.werkt){ a.werkt=true; a.afspraken=r.ok?0:r.stijl.length;
+        if(a.afspraken) eerste=`<div class="ex" style="margin-top:6px">Je code bevatte <b>${a.afspraken} ${a.afspraken===1?"overtreding":"overtredingen"}</b> van de klasafspraken: dat kost ${fmt(a.afspraken*CIJFER.perAfspraak)} punt. Verbeter ze nu. Opnieuw controleren kost geen pogingen meer.</div>` }
+      save();
+      if(r.toon){ toonUit(out,{out:r.toon.out,err:r.toon.err}) } else out.style.display="none";
+      if(r.ok){ a.ok=true; a.oplossing=code; save(); blok.vergrendel(); hc.classList.add("done"); verfHulp(); toonFb(hfb,r,pogTxt()); tekenExtra(); tekenAf() }
+      else { toonFb(hfb,r); hfb.insertAdjacentHTML("beforeend",r.stijlFout?(eerste||`<div class="ex" style="margin-top:6px;font-size:14px">Verbeter de overtredingen hierboven. Opnieuw controleren kost geen pogingen meer.</div>`):pogingInfo()); tekenAf() }
+    }});
+  hc.appendChild(blok);
+  const hfb=$(`<div class="fb"></div>`); hc.appendChild(hfb);
+  const pogTxt=()=>` <span style="color:var(--muted)">(${a.controles} ${a.controles===1?"poging":"pogingen"})</span>`;
+  if(a.ok){ blok.vergrendel(); toonFb(hfb,{ok:true,msg:h.ok},pogTxt()) }
+  function pogingInfo(){ const vrij=CIJFER.gratisControles-a.controles;
+    return `<div class="ex" style="font-size:14px">${vrij>0?`Nog ${vrij} gratis ${vrij===1?"poging":"pogingen"}.`:`Elke volgende poging kost ${fmt(CIJFER.perExtraControle)} punt. Probeer eerst met ▶ Uitvoeren, dat is gratis!`}</div>` }
+
+  /* hulp */
+  const hulpWrap=$(`<div style="margin-top:14px"></div>`); hc.appendChild(hulpWrap);
+  function verfHulp(){ hulpWrap.innerHTML="";
+    for(let i=0;i<a.hulp;i++) hulpWrap.appendChild($(`<div class="hintbox"><b>💡 Hulp ${i+1}</b><div>${h.hulp[i].split("{NAAM}").join(esc(S.naam))}</div></div>`));
+    if(a.hulp<h.hulp.length && !a.ok){ const kost=CIJFER.hulpKost[a.hulp];
+      const b=$(`<button class="btn hint" style="margin-top:10px">💡 Hulp ${a.hulp+1} vragen (kost ${fmt(kost)} punt)</button>`);
+      b.onclick=()=>{ if(confirm(`Hulp ${a.hulp+1} kost ${fmt(kost)} punt van je cijfer. Wil je de hulp zien?`)){ a.hulp++; save(); verfHulp(); tekenAf() } };
+      hulpWrap.appendChild(b) } }
+  verfHulp();
+  m.appendChild(hc);
+
+  /* extra uitdaging */
+  const ec=$(`<div class="card step"></div>`); m.appendChild(ec);
+  function tekenExtra(){ ec.innerHTML=""; const e=oef.extra; if(!e) {ec.remove();return}
+    ec.appendChild($(`<h3>${esc(e.titel)}</h3>`));
+    if(!a.ok){ ec.appendChild($(`<p style="color:var(--muted)">Deze uitdaging wordt beschikbaar zodra je hoofdopdracht correct is.</p>`)); return }
+    ec.appendChild($(`<div>${e.html}<p style="font-size:14px;color:var(--muted)">Pogingen tellen hier niet mee. Je startcode is je correcte programma van hierboven.</p></div>`));
+    const eb=codeBlok({waarde:a.extraCode??a.oplossing, onCode:v=>{a.extraCode=v;save()}, invoer:a.invoer??h.invoer, onInvoer:v=>{a.invoer=v;save()},
+      controleer:async(code,out)=>{ const r=await nakijken(code,e,h.invoerNamen);
+        if(r.toon) toonUit(out,{out:r.toon.out,err:r.toon.err}); else out.style.display="none";
+        if(r.ok){a.extraOk=true;a.extraOplossing=code;save();eb.vergrendel();ec.classList.add("done");toonFb(efb,r," (+"+fmt(CIJFER.bonusExtra)+" punt)");tekenAf()}
+        else toonFb(efb,r) }});
+    ec.appendChild(eb);
+    const efb=$(`<div class="fb"></div>`); ec.appendChild(efb);
+    if(a.extraOk){ eb.vergrendel(); ec.classList.add("done"); toonFb(efb,{ok:true,msg:e.ok}," (+"+fmt(CIJFER.bonusExtra)+" punt)") } }
+  tekenExtra();
+
+  /* afronden */
+  const af=$(`<div class="card" id="afronden"></div>`); m.appendChild(af);
+  function tekenAf(){ const c=berekenCijfer(a);
+    af.innerHTML=`<div class="kicker">Afronden</div><h3>Jouw cijfer voor deze oefening</h3>
+      <div style="display:flex;gap:18px;align-items:baseline;flex-wrap:wrap"><span class="score">${a.ok?fmt(c.cijfer):"…"}</span><span>${a.ok?"op "+CIJFER.maximum:"Je cijfer verschijnt zodra je programma correct is."}</span></div>
+      <div style="margin-top:10px">
+        <div class="line"><span>Start</span><span>${fmt(CIJFER.start)}</span></div>
+        <div class="line"><span>Pogingen met ✓ Controleer: ${a.controles} (${CIJFER.gratisControles} gratis)</span><span>− ${fmt(c.aftrekPog)}</span></div>
+        <div class="line"><span>Gebruikte hulp: ${a.hulp} van ${h.hulp.length}</span><span>− ${fmt(c.aftrekHulp)}</span></div>
+        ${KLASAFSPRAKEN?`<div class="line"><span>Klasafspraken: ${a.werkt?(a.afspraken||0)+" "+((a.afspraken||0)===1?"overtreding":"overtredingen")+" × "+fmt(CIJFER.perAfspraak):"nog niet nagekeken"}</span><span>− ${fmt(c.aftrekAfspr)}</span></div>`:""}
+        ${c.basis===CIJFER.minimum&&CIJFER.start-c.aftrekPog-c.aftrekHulp-c.aftrekAfspr<CIJFER.minimum?`<div class="line"><span>Minimum voor een correct programma</span><span>${fmt(CIJFER.minimum)}</span></div>`:""}
+        <div class="line"><span>Extra uitdaging</span><span>${!oef.extra?"geen bij deze oefening":a.extraOk?"+ "+fmt(c.bonus):"—"}</span></div>
+      </div>
+      <div class="actions" style="margin-top:14px"><button class="btn" id="stuur" ${a.ok?"":"disabled"}>📤 Verstuur naar mijn leerkracht</button></div>
+      <div class="fb" id="stuurfb"></div>`;
+    if(a.verstuurd){const f=af.querySelector("#stuurfb"); f.className="fb ok"; f.innerHTML=`✔ Verstuurd op ${esc(a.verstuurd.op)} met cijfer ${fmt(a.verstuurd.cijfer)}.`+(a.verstuurd.cijfer!==c.cijfer?` <b>Je cijfer is sindsdien veranderd: verstuur opnieuw.</b>`:"")}
+    af.querySelector("#stuur").onclick=()=>verstuur(oef,a,c);
+  }
+  tekenAf();
+}
+
+/* ---------------- Versturen via Microsoft Forms ---------------- */
+function formLink(waarden){
+  const [basis,query]=FORM_URL.split("?"); if(!query) return null;
+  let gevonden=0;
+  const delen=query.split("&").map(p=>{ const i=p.indexOf("="); if(i<0) return p;
+    const k=p.slice(0,i); let v; try{v=decodeURIComponent(p.slice(i+1).replace(/\+/g," "))}catch(e){return p}
+    let quote=false; if(/^".*"$/.test(v)){v=v.slice(1,-1);quote=true}
+    // Vergeeft kleine tikfouten in het sleutelwoord (bv. LEERLIN of CONTROLECODE)
+    const ruw=v.trim().toUpperCase().replace(/[^A-Z]/g,"");
+    const sleutel=(ruw in waarden)?ruw:Object.keys(waarden).find(k=>ruw.length>=4&&(k.startsWith(ruw)||ruw.startsWith(k)));
+    if(sleutel){ gevonden++; const w=String(waarden[sleutel]); return k+"="+encodeURIComponent(quote?'"'+w+'"':w) }
+    return p });
+  return {url:basis+"?"+delen.join("&"), gevonden};
+}
+function verstuur(oef,a,c){
+  const f=document.querySelector("#stuurfb");
+  const pog=a.controles, hulp=a.hulp, cijferTxt=fmt(c.cijfer);
+  const code=(a.extraOk?a.extraOplossing:a.oplossing)||"";
+  const waarden={ LEERLING:S.naam, KLAS:S.klas, OEFENING:oef.titel, CIJFER:cijferTxt, POGINGEN:pog, HULP:hulp, AFSPRAKEN:a.afspraken||0,
+    CONTROLE:controleCode(S.naam,oef.titel,c.cijfer,pog,hulp), CODE:code.length>1500?code.slice(0,1500)+"\n…(ingekort)":code };
+  const overzicht=`<table style="margin-top:8px;font-size:14px">${[["Leerling",S.naam],["Klas",S.klas],["Oefening",oef.titel],["Cijfer",cijferTxt],["Pogingen",pog],["Hulp",hulp],["Overtredingen klasafspraken",a.afspraken||0],["Controlecode",waarden.CONTROLE]].map(([k,v])=>`<tr><th style="width:130px">${k}</th><td>${esc(v)}</td></tr>`).join("")}</table>`;
+  if(!FORM_URL){ f.className="fb info"; f.innerHTML="<b>Testmodus:</b> je leerkracht heeft nog geen Form gekoppeld. Dit zou er verstuurd worden:"+overzicht; return }
+  const l=formLink(waarden);
+  if(!l||!l.gevonden){ f.className="fb bad"; f.textContent="De link naar het Form is niet goed ingesteld. Verwittig je leerkracht."; return }
+  window.open(l.url,"_blank","noopener");
+  a.verstuurd={cijfer:c.cijfer,op:new Date().toLocaleString("nl-BE",{dateStyle:"short",timeStyle:"short"})}; save();
+  f.className="fb ok"; f.innerHTML="✔ Het Form opent in een nieuw tabblad. <b>Controleer of deze gegevens erin staan</b> en klik dan op <b>Verzenden</b>:"+overzicht;
+}
+
+/* ---------------- Thema ---------------- */
+(function(){let th=null;try{th=localStorage.getItem(APP_ID+"-theme")}catch(e){} if(th)document.documentElement.dataset.theme=th;
+  document.getElementById("themeBtn").onclick=()=>{const cur=document.documentElement.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"); const nx=cur==="dark"?"light":"dark"; document.documentElement.dataset.theme=nx; try{localStorage.setItem(APP_ID+"-theme",nx)}catch(e){}}})();
+document.getElementById("home").onclick=()=>go("start");
+
+render(); toonWie();
+</script>
+</body>
+</html>

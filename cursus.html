@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cursus Python</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#1d2433; --muted:#5b6475; --line:#dde2ea;
+  --brand:#1f4e79; --brand-soft:#e3edf7; --accent:#d66028;
+  --ok:#1e7a46; --ok-soft:#e3f4ea; --bad:#b3261e; --bad-soft:#fbe7e5; --warn-soft:#fff3e3;
+  --code-bg:#f1f3f6; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --card:#1d222b; --ink:#e7eaf0; --muted:#a2abbb; --line:#323947;
+    --brand:#8cb8e6; --brand-soft:#22344a; --accent:#f08a55;
+    --ok:#6fd39b; --ok-soft:#1c3427; --bad:#ff9a90; --bad-soft:#3d2020; --warn-soft:#3a2d1c;
+    --code-bg:#262c37;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --card:#1d222b; --ink:#e7eaf0; --muted:#a2abbb; --line:#323947;
+  --brand:#8cb8e6; --brand-soft:#22344a; --accent:#f08a55;
+  --ok:#6fd39b; --ok-soft:#1c3427; --bad:#ff9a90; --bad-soft:#3d2020; --warn-soft:#3a2d1c;
+  --code-bg:#262c37;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top{max-width:900px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.top h1{font-size:18px;margin:0;color:var(--brand);flex:1;min-width:160px}
+.top button.theme{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--ink);cursor:pointer}
+.progress{height:6px;background:var(--line)}
+.progress div{height:100%;background:var(--accent);width:0;transition:width .4s}
+nav{max-width:900px;margin:0 auto;padding:0 16px 10px;display:flex;gap:8px;align-items:center}
+.navb{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 12px;font:inherit;font-size:15px;color:var(--ink);cursor:pointer;white-space:nowrap}
+.navb.menu{background:var(--brand);color:var(--card);border-color:var(--brand);font-weight:600}
+.navb.active{border-color:var(--brand);color:var(--brand);font-weight:600}
+.where{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--brand)}
+.menu-ov{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20;display:flex}
+.menu-panel{background:var(--card);width:min(380px,92vw);height:100%;overflow-y:auto;padding:14px 14px 30px;box-shadow:4px 0 20px rgba(0,0,0,.2)}
+.menu-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:18px;color:var(--brand)}
+.xbtn{border:0;background:none;font-size:20px;cursor:pointer;color:var(--muted)}
+.grp{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 4px 4px}
+.mi{display:flex;width:100%;gap:10px;align-items:center;text-align:left;border:0;background:none;padding:9px 10px;border-radius:8px;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
+.mi:hover{background:var(--brand-soft)}
+.mi.cur{background:var(--brand-soft);font-weight:600;color:var(--brand)}
+.mt{flex:1}
+.mbar{display:inline-block;width:54px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;vertical-align:middle}
+.mbar i{display:block;height:100%;background:var(--accent)}
+.okm{color:var(--ok);font-weight:700}
+@media (max-width:560px){ .navb:not(.menu){padding:7px 9px;font-size:14px} .where{display:none} }
+main{max-width:900px;margin:0 auto;padding:20px 16px 80px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:0 0 16px}
+h2{color:var(--brand);font-size:24px;margin:4px 0 6px;line-height:1.25}
+h3{color:var(--brand);font-size:19px;margin:0 0 8px}
+.kicker{font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.box{border-radius:10px;padding:12px 16px;margin:12px 0;background:var(--brand-soft)}
+.box.warm{background:var(--warn-soft)}
+.box b:first-child{color:var(--brand)}
+code,pre,textarea.code{font-family:ui-monospace,Consolas,"DejaVu Sans Mono",monospace;font-size:14.5px}
+code{background:var(--code-bg);padding:1px 5px;border-radius:5px}
+pre{background:var(--code-bg);padding:12px 14px;border-radius:8px;overflow-x:auto;margin:10px 0}
+img.schema{width:100%;height:auto;border-radius:8px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--brand-soft)}
+a{color:var(--brand)}
+.btn{display:inline-block;border:0;border-radius:8px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer;background:var(--brand);color:var(--card);text-decoration:none}
+.btn.secondary{background:var(--brand-soft);color:var(--brand)}
+.btn:disabled{opacity:.5;cursor:default}
+.q{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0;background:var(--card)}
+.q .qhead{display:flex;gap:8px;align-items:baseline;margin-bottom:8px}
+.q .qnum{font-weight:700;color:var(--accent);white-space:nowrap}
+.q .qtag{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.q.done-ok{border-color:var(--ok);box-shadow:inset 4px 0 0 var(--ok)}
+.q.done-bad{border-color:var(--bad);box-shadow:inset 4px 0 0 var(--bad)}
+.q.done-open{box-shadow:inset 4px 0 0 var(--brand)}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin:6px 0;cursor:pointer}
+.opt input{margin-top:5px}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin:6px 0}
+.row.right{background:var(--ok-soft);border-color:var(--ok)}
+.row.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.row label{margin-left:8px;white-space:nowrap}
+select,input[type=text],textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%}
+select{min-width:0;width:100%}
+textarea{width:100%;min-height:80px;resize:vertical}
+textarea.code{min-height:110px;background:var(--code-bg)}
+.actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fb{margin-top:10px;padding:10px 12px;border-radius:8px;display:none}
+.fb.ok{display:block;background:var(--ok-soft);color:var(--ok)}
+.fb.bad{display:block;background:var(--bad-soft);color:var(--bad)}
+.fb.info{display:block;background:var(--brand-soft);color:var(--ink)}
+.fb .ex{color:var(--ink);margin-top:4px}
+.out{white-space:pre-wrap;background:#0f1720;color:#d6e2f0;border-radius:8px;padding:10px 12px;margin-top:10px;font-family:ui-monospace,Consolas,monospace;font-size:14px;display:none;max-height:260px;overflow:auto}
+.check{display:flex;gap:10px;align-items:flex-start;margin:6px 0}
+.check input{margin-top:6px}
+.match{display:grid;grid-template-columns:minmax(120px,1fr) 2fr;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;margin:4px 0}
+.match.right{background:var(--ok-soft)}
+.match.wrong{background:var(--bad-soft)}
+.score{font-size:40px;font-weight:700;color:var(--brand)}
+.rep-line{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:15px}
+.rep-line span:last-child{margin-left:auto;white-space:nowrap;color:var(--muted)}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:13px;font-weight:600}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.mid{background:var(--warn-soft);color:var(--accent)}
+.ed{display:flex;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);overflow:hidden}
+.ed:focus-within{border-color:var(--brand)}
+.gut{padding:10px 8px 10px 10px;text-align:right;color:var(--muted);user-select:none;min-width:2.6em;white-space:pre;overflow:hidden;font:14.5px/1.55 ui-monospace,Consolas,"DejaVu Sans Mono",monospace;border-right:1px solid var(--line)}
+.ed textarea{flex:1;border:0;border-radius:0;background:transparent;padding:10px;min-height:120px;resize:vertical;white-space:pre;overflow:auto;font:14.5px/1.55 ui-monospace,Consolas,"DejaVu Sans Mono",monospace;tab-size:4;outline:none}
+.stdin{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--brand-soft);display:none}
+.stdin textarea{min-height:56px;font-family:ui-monospace,Consolas,monospace;font-size:14px}
+.out .errl{color:#ffb4a8}
+.navbtns{display:flex;justify-content:space-between;gap:8px;margin-top:20px;flex-wrap:wrap}
+@media (max-width:560px){ .match{grid-template-columns:1fr} h2{font-size:21px} .card{padding:14px} }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>Cursus Python</h1>
+    <span id="who" style="color:var(--muted);font-size:14px"></span>
+    <a href="index.html" title="Terug naar de startpagina met beide cursussen" style="text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap">⌂ Alle cursussen</a>
+    <button class="theme" id="themeBtn" title="Licht of donker scherm">◐ Thema</button>
+  </div>
+  <nav id="nav"></nav>
+  <div class="progress"><div id="bar"></div></div>
+</header>
+<main id="main"></main>
+
+<script>
+/* ===== INSTELLINGEN VOOR DE LEERKRACHT =====
+   Vul hier je e-mailadres in. Dan opent de knop "Mail naar mijn leerkracht" meteen een mail naar jou. */
+const TEACHER_EMAIL = "wendy.marsoul@hhscholen.be";
+const COURSE_ID = "python-cursus-v1";
+/* =========================================== */
+
+
+const CHAPTERS = [
+{ id:"h1", short:"1. Introductie", title:"Hoofdstuk 1 – Introductie",
+  video:"https://youtu.be/USTlHenC54A", videoTitle:"Video 1: Introductie tutorials Python",
+  intro:`<p>In dit hoofdstuk maak je kennis met de videoreeks van de Universiteit Hasselt, met de programmeertaal Python en met het idee van een online programmeeromgeving.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk eerst het filmpje. Beantwoord daarna de vragen. Na elke vraag klik je op <b>Controleer</b> en zie je meteen of je antwoord juist is. Is het fout? Dan mag je het nog één keer proberen. Je mag het filmpje gerust pauzeren of opnieuw bekijken.</div>
+  <div class="box warm"><b>Let op</b><br>In het filmpje wordt een andere online omgeving gebruikt (Replit). Wij schrijven onze code <b>rechtstreeks in deze cursus</b>. Je hoeft dus <b>geen</b> account aan te maken. In hoofdstuk 2 leer je hoe dat werkt.</div>`,
+  sections:[
+  { title:"Voor het kijken", items:[
+    {id:"h1-open1", type:"open", q:"Wat denk jij dat ‘programmeren’ betekent? Leg uit in je eigen woorden."}
+  ]},
+  { title:"Kijkvragen", items:[
+    {id:"h1-mc1", type:"mc", q:"Wie heeft deze videoreeks gemaakt?", options:["Een Amerikaans softwarebedrijf","De Universiteit Hasselt","De makers van Monty Python"], correct:1, explain:"De reeks werd gemaakt door medewerkers van de Universiteit Hasselt."},
+    {id:"h1-mc2", type:"mc", q:"In welke taal zijn de video’s gemaakt, en waarom?", options:["In het Engels, omdat programmeren altijd in het Engels gebeurt","In het Nederlands, om de drempel om te leren programmeren zo laag mogelijk te houden","In het Nederlands, omdat Python een Nederlandse programmeertaal is"], correct:1, explain:"De video’s zijn in het Nederlands, zodat het zo makkelijk mogelijk is om te starten."},
+    {id:"h1-mc3", type:"mc", q:"Hoe spreek je de naam ‘Python’ uit volgens de video?", options:["Zoals in ‘Monty Python’","Als ‘Pie-ton’ op zijn Frans","Als ‘Pitton’"], correct:0, explain:"Je spreekt het uit zoals in Monty Python."},
+    {id:"h1-mc4", type:"mc", q:"Wat heb je nodig om in een online programmeeromgeving te werken?", options:["Een krachtige computer met speciale software","Een computer met een internetbrowser","Een smartphone en een betaald abonnement"], correct:1, explain:"Een online omgeving werkt in je browser. Je hoeft niets te installeren."},
+    {id:"h1-mc5", type:"mc", q:"Waarvoor gebruik je de online omgeving in deze reeks?", options:["Om filmpjes te bekijken","Om code te schrijven en oefeningen te maken","Om berichten te sturen naar de maker"], correct:1, explain:"Je schrijft er je code én je maakt er de oefeningen die bij de video’s horen."},
+    {id:"h1-mc6", type:"mc", q:"Waarom zijn de oefeningen bij de video’s belangrijk?", options:["Zo kun je wat je geleerd hebt meteen in de praktijk toepassen","Ze zijn niet belangrijk, het filmpje is genoeg","Ze dienen alleen om punten te verdienen"], correct:0, explain:"Door meteen te oefenen, onthoud je veel beter wat je geleerd hebt."}
+  ]},
+  { title:"Juist of fout?", items:[
+    {id:"h1-tf", type:"tf", q:"Duid bij elke uitspraak aan of ze juist of fout is.", parts:[
+      {s:"De video’s in deze reeks zijn in het Engels.", a:false, explain:"Ze zijn in het Nederlands."},
+      {s:"Je moet Python eerst op je eigen computer installeren om te kunnen programmeren.", a:false, explain:"Met een online omgeving volstaat een browser."},
+      {s:"In deze eerste video wordt uitgebreid uitgelegd waarom Python een goede keuze is.", a:false, explain:"Dat komt pas in een latere video."},
+      {s:"Om de oefeningen te maken, moet je eerst een account aanmaken.", a:false, explain:"In deze cursus schrijf en voer je je code meteen uit, zonder account."},
+      {s:"De oefeningen horen bij de videotutorials.", a:true, explain:"Juist, ze horen echt bij de video’s."}
+    ]}
+  ]},
+  { title:"Begrippen", items:[
+    {id:"h1-match", type:"match", q:"Kies bij elk begrip de juiste omschrijving.", pairs:[
+      ["Programmeertaal","Een taal waarin je instructies (code) voor de computer schrijft, zoals Python"],
+      ["Programmeeromgeving","Het programma of de plek waarin je code schrijft en uitvoert"],
+      ["Online omgeving","Een programmeeromgeving die in je internetbrowser werkt, zonder installatie"],
+      ["Uitvoervenster","De plek waar je ziet wat je programma doet"]
+    ]}
+  ]}
+  ]
+},
+{ id:"h2", short:"2. Werkomgeving", title:"Hoofdstuk 2 – De werkomgeving: programmeren in deze cursus",
+  video:"https://youtu.be/EIE9dOBSLKE", videoTitle:"Video 2: Introductie programmeeromgeving (optioneel)",
+  intro:`<p>In dit hoofdstuk leer je werken in je eigen programmeeromgeving: deze cursus. Hier schrijf je al je programma’s, voer je ze uit en worden ze nagekeken.</p>
+  <div class="box warm"><b>Een woordje over het filmpje</b><br>In video 2 wordt Replit getoond. Je mag het filmpje bekijken om een idee te krijgen van hoe een programmeeromgeving werkt, maar je hoeft Replit niet te gebruiken: alles gebeurt hier.</div>`,
+  sections:[
+  { title:"2.1 Wat is een programmeeromgeving?", html:`<p>Een programmeertaal, zoals Python, is de taal waarin je instructies voor de computer schrijft. Die instructies schrijf je in een <b>programmeeromgeving</b>.</p>
+    <p>Vergelijk het met een opstel: de taal is Nederlands, maar je typt je tekst in een tekstverwerker zoals Word. Een programmeeromgeving is een ‘tekstverwerker voor code’, met één groot verschil: met één klik laat je de computer jouw instructies ook echt uitvoeren.</p>
+    <p>Een programmeeromgeving heeft altijd minstens twee delen: een <b>editor</b> waarin je code typt, en een <b>uitvoervenster</b> waarin je ziet wat je programma doet.</p>`,
+    items:[
+    {id:"h2-mc1", type:"mc", q:"Welke twee delen heeft een programmeeromgeving altijd?", options:["Een rekenmachine en een woordenboek","Een editor en een uitvoervenster","Een printer en een scherm"], correct:1, explain:"In de editor typ je je code, in het uitvoervenster zie je het resultaat."}
+  ]},
+  { title:"2.2 Jouw werkomgeving", html:`<p>Bij elke codeoefening in deze cursus vind je dezelfde onderdelen:</p>
+    <table><tr><th>Onderdeel</th><th>Waarvoor dient het?</th></tr>
+    <tr><td><b>Codevak</b></td><td>Hier typ je je code. Links staan <b>regelnummers</b>: bij een fout vertelt de computer op welke regel het probleem zit.</td></tr>
+    <tr><td><b>▶ Uitvoeren</b></td><td>Voert je code uit, zodat je kunt zien wat ze doet. Dit telt <b>niet</b> mee: probeer zo vaak je wilt!</td></tr>
+    <tr><td><b>✓ Controleer</b></td><td>Voert je code uit én kijkt na of ze doet wat de opdracht vraagt. Gebruik dit pas als je denkt dat je klaar bent.</td></tr>
+    <tr><td><b>Uitvoervenster</b></td><td>Het donkere vak onder je code. Hier verschijnt het resultaat van je programma, of een foutmelding.</td></tr>
+    <tr><td><b>Kladblok</b></td><td>Een apart tabblad bovenaan, waar je vrij kunt oefenen en experimenteren.</td></tr></table>
+    <p style="margin-top:10px">Probeer het meteen. Klik in het codevak hieronder op <b>▶ Uitvoeren</b> en kijk wat er gebeurt. Je hoeft deze code nog niet te begrijpen.</p>`,
+    items:[
+    {id:"h2-try1", type:"play", q:"Klik op ▶ Uitvoeren.", starter:'print("Welkom in je werkomgeving!")\nprint("Hier verschijnt het resultaat van je code.")'},
+    {id:"h2-mc2", type:"mc", q:"Je wilt eerst eens uitproberen wat je code doet, zonder dat het meetelt. Welke knop gebruik je?", options:["✓ Controleer","▶ Uitvoeren","Mijn resultaat"], correct:1, explain:"Met ▶ Uitvoeren probeer je vrij uit. Met ✓ Controleer laat je je code nakijken."},
+    {id:"h2-mc3", type:"mc", q:"Waarvoor dienen de regelnummers links in het codevak?", options:["Ze tellen hoeveel punten je hebt","Bij een fout zie je op welke regel het probleem zit","Ze geven aan hoe lang je al bezig bent"], correct:1, explain:"Een foutmelding vermeldt altijd een regelnummer. Zo weet je waar je moet zoeken."}
+  ]},
+  { title:"2.3 Je eerste programma: Hallo wereld!", html:`<p>Bijna iedereen die leert programmeren, begint met hetzelfde programma: de computer toont ‘Hallo wereld!’.</p>
+    <p>Typ in het codevak hieronder deze regel. Let goed op de haakjes en de aanhalingstekens:</p>
+    <pre>print("Hallo wereld!")</pre>
+    <p>Klik op <b>▶ Uitvoeren</b> om te kijken wat er gebeurt, en daarna op <b>✓ Controleer</b>.</p>
+    <div class="box"><b>Wat gebeurt hier?</b><br><code>print</code> is een opdracht in Python die betekent: ‘toon dit op het scherm’. Wat tussen de haakjes en de aanhalingstekens staat, wordt letterlijk getoond.</div>`,
+    items:[
+    {id:"h2-code1", type:"code", q:"Schrijf het Hallo wereld-programma.", check:"hallo", starter:""},
+    {id:"h2-code2", type:"code", q:"Pas het programma aan zodat de computer jou begroet met je eigen naam, bijvoorbeeld <i>Hallo Sara!</i>", check:"naam", starter:'print("Hallo wereld!")'},
+    {id:"h2-code3", type:"code", q:"Schrijf een programma met drie <code>print</code>-regels, zodat er drie zinnen over jou op het scherm verschijnen (bv. je naam, je leeftijd en je hobby).", check:"drie", starter:""},
+    {id:"h2-mc4", type:"mc", q:"In welke volgorde verschijnen de zinnen op het scherm?", options:["In willekeurige volgorde","Van onder naar boven","In dezelfde volgorde als de regels in je code, van boven naar onder"], correct:2, explain:"De computer voert je instructies één voor één uit, van boven naar onder."}
+  ]},
+  { title:"2.4 Een bestaand programma aanpassen", html:`<p>In het filmpje wordt een programma aangepast dat al klaarstaat. Dat doen wij ook, met een programma dat een maaltafel toont. <b>Je hoeft deze code nog niet te begrijpen!</b> Je leert later wat elke regel doet.</p>
+    <p>Klik eerst op <b>▶ Uitvoeren</b> om te zien wat het programma doet.</p>`,
+    items:[
+    {id:"h2-try2", type:"play", q:"Voer het programma uit en bekijk het resultaat.", starter:'getal = 7\nprint("De tafel van", getal)\nfor i in range(1, 11):\n    print(i, "x", getal, "=", i * getal)'},
+    {id:"h2-mc5", type:"mc", q:"Wat staat er op de eerste regel van het uitvoervenster?", options:["getal = 7","De tafel van 7","1 x 7 = 7"], correct:1, explain:"De eerste print-regel toont ‘De tafel van’ gevolgd door het getal 7."},
+    {id:"h2-fill1", type:"fill", q:"Wat is de uitkomst op de regel die begint met <code>3 x 7 =</code>?", answers:["21"], explain:"3 x 7 = 21"},
+    {id:"h2-code4", type:"code", q:"Verander het programma zodat het de <b>tafel van 9</b> toont.", check:"tafel9", starter:'getal = 7\nprint("De tafel van", getal)\nfor i in range(1, 11):\n    print(i, "x", getal, "=", i * getal)'},
+    {id:"h2-code5", type:"code", q:"Uitdaging: in regel 3 staat <code>range(1, 11)</code>. Pas het programma (opnieuw met 7) zo aan dat de tafel doorgaat tot <b>20 x 7</b>.", check:"tot20", starter:'getal = 7\nprint("De tafel van", getal)\nfor i in range(1, 11):\n    print(i, "x", getal, "=", i * getal)'}
+  ]},
+  { title:"2.5 Fouten maken mag!", html:`<p>Elke programmeur maakt voortdurend fouten. Een computer is heel precies: één vergeten haakje of aanhalingsteken en hij begrijpt je niet meer. Dan toont het uitvoervenster een <b>foutmelding</b>. Dat is geen ramp: de melding helpt je zoeken.</p>
+    <div class="box"><b>Stappenplan bij een foutmelding</b><br>1. Lees rustig de melding en zoek het regelnummer.<br>2. Kijk naar die regel (en de regel erboven): ontbreekt er een haakje, aanhalingsteken of dubbelpunt?<br>3. Verbeter en klik opnieuw op Uitvoeren.<br>4. Lukt het na drie pogingen niet? Noteer je vraag en ga verder met iets anders.</div>
+    <p>In het codevak hieronder staat een programma met een fout: het laatste aanhalingsteken ontbreekt. Klik op <b>▶ Uitvoeren</b> en bekijk de foutmelding.</p>`,
+    items:[
+    {id:"h2-try3", type:"play", q:"Voer dit programma uit. Verander nog niets!", starter:'print("Hallo wereld!)'},
+    {id:"h2-mc6", type:"mc", q:"Welk woord zie je in de foutmelding?", options:["SyntaxError","ZeroDivisionError","Gelukt!"], correct:0, explain:"Een SyntaxError betekent dat de computer de regel niet begrijpt, meestal door een tikfout."},
+    {id:"h2-fill2", type:"fill", q:"Op welke regel zit de fout volgens de foutmelding? (Typ alleen het getal.)", answers:["1"], explain:"De fout zit op regel 1."},
+    {id:"h2-code6", type:"code", q:"Verbeter de fout en controleer.", check:"hallo", starter:'print("Hallo wereld!)'},
+    {id:"h2-mc7", type:"mc", q:"Wat doe je als eerste bij een foutmelding?", options:["Alles wissen en opnieuw beginnen","Rustig de melding lezen en het regelnummer zoeken","De computer herstarten"], correct:1, explain:"De melding vertelt je waar je moet zoeken."}
+  ]},
+  { title:"2.6 Je werk wordt bewaard", html:`<p>Alles wat je typt, wordt <b>automatisch bewaard</b> op deze computer, in deze browser. Je kunt de cursus dus gerust sluiten en later verdergaan.</p>
+    <p>Twee dingen om te onthouden:</p>
+    <ul><li>Werk altijd op <b>dezelfde computer</b> en in <b>dezelfde browser</b> (bv. Chrome). Op een andere computer zie je je antwoorden niet.</li>
+    <li>Stuur na elk lesuur je rapport via <b>Mijn resultaat</b> naar je leerkracht. Dan zit je werk ook veilig bij hem of haar.</li></ul>
+    <p>Vind je het scherm te fel? Met de knop <b>◐ Thema</b> bovenaan kies je een donker scherm.</p>`,
+    items:[
+    {id:"h2-tf", type:"tf", q:"Juist of fout?", parts:[
+      {s:"Als ik de cursus sluit, ben ik al mijn antwoorden kwijt.", a:false, explain:"Je werk wordt automatisch bewaard op deze computer."},
+      {s:"Op een andere computer zie ik mijn antwoorden ook.", a:false, explain:"Je antwoorden staan alleen op de computer en in de browser waar je werkt."},
+      {s:"Na elk lesuur stuur ik mijn rapport naar mijn leerkracht.", a:true, explain:"Zo weet je leerkracht hoe het gaat, en is je werk veilig."}
+    ]}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h2-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik weet wat een programmeeromgeving is.","Ik kan code typen en uitvoeren.","Ik ken het verschil tussen Uitvoeren en Controleer.","Ik kan een bestaand programma aanpassen.","Ik kan een foutmelding lezen en het regelnummer vinden."]},
+    {id:"h2-open2", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h3", short:"3. Rekenen", title:"Hoofdstuk 3 – Rekenen met gehele getallen",
+  video:"https://youtu.be/iP78KB8QPg0", videoTitle:"Video 3: Berekeningen met 2 gehele getallen",
+  intro:`<p>Een computer is in de eerste plaats een supersnelle rekenmachine. In dit hoofdstuk leer je Python laten rekenen: optellen, aftrekken, vermenigvuldigen en delen.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk eerst het filmpje. Lees daarna elk stukje, probeer de voorbeelden uit met <b>▶ Uitvoeren</b> en maak de vragen en oefeningen.</div>
+  <div class="box warm"><b>Let op: een verschil met het filmpje</b><br>In het filmpje typt men een berekening, zoals <code>12 + 27</code>, en Python toont meteen het antwoord. Dat werkt in een speciaal venster (de ‘console’). In onze cursus schrijf je een <b>programma</b>, en een programma toont alleen iets op het scherm als je het daarom vraagt. Daarom zet je de berekening altijd tussen <code>print( )</code>:<pre>print(12 + 27)</pre></div>`,
+  sections:[
+  { title:"3.1 Gehele getallen", html:`<p><b>Gehele getallen</b> zijn getallen zonder komma: 0, 1, 2, 3, … maar ook de negatieve getallen −1, −2, −3, … In Python heet dit soort getal een <b>int</b> (van het Engelse <i>integer</i>, ‘geheel getal’).</p>
+    <p>Getallen met een komma, zoals 2,5, zijn <b>geen</b> gehele getallen. Die leer je verderop in dit hoofdstuk kennen.</p>`,
+    items:[
+    {id:"h3-mc1", type:"mc", q:"Welk getal is een geheel getal (int)?", options:["−12","2,5","0,75"], correct:0, explain:"−12 heeft geen cijfers na de komma, dus het is een geheel getal. Ook negatieve getallen kunnen gehele getallen zijn."},
+    {id:"h3-fill1", type:"fill", q:"Hoe heet een geheel getal in Python? (Typ het woord van 3 letters.)", answers:["int"], explain:"int, van het Engelse integer."}
+  ]},
+  { title:"3.2 De vier rekenkundige operatoren", html:`<p>Om te rekenen gebruik je <b>rekenkundige operatoren</b>. Twee ervan ken je al uit de wiskundeles, twee zien er anders uit:</p>
+    <table><tr><th>Bewerking</th><th>Operator</th><th>Voorbeeld</th><th>Resultaat</th></tr>
+    <tr><td>optellen</td><td><code>+</code></td><td><code>print(12 + 27)</code></td><td>39</td></tr>
+    <tr><td>aftrekken</td><td><code>-</code></td><td><code>print(36 - 14)</code></td><td>22</td></tr>
+    <tr><td>vermenigvuldigen</td><td><code>*</code> (sterretje)</td><td><code>print(7 * 8)</code></td><td>56</td></tr>
+    <tr><td>delen</td><td><code>/</code> (schuine streep)</td><td><code>print(100 / 4)</code></td><td>25.0</td></tr></table>
+    <p style="margin-top:10px">Let op: vermenigvuldigen doe je in Python met een <b>sterretje</b> <code>*</code>, niet met een x of een punt.</p>`,
+    items:[
+    {id:"h3-try1", type:"play", q:"Voer deze berekeningen uit. Verander daarna gerust de getallen en probeer opnieuw!", starter:'print(12 + 27)\nprint(36 - 14)\nprint(7 * 8)\nprint(100 / 4)'},
+    {id:"h3-match", type:"match", q:"Welke operator hoort bij welke bewerking?", pairs:[["+","optellen"],["-","aftrekken"],["*","vermenigvuldigen"],["/","delen"]]},
+    {id:"h3-fill2", type:"fill", q:"Wat toont <code>print(15 - 6)</code>?", answers:["9"], explain:"15 − 6 = 9"},
+    {id:"h3-fill3", type:"fill", q:"Wat toont <code>print(6 * 4)</code>?", answers:["24"], explain:"6 × 4 = 24"},
+    {id:"h3-mc2", type:"mc", q:"Wat gebeurt er als je <code>print(7 x 8)</code> schrijft?", options:["Python toont 56","Python geeft een foutmelding (SyntaxError)","Python toont 7 x 8"], correct:1, explain:"Python kent de x niet als maalteken. Gebruik altijd het sterretje: 7 * 8."}
+  ]},
+  { title:"3.3 Spaties maken niet uit", html:`<p>Rond een operator mag je zoveel spaties zetten als je wilt: Python negeert ze. <code>print(12+27)</code> en <code>print(12   +   27)</code> geven allebei 39.</p>
+    <p>Toch is het een goede gewoonte om <b>één spatie</b> rond een operator te zetten, zoals <code>12 + 27</code>. Zo is je code makkelijker te lezen.</p>`,
+    items:[
+    {id:"h3-tf1", type:"tf", q:"Juist of fout?", parts:[
+      {s:"print(12+27) en print(12 + 27) tonen hetzelfde resultaat.", a:true, explain:"Spaties rond een operator maken niet uit."},
+      {s:"Het is een goede gewoonte om één spatie rond een operator te zetten.", a:true, explain:"Zo leest je code makkelijker."},
+      {s:"Voor vermenigvuldigen gebruik je in Python de letter x.", a:false, explain:"Je gebruikt het sterretje *."}
+    ]}
+  ]},
+  { title:"3.4 Delen geeft een kommagetal", html:`<p>Bij <code>print(100 / 4)</code> toont Python <b>25.0</b> en niet 25. Hoe komt dat?</p>
+    <p>Als je deelt, is het resultaat vaak geen geheel getal (denk aan 9 / 2 = 4,5). Daarom geeft een deling in Python <b>altijd</b> een kommagetal, ook als de uitkomst toevallig ‘mooi’ uitkomt. Zo’n kommagetal heet in Python een <b>float</b>.</p>
+    <div class="box"><b>Onthoud</b><br><code>+</code>, <code>-</code> en <code>*</code> met gehele getallen geven een geheel getal (int).<br><code>/</code> geeft altijd een kommagetal (float).</div>`,
+    items:[
+    {id:"h3-mc3", type:"mc", q:"Waarom toont <code>print(100 / 4)</code> het resultaat 25.0 en niet 25?", options:["Omdat Python zich verrekent","Omdat een deling in Python altijd een kommagetal (float) geeft","Omdat 100 een kommagetal is"], correct:1, explain:"Een deling met / geeft in Python altijd een float."},
+    {id:"h3-fill4", type:"fill", q:"Wat toont <code>print(9 / 2)</code>? (Let op: Python gebruikt een punt!)", answers:["4.5"], explain:"9 / 2 = 4.5"},
+    {id:"h3-fill5", type:"fill", q:"Wat toont <code>print(10 / 5)</code>?", answers:["2.0"], explain:"Een deling geeft altijd een float, dus 2.0 en niet 2."}
+  ]},
+  { title:"3.5 Een punt, geen komma!", html:`<p>In België schrijven we een kommagetal met een komma: 3,5. Python is een Engelstalige taal en gebruikt daarom een <b>punt</b>: <code>3.5</code>.</p>
+    <p>Gebruik je toch een komma, dan krijg je een vreemd resultaat. Probeer het maar:</p>`,
+    items:[
+    {id:"h3-try2", type:"play", q:"Voer beide regels uit en vergelijk.", starter:'print(3.5 + 6.4)\nprint(3,5 + 6,4)'},
+    {id:"h3-mc4", type:"mc", q:"Wat toont de tweede regel, <code>print(3,5 + 6,4)</code>?", options:["9.9","3 11 4","Een foutmelding"], correct:1, explain:"De komma scheidt in print() verschillende waarden. Python toont dus 3, dan 5 + 6 = 11, en dan 4. Gebruik voor kommagetallen altijd een punt!"},
+    {id:"h3-mc5", type:"mc", q:"Hoe schrijf je het getal ‘twee komma vijf’ in Python?", options:["2,5","2.5","2 5"], correct:1, explain:"Python gebruikt een punt als decimaalteken."}
+  ]},
+  { title:"3.6 Oefeningen: laat Python rekenen", html:`<p>Schrijf telkens een programma dat de berekening <b>zelf laat uitvoeren</b> door Python. Het antwoord zelf intypen telt niet: de computer moet rekenen!</p>`,
+    items:[
+    {id:"h3-code1", type:"code", q:"Laat Python <b>123 + 456</b> berekenen en toon het resultaat.", starter:"",
+      expect:["579"], must:[[/123\s*\+\s*456|456\s*\+\s*123/,"Laat Python zelf rekenen: schrijf de berekening 123 + 456 tussen de haakjes van print."]], hint:"print(123 + 456)", ok:"Juist! Python rekende 123 + 456 = 579 uit."},
+    {id:"h3-code2", type:"code", q:"Een pizza kost 12 euro. Je koopt er 3. Laat Python berekenen hoeveel je moet betalen.", starter:"",
+      expect:["36"], must:[[/\*/,"Gebruik een vermenigvuldiging met *."]], hint:"print(12 * 3)", ok:"Juist! 3 pizza’s kosten 36 euro."},
+    {id:"h3-code3", type:"code", q:"Je verdeelt 36 snoepjes eerlijk over 4 vrienden. Laat Python berekenen hoeveel snoepjes elke vriend krijgt.", starter:"",
+      expect:["9.0"], must:[[/\//,"Gebruik een deling met /."]], hint:"print(36 / 4)", ok:"Juist! Iedereen krijgt 9 snoepjes. Zie je dat Python 9.0 toont? Dat komt doordat delen altijd een float geeft."},
+    {id:"h3-code4", type:"code", q:"Schrijf een programma met vier <code>print</code>-regels dat met de getallen <b>20 en 5</b> achtereenvolgens de som, het verschil, het product en het quotiënt toont.", starter:"",
+      expect:["25","15","100","4.0"], must:[[/20\s*\+\s*5/,"Laat Python 20 + 5 uitrekenen."],[/20\s*-\s*5/,"Laat Python 20 - 5 uitrekenen."],[/20\s*\*\s*5/,"Laat Python 20 * 5 uitrekenen."],[/20\s*\/\s*5/,"Laat Python 20 / 5 uitrekenen."]], hint:"print(20 + 5)\nprint(20 - 5)\nprint(20 * 5)\nprint(20 / 5)", ok:"Super! Je gebruikte alle vier de operatoren."},
+    {id:"h3-code5", type:"code", q:"Uitdaging: een week heeft 7 dagen, een dag 24 uur en een uur 60 minuten. Laat Python berekenen hoeveel minuten er in een week zitten. (Tip: je mag meerdere operatoren in één berekening gebruiken.)", starter:"",
+      expect:["10080"], must:[[/7\s*\*\s*24\s*\*\s*60|\*.*\*/,"Laat Python de berekening met * zelf uitvoeren."]], hint:"print(7 * 24 * 60)", ok:"Knap! Een week telt 10080 minuten."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h3-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik weet wat een geheel getal (int) is.","Ik kan optellen, aftrekken, vermenigvuldigen en delen in Python.","Ik weet dat ik voor vermenigvuldigen * gebruik.","Ik weet dat delen altijd een kommagetal (float) geeft.","Ik gebruik een punt in kommagetallen, geen komma."]},
+    {id:"h3-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h4", short:"4. print() en strings", title:"Hoofdstuk 4 – De functie print() en het datatype string",
+  video:"https://youtu.be/_uoBdW-D9mg", videoTitle:"Video 4: De functie print() en het datatype \"string\"",
+  intro:`<p>Je gebruikt <code>print()</code> al sinds hoofdstuk 2. In dit hoofdstuk leer je wat een <b>functie</b> eigenlijk is, en wat een <b>string</b> is: het soort gegevens waarmee je tekst opslaat.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk eerst het filmpje. Lees daarna elk stukje, probeer de voorbeelden uit met <b>▶ Uitvoeren</b> en maak de vragen en oefeningen.</div>
+  <div class="box warm"><b>Let op</b><br>Ook in dit filmpje werkt men in de console. In onze cursus zet je alles in een programma, maar <code>print()</code> werkt precies hetzelfde.</div>`,
+  sections:[
+  { title:"4.1 Wat is een functie?", html:`<p>Een <b>functie</b> is een opdracht die Python voor je uitvoert. Vergelijk het met een hond die je commando’s geeft: ‘zit’, ‘apport’. Python kent heel wat van die commando’s. <code>print</code> is er één van: het betekent ‘toon dit op het scherm’.</p>
+    <p>Na de naam van een functie komen altijd <b>haakjes</b>: <code>print( )</code>. Die haakjes zijn een vast onderdeel van de functie. Zonder haakjes is de opdracht niet volledig en begrijpt Python ze niet.</p>`,
+    items:[
+    {id:"h4-mc1", type:"mc", q:"Wat is een functie in Python?", options:["Een getal met een komma","Een opdracht die Python voor je uitvoert","Een foutmelding"], correct:1, explain:"Een functie is een opdracht, zoals print(): ‘toon dit op het scherm’."},
+    {id:"h4-mc2", type:"mc", q:"Wat hoort altijd bij een functie, na de naam?", options:["Haakjes ( )","Een uitroepteken !","Een dubbelpunt :"], correct:0, explain:"De haakjes zijn een vast onderdeel van elke functie."}
+  ]},
+  { title:"4.2 Wat staat er tussen de haakjes?", html:`<p>Tussen de haakjes geef je de functie de informatie die ze nodig heeft. Bij de hond: zeg je ‘apport’, dan moet je ook zeggen <i>wat</i> hij moet brengen: de stok, de bal of de sleutels.</p>
+    <p>Bij <code>print()</code> zet je tussen de haakjes <b>wat</b> er op het scherm moet komen. Programmeurs noemen die informatie het <b>argument</b> van de functie.</p>
+    <pre>print("Goedemorgen!")</pre>
+    <p>Hier is <code>print</code> de functie en <code>"Goedemorgen!"</code> het argument.</p>
+    <p>En als je niets tussen de haakjes zet? Dan heeft <code>print()</code> niets om te tonen, en krijg je gewoon een <b>lege regel</b>. Dat is soms handig om je uitvoer overzichtelijker te maken.</p>`,
+    items:[
+    {id:"h4-try1", type:"play", q:"Voer dit programma uit. Zie je de lege regel?", starter:'print("Eerste regel")\nprint()\nprint("Derde regel")'},
+    {id:"h4-mc3", type:"mc", q:"In <code>print(&quot;Goedemorgen!&quot;)</code>, wat is het argument?", options:["print","\"Goedemorgen!\"","de haakjes"], correct:1, explain:"Het argument is de informatie tussen de haakjes: wat er getoond moet worden."},
+    {id:"h4-mc4", type:"mc", q:"Wat doet <code>print()</code> met niets tussen de haakjes?", options:["Het geeft een foutmelding","Het toont een lege regel","Het toont het woord print"], correct:1, explain:"Zonder argument toont print() een lege regel."}
+  ]},
+  { title:"4.3 Het datatype string", html:`<p>Een <b>string</b> is een reeks tekens: letters, cijfers, leestekens, symbolen en ook spaties. Je herkent een string aan de <b>aanhalingstekens</b> errond. Die geven aan waar de string begint en waar hij eindigt.</p>
+    <pre>"Hallo"
+"Ik ben 15 jaar."
+"5 + 3"
+"@#!?"</pre>
+    <p>Dit zijn allemaal strings, ook <code>"5 + 3"</code>! Alles tussen aanhalingstekens is voor Python gewoon tekst, en wordt dus letterlijk getoond. Python rekent er niet mee.</p>
+    <div class="box"><b>Onthoud</b><br>Je kent nu al drie datatypes:<br>• <b>int</b>: gehele getallen, zoals <code>27</code><br>• <b>float</b>: kommagetallen, zoals <code>2.5</code><br>• <b>string</b>: tekst tussen aanhalingstekens, zoals <code>"Hallo"</code></div>
+    <p>Probeer het verschil tussen tekst en een berekening zelf uit:</p>`,
+    items:[
+    {id:"h4-try2", type:"play", q:"Voer uit en vergelijk de twee regels.", starter:'print("12 + 27")\nprint(12 + 27)'},
+    {id:"h4-fill1", type:"fill", q:"Wat toont <code>print(&quot;12 + 27&quot;)</code>?", answers:["12 + 27","12+27"], explain:"Tussen aanhalingstekens is het een string: Python toont de tekst letterlijk en rekent niet."},
+    {id:"h4-fill2", type:"fill", q:"Wat toont <code>print(12 + 27)</code>?", answers:["39"], explain:"Zonder aanhalingstekens is het een berekening: Python rekent 12 + 27 = 39 uit."},
+    {id:"h4-mc5", type:"mc", q:"Welke van deze is een string?", options:["42","3.14","\"42\""], correct:2, explain:"\"42\" staat tussen aanhalingstekens, dus het is een string (tekst). 42 is een int en 3.14 een float."},
+    {id:"h4-match", type:"match", q:"Welk datatype hoort bij welke waarde?", pairs:[["27","int (geheel getal)"],["2.5","float (kommagetal)"],["\"Hallo\"","string (tekst)"]]}
+  ]},
+  { title:"4.4 Valkuilen: haakjes en aanhalingstekens", html:`<p>Bij <code>print()</code> gaan er vaak dezelfde dingen mis. Gelukkig vertelt Python je met een foutmelding wat er scheelt. In het programma hieronder staan drie fouten. Voer het uit, en kijk naar de foutmelding.</p>
+    <table><tr><th>Fout</th><th>Foutmelding</th><th>Wat is er mis?</th></tr>
+    <tr><td><code>print "Welkom"</code></td><td>SyntaxError: Missing parentheses…</td><td>De <b>haakjes</b> ontbreken.</td></tr>
+    <tr><td><code>print("Tot ziens)</code></td><td>SyntaxError: unterminated string literal</td><td>Het <b>laatste aanhalingsteken</b> ontbreekt: Python weet niet waar de string eindigt.</td></tr>
+    <tr><td><code>print(Hallo)</code></td><td>NameError: name 'Hallo' is not defined</td><td>De <b>aanhalingstekens</b> ontbreken: Python denkt dat Hallo de naam van iets is, en kent die naam niet.</td></tr></table>
+    <p style="margin-top:10px">Python toont altijd <b>één fout tegelijk</b>. Verbeter je die, dan toont Python de volgende. Schrijffouten zoals een vergeten haakje of aanhalingsteken ontdekt Python als eerste, nog vóór het programma start. Daarom komt de fout op regel 1 hier pas als laatste aan de beurt.</p>`,
+    items:[
+    {id:"h4-mc6", type:"mc", q:"Je schrijft <code>print(Hallo)</code>. Wat is er mis?", options:["De haakjes ontbreken","De aanhalingstekens rond Hallo ontbreken","Er staat een hoofdletter in"], correct:1, explain:"Zonder aanhalingstekens is Hallo geen tekst. Python zoekt dan iets met de naam Hallo, en vindt dat niet: NameError."},
+    {id:"h4-mc7", type:"mc", q:"Welke foutmelding krijg je als je de haakjes vergeet, zoals in <code>print &quot;Welkom&quot;</code>?", options:["SyntaxError: Missing parentheses in call to 'print'","NameError: name 'Welkom' is not defined","Er komt geen fout, Python toont Welkom"], correct:0, explain:"‘Missing parentheses’ betekent: de haakjes ontbreken."},
+    {id:"h4-code1", type:"code", q:"In dit programma staan drie fouten. Verbeter ze zodat het programma drie regels toont: <i>Hallo</i>, <i>Welkom</i> en <i>Tot ziens</i>. Tip: voer het eerst uit en lees de foutmelding.", starter:'print(Hallo)\nprint "Welkom"\nprint("Tot ziens)',
+      expect:["Hallo","Welkom","Tot ziens"], hint:'print("Hallo")\nprint("Welkom")\nprint("Tot ziens")', ok:"Knap! Je hebt alle drie de fouten gevonden en verbeterd."}
+  ]},
+  { title:"4.5 Oefeningen", items:[
+    {id:"h4-code2", type:"code", q:"Laat het programma precies deze zin tonen: <b>Ik leer Python!</b>", starter:"",
+      expect:["Ik leer Python!"], hint:'print("Ik leer Python!")', ok:"Juist!"},
+    {id:"h4-code3", type:"code", q:"Laat het programma eerst de tekst <b>5 + 3</b> tonen, en op de volgende regel de <b>uitkomst</b> van die berekening. Laat Python zelf rekenen!", starter:"",
+      expect:["5 + 3","8"], must:[[/print\(\s*["']\s*5\s*\+\s*3\s*["']\s*\)/,"Toon op de eerste regel de tekst 5 + 3: zet die tussen aanhalingstekens."],[/print\(\s*5\s*\+\s*3\s*\)/,"Laat Python op de tweede regel 5 + 3 uitrekenen: zonder aanhalingstekens."]],
+      hint:'print("5 + 3")\nprint(5 + 3)', ok:"Super! Je ziet het verschil tussen tekst (string) en een berekening."},
+    {id:"h4-code4", type:"code", q:"Maak een boodschappenlijstje. Je programma toont eerst <b>Boodschappen:</b>, dan een <b>lege regel</b>, en dan onder elkaar <b>brood</b>, <b>melk</b> en <b>kaas</b>.", starter:"",
+      expect:["Boodschappen:","","brood","melk","kaas"], exact:true, hint:'print("Boodschappen:")\nprint()\nprint("brood")\nprint("melk")\nprint("kaas")', ok:"Mooi! Met print() zonder argument maak je een lege regel."},
+    {id:"h4-code5", type:"code", q:"Uitdaging: teken met <code>print()</code> deze kerstboom. Let op: de spaties vooraan tellen mee!<pre>  *\n ***\n*****\n  |</pre>", starter:"",
+      expect:["  *"," ***","*****","  |"], exact:true, hint:'print("  *")\nprint(" ***")\nprint("*****")\nprint("  |")', ok:"Prachtig! Ook spaties zijn tekens in een string."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h4-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik weet wat een functie is.","Ik weet dat een functie altijd haakjes heeft.","Ik weet wat een string is.","Ik ken het verschil tussen print(\"5 + 3\") en print(5 + 3).","Ik herken fouten met haakjes en aanhalingstekens."]},
+    {id:"h4-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h5", short:"5. Variabelen", title:"Hoofdstuk 5 – Variabelen en de toekenning",
+  video:"https://youtu.be/rKFJ8tRvqFk", videoTitle:"Video 5: Variabelen en lades",
+  video2:"https://youtu.be/V58gHCwSxrw", video2Title:"Video 6: De toekenning (assignment statement)",
+  intro:`<p>Programma’s moeten dingen kunnen <b>onthouden</b>: een naam, een score, een prijs. Daarvoor gebruik je <b>variabelen</b>. In dit hoofdstuk leer je wat een variabele is en hoe je er een waarde in bewaart.</p>
+  <div class="box"><b>Zo werk je</b><br>Bij dit hoofdstuk horen twee filmpjes. Bekijk eerst <b>video 5</b> en maak 5.1. Bekijk daarna <b>video 6</b> en maak de rest.</div>
+  <div class="box warm"><b>Let op</b><br>In video 6 typt men soms alleen de naam van een variabele om de waarde te zien. Dat werkt alleen in de console. In een programma gebruik je <code>print( )</code>: <code>print(dag)</code>.</div>`,
+  sections:[
+  { title:"5.1 Wat is een variabele?", html:`<p>Het geheugen van een computer kun je vergelijken met een enorme kast met duizenden <b>lades</b>. In zo’n lade kun je iets bewaren. Op elke lade kleeft een <b>label</b>, zodat je later terugvindt wat je erin stak.</p>
+    <p>Een <b>variabele</b> werkt net zo. Ze heeft:</p>
+    <ul><li>een <b>naam</b>: het label op de lade, bijvoorbeeld <code>leeftijd</code>;</li><li>een <b>waarde</b>: wat er in de lade zit, bijvoorbeeld <code>15</code>.</li></ul>
+    <p>Twee lades met hetzelfde label zouden voor verwarring zorgen. Daarom kan een naam maar bij <b>één</b> variabele horen.</p>
+    <div class="box"><b>Denk aan je telefoon</b><br>In je contacten zoek je op een <b>naam</b>, en je telefoon zoekt het <b>nummer</b> erbij. Een naam onthouden is veel makkelijker dan een nummer. En verandert iemand van nummer, dan pas je alleen het nummer aan: de naam blijft hetzelfde.</div>`,
+    items:[
+    {id:"h5-mc1", type:"mc", q:"Welke twee dingen heeft elke variabele?", options:["Een naam en een waarde","Een kleur en een grootte","Een lade en een sleutel"], correct:0, explain:"De naam is het label, de waarde is wat er in de lade zit."},
+    {id:"h5-match1", type:"match", q:"Verbind de vergelijking met de lade met wat het betekent bij een variabele.", pairs:[["Het label op de lade","De naam van de variabele"],["Wat er in de lade zit","De waarde van de variabele"],["De kast met lades","Het geheugen van de computer"]]}
+  ]},
+  { title:"5.2 De toekenning", html:`<p>Met een <b>toekenning</b> maak je een variabele en geef je ze meteen een waarde. Je herkent een toekenning aan het <b>=-teken</b>:</p>
+    <pre>hoofdpersonage = "Harry Potter"
+rugnummer = 7
+pi = 3.14</pre>
+    <p>Links van het =-teken staat altijd de <b>naam</b>, rechts de <b>waarde</b>. Een waarde kan een string, een int of een float zijn.</p>
+    <div class="box"><b>Let op: = betekent hier niet ‘is gelijk aan’</b><br>Lees <code>rugnummer = 7</code> als: ‘de variabele <i>rugnummer</i> <b>krijgt</b> de waarde 7’. Omdat het =-teken een richting heeft, werkt het omgekeerde niet: <code>7 = rugnummer</code> geeft een foutmelding.</div>
+    <p>Wil je de waarde van een variabele zien? Zet de naam tussen de haakjes van <code>print()</code>, <b>zonder</b> aanhalingstekens:</p>`,
+    items:[
+    {id:"h5-try1", type:"play", q:"Voer uit. Zie je het verschil tussen de laatste twee regels?", starter:'dier = "kat"\nprint(dier)\nprint("dier")'},
+    {id:"h5-mc2", type:"mc", q:"Wat toont <code>print(&quot;dier&quot;)</code>, met aanhalingstekens?", options:["kat","dier","Een foutmelding"], correct:1, explain:"Met aanhalingstekens is het een string: Python toont het woord dier letterlijk. Zonder aanhalingstekens, print(dier), toont Python de waarde van de variabele: kat."},
+    {id:"h5-mc3", type:"mc", q:"Hoe lees je <code>score = 10</code>?", options:["score is gelijk aan 10","de variabele score krijgt de waarde 10","10 krijgt de waarde score"], correct:1, explain:"Het =-teken is een toekenning: de naam links krijgt de waarde rechts."},
+    {id:"h5-mc4", type:"mc", q:"Wat gebeurt er bij <code>7 = rugnummer</code>?", options:["rugnummer krijgt de waarde 7","Python geeft een foutmelding","Python toont 7"], correct:1, explain:"De naam moet links staan. Python geeft een SyntaxError: cannot assign to literal."}
+  ]},
+  { title:"5.3 Een goede naam kiezen", html:`<p>Een variabelenaam kies je zelf, maar er zijn een paar regels:</p>
+    <table><tr><th>Regel</th><th>Goed</th><th>Fout</th></tr>
+    <tr><td>Geen spaties. Gebruik een liggend streepje <code>_</code></td><td><code>mijn_leeftijd</code></td><td><code>mijn leeftijd</code></td></tr>
+    <tr><td>Begin met een letter, niet met een cijfer</td><td><code>vak2</code></td><td><code>2de_vak</code></td></tr>
+    <tr><td>Geen leestekens of rare tekens</td><td><code>score</code></td><td><code>score!</code></td></tr></table>
+    <p style="margin-top:10px">Let ook op hoofdletters: voor Python zijn <code>naam</code> en <code>Naam</code> twee <b>verschillende</b> namen. Gebruik daarom gewoon altijd kleine letters.</p>
+    <p>Kies tot slot een naam die zegt wat erin zit. <code>prijs_pizza</code> is veel duidelijker dan <code>x</code>.</p>`,
+    items:[
+    {id:"h5-tf1", type:"tf", q:"Is dit een geldige variabelenaam? Duid ‘Juist’ aan als de naam mag, en ‘Fout’ als hij niet mag.", parts:[
+      {s:"mijn_leeftijd", a:true, explain:"Een liggend streepje in plaats van een spatie: prima."},
+      {s:"mijn leeftijd", a:false, explain:"Er staat een spatie in de naam."},
+      {s:"2de_vak", a:false, explain:"Een naam mag niet met een cijfer beginnen."},
+      {s:"vak2", a:true, explain:"Een cijfer mag wel, zolang het niet vooraan staat."},
+      {s:"prijs_pizza", a:true, explain:"Een duidelijke, geldige naam."}
+    ]},
+    {id:"h5-code1", type:"code", q:"In dit programma staan drie fouten in de toekenningen. Verbeter ze zodat het programma <i>Sara</i>, <i>wiskunde</i> en <i>15</i> toont. Laat de <code>print</code>-regels zoals ze zijn.", starter:'mijn naam = "Sara"\n2de_vak = "wiskunde"\n15 = leeftijd\nprint(mijn_naam)\nprint(tweede_vak)\nprint(leeftijd)',
+      expect:["Sara","wiskunde","15"], must:[[/print\(\s*mijn_naam\s*\)/,"Laat de print-regels staan zoals ze waren."],[/print\(\s*tweede_vak\s*\)/,"Laat de print-regels staan zoals ze waren."],[/print\(\s*leeftijd\s*\)/,"Laat de print-regels staan zoals ze waren."]],
+      hint:'mijn_naam = "Sara"\ntweede_vak = "wiskunde"\nleeftijd = 15\nprint(mijn_naam)\nprint(tweede_vak)\nprint(leeftijd)', ok:"Knap! Je hebt alle drie de fouten verbeterd."}
+  ]},
+  { title:"5.4 Een waarde veranderen", html:`<p>Je kunt de waarde van een variabele later veranderen met een nieuwe toekenning. De oude waarde wordt dan <b>overschreven</b>: Python onthoudt alleen de <b>laatste</b> waarde.</p>
+    <p>Een variabele kan daarbij zelfs van datatype veranderen: eerst een string, daarna een int.</p>`,
+    items:[
+    {id:"h5-try2", type:"play", q:"Voer uit en volg wat er met de variabele dag gebeurt.", starter:'dag = "donderdag"\nprint(dag)\ndag = "vrijdag"\nprint(dag)\ndag = 21\nprint(dag)'},
+    {id:"h5-fill1", type:"fill", q:"Wat toont dit programma?<pre>kleur = \"rood\"\nkleur = \"blauw\"\nprint(kleur)</pre>", answers:["blauw"], explain:"De tweede toekenning overschrijft de eerste. Python onthoudt alleen de laatste waarde: blauw."},
+    {id:"h5-fill2", type:"fill", q:"Wat toont dit programma?<pre>punten = 5\nprint(punten)\npunten = 8</pre>", answers:["5"], explain:"Op het moment van print() is de waarde nog 5. De nieuwe waarde 8 komt pas daarna."}
+  ]},
+  { title:"5.5 Oefeningen", items:[
+    {id:"h5-code2", type:"code", q:"Maak een variabele <code>lievelingsdier</code> met jouw lievelingsdier als waarde. Toon daarna de waarde met <code>print(lievelingsdier)</code>.", starter:"",
+      anyLines:1, must:[[/lievelingsdier\s*=\s*["']/,"Maak de variabele lievelingsdier met een string als waarde, bijvoorbeeld lievelingsdier = \"hond\"."],[/print\(\s*lievelingsdier\s*\)/,"Toon de waarde met print(lievelingsdier), zonder aanhalingstekens."]],
+      hint:'lievelingsdier = "hond"\nprint(lievelingsdier)', ok:"Juist! Je maakte je eerste variabele."},
+    {id:"h5-code3", type:"code", q:"De variabele <code>weer</code> krijgt eerst de waarde <b>regen</b>. Toon ze. Verander daarna de waarde in <b>zon</b> en toon ze opnieuw. Gebruik twee keer <code>print(weer)</code>.", starter:"",
+      expect:["regen","zon"], must:[[/weer\s*=\s*["']regen["'][\s\S]*weer\s*=\s*["']zon["']/,"Geef weer eerst de waarde \"regen\" en daarna de waarde \"zon\"."],[/print\(\s*weer\s*\)[\s\S]*print\(\s*weer\s*\)/,"Toon de waarde twee keer met print(weer)."]],
+      hint:'weer = "regen"\nprint(weer)\nweer = "zon"\nprint(weer)', ok:"Super! De tweede toekenning overschreef de eerste waarde."},
+    {id:"h5-code4", type:"code", q:"Maak een variabele <code>pi</code> met de waarde <b>3.14</b>. Toon eerst de tekst <b>De waarde van pi is:</b> en op de volgende regel de waarde van de variabele.", starter:"",
+      expect:["De waarde van pi is:","3.14"], must:[[/pi\s*=\s*3\.14/,"Maak de variabele pi = 3.14 (met een punt!)."],[/print\(\s*pi\s*\)/,"Toon de waarde met print(pi)."]],
+      hint:'pi = 3.14\nprint("De waarde van pi is:")\nprint(pi)', ok:"Juist! Let op het verschil: de tekst staat tussen aanhalingstekens, de variabele niet."},
+    {id:"h5-code5", type:"code", q:"Uitdaging: maak drie variabelen over jezelf: <code>voornaam</code> (een string), <code>leeftijd</code> (een geheel getal) en <code>lengte</code> (in meter, een kommagetal zoals 1.65). Toon ze daarna elk op een eigen regel.", starter:"",
+      anyLines:3, must:[[/voornaam\s*=\s*["']/,"voornaam moet een string zijn: zet de waarde tussen aanhalingstekens."],[/leeftijd\s*=\s*\d+\s*($|\n|#)/,"leeftijd moet een geheel getal zijn, zonder aanhalingstekens, bijvoorbeeld leeftijd = 15."],[/lengte\s*=\s*\d+\.\d+/,"lengte moet een kommagetal zijn, met een punt, bijvoorbeeld lengte = 1.65."],[/print\(\s*voornaam\s*\)/,"Toon voornaam met print(voornaam)."],[/print\(\s*leeftijd\s*\)/,"Toon leeftijd met print(leeftijd)."],[/print\(\s*lengte\s*\)/,"Toon lengte met print(lengte)."]],
+      hint:'voornaam = "Sara"\nleeftijd = 15\nlengte = 1.65\nprint(voornaam)\nprint(leeftijd)\nprint(lengte)', ok:"Knap! Je gebruikte drie verschillende datatypes: een string, een int en een float."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h5-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik weet wat een variabele is (naam en waarde).","Ik kan een variabele maken met een toekenning (=).","Ik ken het verschil tussen print(dier) en print(\"dier\").","Ik ken de regels voor een goede variabelenaam.","Ik weet dat een nieuwe toekenning de oude waarde overschrijft."]},
+    {id:"h5-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+}
+];
+
+/* ---------- code checks ---------- */
+const CHECKS = {
+  hallo:(out)=> out.trim()==="Hallo wereld!" ? [true,"Perfect! Je programma toont precies ‘Hallo wereld!’."] :
+     [false, out.trim()==="" ? "Je programma toont nog niets. Gebruik print(...)." : "Je programma toont: ‘"+out.trim()+"’. Het moet precies ‘Hallo wereld!’ zijn. Let op hoofdletters en het uitroepteken."],
+  naam:(out,code)=>{const o=out.trim(); if(!/print\s*\(/.test(code)) return [false,"Gebruik de opdracht print(...)."];
+     if(o==="") return [false,"Je programma toont nog niets."];
+     if(/^hallo wereld!?$/i.test(o)) return [false,"Je programma toont nog ‘Hallo wereld!’. Vervang ‘wereld’ door je eigen naam."];
+     if(!/^(hallo|hoi|hey|dag|goedemorgen|goeiedag|welkom)/i.test(o)) return [false,"Begin je begroeting met bijvoorbeeld ‘Hallo’ of ‘Hoi’."];
+     return [true,"Mooi! Je programma begroet je met: ‘"+o+"’."]},
+  drie:(out,code)=>{const n=(code.match(/print\s*\(/g)||[]).length, lines=out.split("\n").filter(l=>l.trim()).length;
+     if(n<3) return [false,"Ik zie maar "+n+" print-regel(s). Je hebt er drie nodig."];
+     if(lines<3) return [false,"Je programma toont maar "+lines+" regel(s) tekst."];
+     return [true,"Super! Je programma toont "+lines+" regels."]},
+  tafel9:(out)=>{const o=out.replace(/\s+/g," ");
+     if(/10 x 9 = 90/.test(o) && /De tafel van 9/.test(o)) return [true,"Juist! Door één getal te veranderen, verandert het hele resultaat."];
+     if(/x 7 =/.test(o)) return [false,"Je programma toont nog de tafel van 7. Verander het getal op regel 1."];
+     return [false,"Dat is nog niet de tafel van 9 tot 10 x 9 = 90."]},
+  tot20:(out)=>{const o=out.replace(/\s+/g," ");
+     if(/20 x 7 = 140/.test(o) && !/21 x 7/.test(o)) return [true,"Knap! Het tweede getal in range bepaalt tot waar er geteld wordt. Het getal zelf telt niet mee: met 21 stopt het bij 20."];
+     if(/21 x 7/.test(o)) return [false,"Je gaat net te ver: de tafel moet stoppen bij 20 x 7."];
+     if(/10 x 7 = 70/.test(o)) return [false,"Je tafel stopt nog bij 10 x 7. Pas het getal 11 in range aan."];
+     return [false,"Dat is nog niet de tafel van 7 tot 20 x 7 = 140. Staat getal nog op 7?"]}
+};
+function genericCheck(it){ return (out,code)=>{
+  for(const [re,msg] of (it.must||[])) if(!re.test(code)) return [false,msg];
+  let got;
+  if(it.exact){ got=out.replace(/\r/g,"").split("\n").map(l=>l.replace(/\s+$/,"")); while(got.length&&got[got.length-1]==="") got.pop(); }
+  else got=out.replace(/\r/g,"").split("\n").map(l=>l.trim()).filter(l=>l!=="");
+  if(it.anyLines){ const g=out.split("\n").map(l=>l.trim()).filter(l=>l); if(g.length<it.anyLines) return [false, g.length===0?"Je programma toont nog niets.":`Je programma toont ${g.length} regel(s), maar er ${it.anyLines===1?"moet minstens 1 regel":"moeten minstens "+it.anyLines+" regels"} verschijnen.`]; return [true,it.ok||"Juist!"]; }
+  const exp=it.expect||[];
+  if(got.length===0) return [false,"Je programma toont nog niets. Gebruik print(...)."];
+  if(got.length!==exp.length) return [false,`Je programma toont ${got.length} regel(s), maar er ${exp.length===1?"wordt 1 regel":"worden "+exp.length+" regels"} verwacht.`];
+  for(let i=0;i<exp.length;i++) if(got[i]!==exp[i]){
+    if(it.exact&&got[i].trim()===exp[i].trim()) return [false,`Regel ${i+1} bevat de juiste tekens, maar de spaties kloppen nog niet.`];
+    if(exp[i]==="") return [false,`Regel ${i+1} moet een lege regel zijn.`];
+    return [false, exp.length===1?"Het resultaat klopt nog niet. Controleer je code goed (ook hoofdletters en leestekens).":`Regel ${i+1} van je uitvoer klopt nog niet. Controleer die regel goed (ook hoofdletters en leestekens).`]; }
+  return [true,it.ok||"Juist!"]; } }
+const CODE_HINT = {hallo:'print("Hallo wereld!")', naam:'print("Hallo Sara!")', drie:'print("Ik heet Sara.")\nprint("Ik ben 15 jaar.")\nprint("Mijn hobby is tekenen.")', tafel9:'getal = 9  (op regel 1)', tot20:'for i in range(1, 21):  (op regel 3)'};
+
+/* ---------- Python in a worker ---------- */
+let worker=null, pyReady=null;
+function startWorker(){
+  const src=`importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js");
+  let py=null;
+  const ready=loadPyodide().then(p=>{py=p;postMessage({type:"ready"});}).catch(e=>postMessage({type:"loadfail",msg:String(e)}));
+  onmessage=async(e)=>{await ready; if(!py) return; let out=""; const q=(e.data.inputs||[]).slice(); const dec=new TextDecoder();
+    py.setStdout({write:b=>{out+=dec.decode(b,{stream:true});return b.length}});
+    py.setStderr({write:b=>{out+=dec.decode(b,{stream:true});return b.length}});
+    py.setStdin({stdin:()=>{if(!q.length)return undefined; const v=q.shift(); out+=v+"\\n"; return v;}});
+    try{ py.runPython("import sys\\nfor _k in [k for k in list(globals()) if not k.startswith('_') and k not in ('sys',)]: del globals()[_k]");
+      await py.runPythonAsync(e.data.code); postMessage({type:"done",out,err:null}); }
+    catch(err){ postMessage({type:"done",out,err:String(err.message||err)}); }
+  };`;
+  worker=new Worker(URL.createObjectURL(new Blob([src],{type:"text/javascript"})));
+  pyReady=new Promise((res,rej)=>{worker.onmessage=e=>{if(e.data.type==="ready")res();if(e.data.type==="loadfail")rej(e.data.msg)}; worker.onerror=()=>rej("worker")});
+}
+function friendlyError(raw){
+  if(!raw) return null;
+  const lines=raw.trim().split("\n");
+  const last=lines[lines.length-1];
+  let ln=null; for(const l of lines){const m=l.match(/File "<exec>", line (\d+)/); if(m) ln=m[1]}
+  const m2=last.match(/\(detected at line (\d+)\)/); if(m2) ln=ln||m2[1];
+  if(/^EOFError/.test(last)) return {line:ln,text:"Je programma vraagt om invoer, maar er is (niet genoeg) invoer ingevuld. Vul het vak ‘Invoer’ aan: één antwoord per regel.",type:"EOFError"};
+  return {line:ln,text:last,type:(last.match(/^(\w+(Error|Exception))/)||[])[1]||"Fout"};
+}
+function runPython(code,inputs){
+  if(!worker) startWorker();
+  return pyReady.then(()=>new Promise(res=>{
+    const t=setTimeout(()=>{worker.terminate();worker=null;res({out:"",err:{line:null,text:"Je programma bleef te lang lopen en werd gestopt. Zit er misschien een lus in die nooit stopt?",type:"Tijd"}})},8000);
+    worker.onmessage=e=>{if(e.data.type==="done"){clearTimeout(t);res({out:e.data.out,err:friendlyError(e.data.err)})}};
+    worker.postMessage({code,inputs:inputs||[]});
+  }));
+}
+function showOut(el,r){el.style.display="block"; el.innerHTML="";
+  const o=document.createElement("div"); o.textContent=r.out||(r.err?"":"(je programma toonde niets)"); el.appendChild(o);
+  if(r.err){const e=document.createElement("div"); e.className="errl"; e.textContent=(r.out?"\n":"")+"⚠ Foutmelding"+(r.err.line?" op regel "+r.err.line:"")+":\n"+r.err.text; el.appendChild(e)}}
+function makeEditor(value,onChange){
+  const ed=$(`<div class="ed"><div class="gut">1</div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Typ hier je code"></textarea></div>`);
+  const ta=ed.querySelector("textarea"), gut=ed.querySelector(".gut");
+  const nums=()=>{const n=Math.max(ta.value.split("\n").length,5); gut.textContent=Array.from({length:n},(_,i)=>i+1).join("\n"); ta.rows=Math.min(Math.max(n,5),20)};
+  ta.value=value||""; nums();
+  ta.addEventListener("scroll",()=>{gut.scrollTop=ta.scrollTop});
+  ta.addEventListener("input",()=>{nums();onChange(ta.value)});
+  ta.addEventListener("keydown",e=>{
+    if(e.key==="Tab"&&!e.shiftKey){e.preventDefault();ins("    ")}
+    else if(e.key==="Enter"){const s=ta.selectionStart, before=ta.value.slice(0,s), line=before.split("\n").pop(); let ind=(line.match(/^ */)||[""])[0]; if(/:\s*$/.test(line)) ind+="    "; e.preventDefault(); ins("\n"+ind)}
+  });
+  function ins(txt){const s=ta.selectionStart; ta.value=ta.value.slice(0,s)+txt+ta.value.slice(ta.selectionEnd); ta.selectionStart=ta.selectionEnd=s+txt.length; nums(); onChange(ta.value)}
+  ed.ta=ta; ed.setReadOnly=(r)=>{ta.readOnly=r}; return ed;
+}
+function makeStdin(a,getCode){
+  const box=$(`<div class="stdin"><label style="font-size:14px"><b>Invoer</b> – wat typ je in als je programma iets vraagt? Eén antwoord per regel.</label><textarea placeholder="bv. Sara"></textarea></div>`);
+  const ta=box.querySelector("textarea"); ta.value=a.stdin||""; ta.oninput=()=>{a.stdin=ta.value;save()};
+  box.refresh=()=>{box.style.display=/input\s*\(/.test(getCode())?"block":"none"};
+  box.lines=()=>ta.value===""?[]:ta.value.replace(/\r/g,"").split("\n");
+  return box;
+}
+
+/* ---------- state ---------- */
+let S={name:"",answers:{},current:"start"};
+try{const raw=localStorage.getItem(COURSE_ID); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(COURSE_ID,JSON.stringify(S))}catch(e){}; updateBar()}
+const A=id=>S.answers[id]||(S.answers[id]={attempts:0});
+const MAXTRY=2;
+
+function allItems(ch){return ch.sections.flatMap(s=>s.items)}
+function graded(it){return ["mc","tf","match","fill","code"].includes(it.type)}
+function maxOf(it){return (it.type==="tf"||it.type==="match")?it.parts?.length||it.pairs.length:1}
+function isDone(it){const a=S.answers[it.id]; if(!a) return false;
+  if(graded(it)) return !!a.locked; if(it.type==="open") return it.optional || !!(a.value&&a.value.trim()); if(it.type==="checklist") return (a.value||[]).length===it.parts.length; if(it.type==="play") return !!a.ran; return false}
+function updateBar(){const its=CHAPTERS.flatMap(allItems); const d=its.filter(isDone).length;
+  document.getElementById("bar").style.width=(100*d/its.length)+"%";
+  document.getElementById("who").textContent=S.name?("👤 "+S.name):"";}
+
+/* ---------- rendering ---------- */
+const $=(h)=>{const t=document.createElement("template");t.innerHTML=h.trim();return t.content.firstChild};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function shuffleFixed(arr,seed){const a=arr.map((x,i)=>[x,i]); let s=seed; for(let i=a.length-1;i>0;i--){s=(s*9301+49297)%233280; const j=Math.floor(s/233280*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a}
+function seedOf(id){let h=7;for(const c of id)h=(h*31+c.charCodeAt(0))%100000;return h+1}
+
+const GROUPS=[["Basis",["h1","h2","h3","h4"]],["Variabelen",["h5","h6","h7","h8"]],["Rekenen en tekst",["h9","h10"]],["Beslissingen",["h11","h12","h13","h14"]],["Herhalingen",["h15","h16","h17"]],["Strings",["h18"]]];
+function chProgress(ch){const its=allItems(ch); return [its.filter(isDone).length,its.length]}
+function chLabel(ch){const n=ch.short.split(".")[0]; return n+". "+ch.title.replace(/^Hoofdstuk \d+ – /,"")}
+function chapterList(onPick){
+  const box=$(`<div class="chlist"></div>`);
+  GROUPS.forEach(([g,ids])=>{const chs=ids.map(id=>CHAPTERS.find(c=>c.id===id)).filter(Boolean); if(!chs.length) return;
+    box.appendChild($(`<div class="grp">${esc(g)}</div>`));
+    chs.forEach(ch=>{const [d,t]=chProgress(ch); const pct=Math.round(100*d/t);
+      const b=$(`<button class="mi${S.current===ch.id?" cur":""}"><span class="mt">${esc(chLabel(ch))}</span><span class="mp">${d===t?'<span class="okm">✓</span>':`<span class="mbar"><i style="width:${pct}%"></i></span>`}</span></button>`);
+      b.onclick=()=>onPick(ch.id); box.appendChild(b)})});
+  return box}
+function openMenu(){closeMenu();
+  const ov=$(`<div class="menu-ov" id="menu"><div class="menu-panel" role="dialog" aria-label="Hoofdstukken"><div class="menu-head"><b>Hoofdstukken</b><button class="xbtn" aria-label="Sluiten">✕</button></div></div></div>`);
+  const panel=ov.querySelector(".menu-panel");
+  const st=$(`<button class="mi${S.current==="start"?" cur":""}"><span class="mt">🏠 Start</span></button>`); st.onclick=()=>{closeMenu();go("start")}; panel.appendChild(st);
+  panel.appendChild(chapterList(id=>{closeMenu();go(id)}));
+  ov.onclick=e=>{if(e.target===ov)closeMenu()}; ov.querySelector(".xbtn").onclick=closeMenu;
+  document.body.appendChild(ov); document.addEventListener("keydown",escClose)}
+function escClose(e){if(e.key==="Escape")closeMenu()}
+function closeMenu(){const m=document.getElementById("menu"); if(m)m.remove(); document.removeEventListener("keydown",escClose)}
+function renderNav(){const nav=document.getElementById("nav"); nav.innerHTML="";
+  const ch=CHAPTERS.find(c=>c.id===S.current);
+  const where=S.current==="start"?"Start":S.current==="kladblok"?"Kladblok":S.current==="rapport"?"Mijn resultaat":chLabel(ch);
+  const mb=$(`<button class="navb menu">☰ Hoofdstukken</button>`); mb.onclick=openMenu; nav.appendChild(mb);
+  nav.appendChild($(`<span class="where">${esc(where)}</span>`));
+  [["kladblok","✎ Kladblok"],["rapport","📋 Mijn resultaat"]].forEach(([id,l])=>{const b=$(`<button class="navb${S.current===id?" active":""}">${l}</button>`); b.onclick=()=>go(id); nav.appendChild(b)})}
+function go(id){S.current=id;save();render();window.scrollTo(0,0)}
+function render(){renderNav(); const m=document.getElementById("main"); m.innerHTML="";
+  if(S.current==="start") return renderStart(m);
+  if(S.current==="rapport") return renderReport(m);
+  if(S.current==="kladblok") return renderScratch(m);
+  const ch=CHAPTERS.find(c=>c.id===S.current); renderChapter(m,ch)}
+
+function renderStart(m){
+  const c=$(`<div class="card"><div class="kicker">Welkom</div><h2>Leren programmeren in Python</h2>
+  <p>In deze cursus leer je stap voor stap programmeren in Python. Je werkt in je eigen tempo. Je antwoorden worden automatisch bewaard op deze computer, zodat je later verder kunt gaan.</p>
+  <div class="box"><b>Zo werkt het</b><br>• Na elke vraag klik je op <b>Controleer</b>. Je ziet meteen of je antwoord juist is.<br>• Fout? Geen probleem: je krijgt nog een kans. Daarna zie je het juiste antwoord met uitleg.<br>• Je schrijft je code rechtstreeks in de cursus. Met <b>▶ Uitvoeren</b> probeer je uit, met <b>✓ Controleer</b> laat je ze nakijken.<br>• In het <b>Kladblok</b> kun je vrij oefenen.<br>• Klaar met een hoofdstuk? Ga naar <b>Mijn resultaat</b> en stuur je resultaat naar je leerkracht.</div>
+  <p><label for="nm"><b>Wat is je naam?</b></label><br><input type="text" id="nm" style="width:100%;max-width:340px" value="${esc(S.name)}" placeholder="Voornaam en naam"></p>
+  <div class="actions"><button class="btn" id="go1">Start met hoofdstuk 1 →</button></div></div>`);
+  m.appendChild(c);
+  c.querySelector("#nm").oninput=e=>{S.name=e.target.value;save()};
+  c.querySelector("#go1").onclick=()=>go("h1");
+  const ov=$(`<div class="card"><h3>Alle hoofdstukken</h3><p style="font-size:14px;color:var(--muted);margin-top:0">Het balkje toont hoeveel je al gemaakt hebt. ✓ = klaar.</p></div>`);
+  ov.appendChild(chapterList(id=>go(id))); m.appendChild(ov);
+}
+
+function renderScratch(m){
+  const a=A("kladblok"); if(a.value===undefined) a.value='# Dit is je kladblok. Probeer hier gerust van alles uit!\nprint("Hallo!")';
+  const c=$(`<div class="card"><div class="kicker">Vrij oefenen</div><h2>Kladblok</h2><p>Hier kun je alles uitproberen wat je wilt. Niets wordt nagekeken en alles wordt bewaard. Een regel die begint met <code>#</code> is een opmerking: die voert de computer niet uit.</p></div>`);
+  m.appendChild(c);
+  const ed=makeEditor(a.value,v=>{a.value=v;save();stdin.refresh()}); ed.ta.style.minHeight="260px"; c.appendChild(ed);
+  const stdin=makeStdin(a,()=>ed.ta.value); c.appendChild(stdin); stdin.refresh();
+  const act=$(`<div class="actions"><button class="btn">▶ Uitvoeren</button><span class="st" style="color:var(--muted);font-size:14px"></span></div>`); c.appendChild(act);
+  const out=$(`<div class="out"></div>`); c.appendChild(out);
+  act.querySelector("button").onclick=async()=>{const b=act.querySelector("button"),st=act.querySelector(".st"); b.disabled=true; st.textContent=worker?"Bezig…":"Python wordt geladen…";
+    try{const r=await runPython(ed.ta.value,stdin.lines()); showOut(out,r)}catch(e){out.style.display="block";out.textContent="Python kon niet geladen worden. Controleer je internetverbinding.";worker=null}
+    b.disabled=false; st.textContent=""};
+}
+
+function renderChapter(m,ch){
+  let n=0;
+  m.appendChild($(`<div class="card"><div class="kicker">Cursus Python</div><h2>${esc(ch.title)}</h2>
+   <p style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn secondary" href="${ch.video}" target="_blank" rel="noopener">▶ ${esc(ch.videoTitle)}</a>${ch.video2?`<a class="btn secondary" href="${ch.video2}" target="_blank" rel="noopener">▶ ${esc(ch.video2Title)}</a>`:""}</p>${ch.intro}</div>`));
+  ch.sections.forEach(sec=>{
+    const card=$(`<div class="card"><h3>${esc(sec.title)}</h3>${sec.html||""}</div>`);
+    sec.items.forEach(it=>{n++; card.appendChild(renderItem(it,n))});
+    m.appendChild(card);
+  });
+  const idx=CHAPTERS.indexOf(ch);
+  const nb=$(`<div class="navbtns"></div>`);
+  nb.appendChild(idx>0?Object.assign($(`<button class="btn secondary">← Vorig hoofdstuk</button>`),{onclick:()=>go(CHAPTERS[idx-1].id)}):$("<span></span>"));
+  nb.appendChild(Object.assign($(`<button class="btn">${idx<CHAPTERS.length-1?"Volgend hoofdstuk →":"Naar mijn resultaat →"}</button>`),{onclick:()=>go(idx<CHAPTERS.length-1?CHAPTERS[idx+1].id:"rapport")}));
+  m.appendChild(nb);
+}
+
+function wrap(it,n,tag){const box=$(`<div class="q" id="${it.id}"><div class="qhead"><span class="qnum">Vraag ${n}</span><span>${it.q}</span><span class="qtag">${tag}</span></div></div>`);return box}
+function setState(box,a,it){box.classList.remove("done-ok","done-bad","done-open");
+  if(graded(it)&&a.locked) box.classList.add(a.score===maxOf(it)?"done-ok":"done-bad");}
+function fb(box){let f=box.querySelector(".fb"); if(!f){f=$(`<div class="fb"></div>`);box.appendChild(f)} return f}
+
+function renderItem(it,n){
+  const a=A(it.id);
+  if(it.type==="mc"){
+    const box=wrap(it,n,"meerkeuze");
+    const order=shuffleFixed(it.options,seedOf(it.id));
+    order.forEach(([txt,i])=>{const o=$(`<label class="opt"><input type="radio" name="${it.id}" value="${i}"><span>${txt}</span></label>`);
+      if(a.value==i) o.querySelector("input").checked=true; o.querySelector("input").onchange=()=>{a.value=i;save()}; box.appendChild(o)});
+    const act=$(`<div class="actions"><button class="btn">Controleer</button></div>`); box.appendChild(act);
+    const paint=()=>{box.querySelectorAll(".opt").forEach(o=>{const v=+o.querySelector("input").value; o.classList.remove("right","wrong");
+        if(a.locked&&v===it.correct)o.classList.add("right"); else if(a.lastWrong===v)o.classList.add("wrong");
+        if(a.locked)o.querySelector("input").disabled=true});
+      if(a.locked){act.remove(); const f=fb(box); f.className="fb "+(a.score?"ok":"bad");
+        f.innerHTML=(a.score?(a.attempts===1?"✔ Juist!":"✔ Juist, bij je tweede poging!"):"✘ Jammer. Het juiste antwoord is groen aangeduid.")+`<div class="ex">${it.explain||""}</div>`}
+      setState(box,a,it)};
+    act.querySelector("button").onclick=()=>{if(a.value===undefined){const f=fb(box);f.className="fb info";f.textContent="Kies eerst een antwoord.";return}
+      a.attempts++; if(+a.value===it.correct){a.locked=true;a.score=1;a.lastWrong=null}
+      else{a.lastWrong=+a.value; if(a.attempts>=MAXTRY){a.locked=true;a.score=0} else {const f=fb(box);f.className="fb bad";f.textContent="✘ Nog niet juist. Probeer het nog een keer!"}}
+      if(a.attempts===1)a.first=(a.score===1); save(); paint()};
+    paint(); return box;
+  }
+  if(it.type==="tf"){
+    const box=wrap(it,n,"juist / fout"); a.value=a.value||{};
+    it.parts.forEach((p,k)=>{const r=$(`<div class="row"><span>${p.s}</span><span><label><input type="radio" name="${it.id}-${k}" value="1"> Juist</label><label><input type="radio" name="${it.id}-${k}" value="0"> Fout</label></span></div>`);
+      r.querySelectorAll("input").forEach(inp=>{if(a.value[k]!==undefined&&String(+a.value[k])===inp.value)inp.checked=true; inp.onchange=()=>{a.value[k]=inp.value==="1";save()}}); box.appendChild(r)});
+    return multi(box,it,a,(k)=>a.value[k]===it.parts[k].a, k=>it.parts[k].a?"Juist":"Fout", k=>it.parts[k].explain);
+  }
+  if(it.type==="match"){
+    const box=wrap(it,n,"koppelen"); a.value=a.value||{};
+    const defs=shuffleFixed(it.pairs.map(p=>p[1]),seedOf(it.id));
+    it.pairs.forEach((p,k)=>{const r=$(`<div class="match row" style="display:grid"><b>${esc(p[0])}</b><select><option value="">— kies —</option>${defs.map(([d,i])=>`<option value="${i}">${esc(d)}</option>`).join("")}</select></div>`);
+      const sel=r.querySelector("select"); if(a.value[k]!==undefined)sel.value=a.value[k]; sel.onchange=()=>{a.value[k]=sel.value;save()}; box.appendChild(r)});
+    return multi(box,it,a,(k)=>String(a.value[k])===String(k), k=>it.pairs[k][1], ()=>"");
+  }
+  if(it.type==="fill"){
+    const box=wrap(it,n,"invullen");
+    const inp=$(`<input type="text" style="width:100%;max-width:260px" placeholder="Jouw antwoord">`); inp.value=a.value||""; inp.oninput=()=>{a.value=inp.value;save()};
+    box.appendChild(inp); const act=$(`<div class="actions"><button class="btn">Controleer</button></div>`); box.appendChild(act);
+    const norm=s=>String(s||"").toLowerCase().replace(/\s+/g,"").replace(/[!]+$/,"");
+    const paint=()=>{if(a.locked){inp.disabled=true;act.remove();const f=fb(box);f.className="fb "+(a.score?"ok":"bad");
+      f.innerHTML=(a.score?"✔ Juist!":"✘ Jammer. Het juiste antwoord is: <b>"+esc(it.answers[0])+"</b>")+`<div class="ex">${it.explain||""}</div>`} setState(box,a,it)};
+    act.querySelector("button").onclick=()=>{if(!norm(a.value)){const f=fb(box);f.className="fb info";f.textContent="Vul eerst iets in.";return}
+      a.attempts++; if(it.answers.some(x=>norm(x)===norm(a.value))){a.locked=true;a.score=1} else if(a.attempts>=MAXTRY){a.locked=true;a.score=0} else {const f=fb(box);f.className="fb bad";f.textContent="✘ Nog niet juist. Probeer het nog een keer!"}
+      if(a.attempts===1)a.first=(a.score===1); save(); paint()};
+    paint(); return box;
+  }
+  if(it.type==="code"||it.type==="play"){
+    const isPlay=it.type==="play";
+    const box=wrap(it,n,isPlay?"probeer":"code");
+    if(a.value===undefined) a.value=it.starter||"";
+    const ed=makeEditor(a.value,v=>{a.value=v;save();stdin.refresh()}); box.appendChild(ed);
+    const stdin=makeStdin(a,()=>ed.ta.value); box.appendChild(stdin); stdin.refresh();
+    const act=$(`<div class="actions"><button class="btn secondary run">▶ Uitvoeren</button>${isPlay?"":'<button class="btn chk">✓ Controleer</button>'}<button class="btn secondary rst" title="Begin opnieuw met de oorspronkelijke code" style="margin-left:auto">↺</button><span class="st" style="color:var(--muted);font-size:14px;width:100%"></span></div>`); box.appendChild(act);
+    const out=$(`<div class="out"></div>`); box.appendChild(out);
+    const st=act.querySelector(".st"), btns=[...act.querySelectorAll("button")];
+    const paint=()=>{ if(isPlay){ if(a.ran) box.classList.add("done-open"); return }
+      if(a.locked){ed.setReadOnly(true); act.querySelector(".chk").disabled=true; act.querySelector(".rst").disabled=true; const f=fb(box);f.className="fb ok";f.innerHTML="✔ "+esc(a.msg||"Juist!")+(a.attempts>1?` <span style="color:var(--muted)">(na ${a.attempts} pogingen)</span>`:"")}
+      setState(box,a,it)};
+    async function go(grade){ const code=ed.ta.value;
+      if(!code.trim()){const f=fb(box);f.className="fb info";f.textContent="Typ eerst je code in het codevak.";return}
+      btns.forEach(b=>b.disabled=true); st.textContent=worker?"Bezig…":"Python wordt geladen (de eerste keer duurt dit even)…";
+      let r; try{ r=await runPython(code, it.testInputs||stdin.lines()) }catch(e){ st.textContent=""; btns.forEach(b=>b.disabled=false); const f=fb(box); f.className="fb bad"; f.textContent="Python kon niet geladen worden. Controleer je internetverbinding en probeer opnieuw."; worker=null; return }
+      st.textContent=""; btns.forEach(b=>b.disabled=false); showOut(out,r);
+      if(isPlay){a.ran=true; save(); paint(); return}
+      if(!grade){ const f=box.querySelector(".fb"); if(f&&!a.locked){f.className="fb"} return }
+      a.attempts++;
+      if(r.err){const f=fb(box);f.className="fb bad";f.innerHTML="✘ Je code geeft een foutmelding"+(r.err.line?" op regel "+r.err.line:"")+". Lees ze rustig en verbeter je code."+(a.attempts>=3&&(it.hint||CODE_HINT[it.check])?`<div class="ex">Tip – zo kan het:<pre style="margin:6px 0 0">${esc(it.hint||CODE_HINT[it.check])}</pre></div>`:"")}
+      else{const [ok,msg]=(it.check?CHECKS[it.check]:genericCheck(it))(r.out||"",code); if(ok){a.locked=true;a.score=1;a.msg=msg} else {const f=fb(box);f.className="fb bad";f.innerHTML="✘ "+esc(msg)+(a.attempts>=3&&(it.hint||CODE_HINT[it.check])?`<div class="ex">Tip – zo kan het:<pre style="margin:6px 0 0">${esc(it.hint||CODE_HINT[it.check])}</pre></div>`:"")}}
+      if(a.attempts===1)a.first=!!a.locked; save(); paint(); }
+    act.querySelector(".run").onclick=()=>go(false);
+    if(!isPlay) act.querySelector(".chk").onclick=()=>go(true);
+    act.querySelector(".rst").onclick=()=>{ if(a.locked) return; if(confirm("Wil je opnieuw beginnen met de oorspronkelijke code? Je huidige code verdwijnt.")){a.value=it.starter||""; ed.ta.value=a.value; ed.ta.dispatchEvent(new Event("input")); save()} };
+    paint(); return box;
+  }
+  if(it.type==="open"){
+    const box=wrap(it,n,"eigen antwoord"); const ta=$(`<textarea placeholder="Typ hier je antwoord"></textarea>`); ta.value=a.value||"";
+    const st=$(`<div style="font-size:13px;color:var(--muted);margin-top:4px">Je antwoord wordt automatisch bewaard. Je leerkracht leest het in je resultaat.</div>`);
+    ta.oninput=()=>{a.value=ta.value;save();box.classList.toggle("done-open",!!ta.value.trim())}; box.appendChild(ta); box.appendChild(st);
+    if(ta.value.trim())box.classList.add("done-open"); return box;
+  }
+  if(it.type==="checklist"){
+    const box=wrap(it,n,"afvinken"); a.value=a.value||[];
+    it.parts.forEach((p,k)=>{const c=$(`<label class="check"><input type="checkbox"><span>${esc(p)}</span></label>`); const inp=c.querySelector("input"); inp.checked=a.value.includes(k);
+      inp.onchange=()=>{a.value=inp.checked?[...new Set([...a.value,k])]:a.value.filter(x=>x!==k);save();box.classList.toggle("done-open",a.value.length===it.parts.length)}; box.appendChild(c)});
+    if(a.value.length===it.parts.length)box.classList.add("done-open"); return box;
+  }
+}
+
+function multi(box,it,a,isRight,rightLabel,explain){
+  const rows=[...box.querySelectorAll(".row")]; const total=rows.length;
+  const act=$(`<div class="actions"><button class="btn">Controleer</button></div>`); box.appendChild(act);
+  const paint=()=>{rows.forEach((r,k)=>{r.classList.remove("right","wrong"); if(a.checked){r.classList.add(isRight(k)?"right":"wrong")}
+      if(a.locked){r.querySelectorAll("input,select").forEach(x=>x.disabled=true);
+        if(!isRight(k)&&!r.querySelector(".ans")) r.appendChild($(`<div class="ans" style="grid-column:1/-1;font-size:14px;color:var(--ink)">Juist antwoord: <b>${esc(rightLabel(k))}</b>${explain(k)?" – "+esc(explain(k)):""}</div>`))}});
+    if(a.locked){act.remove();const f=fb(box);f.className="fb "+(a.score===total?"ok":"bad");f.innerHTML=(a.score===total?"✔ Alles juist!":`Je had ${a.score} van de ${total} juist. Bekijk de verbeteringen hierboven.`)}
+    setState(box,a,it)};
+  act.querySelector("button").onclick=()=>{const filled=rows.every((r,k)=>a.value[k]!==undefined&&a.value[k]!=="");
+    if(!filled){const f=fb(box);f.className="fb info";f.textContent="Beantwoord eerst alle onderdelen.";return}
+    a.attempts++; a.checked=true; const sc=rows.filter((r,k)=>isRight(k)).length;
+    if(a.attempts===1)a.firstScore=sc;
+    if(sc===total||a.attempts>=MAXTRY){a.locked=true;a.score=sc}
+    else{const f=fb(box);f.className="fb bad";f.textContent=`✘ ${sc} van de ${total} juist. De rode onderdelen kloppen nog niet. Pas ze aan en probeer opnieuw!`}
+    save(); paint()};
+  paint(); return box;
+}
+
+/* ---------- report ---------- */
+function chapterStats(ch){let sc=0,mx=0,first=0,done=0,total=0; const lines=[];
+  allItems(ch).forEach((it,i)=>{const a=S.answers[it.id]||{}; total++; if(isDone(it))done++;
+    if(graded(it)){const m=maxOf(it); mx+=m; if(a.locked){sc+=a.score;}
+      let status; if(!a.locked) status="niet gemaakt"; else if(a.score===m) status=a.attempts===1?"juist bij 1e poging":`juist na ${a.attempts} pogingen`; else status=(m>1?`${a.score}/${m} juist`:"fout (antwoord getoond)");
+      lines.push({n:i+1,q:it.q.replace(/<[^>]+>/g,"").replace(/&quot;/g,'"'),status,ok:a.locked&&a.score===m,part:a.locked&&a.score<m,first:a.attempts===1&&a.score===m})}
+    else if(it.type==="open") lines.push({n:i+1,q:it.q,open:(a.value||"").trim()});
+    else if(it.type==="checklist") lines.push({n:i+1,q:it.q,status:`${(a.value||[]).length}/${it.parts.length} afgevinkt`});
+    else if(it.type==="play") lines.push({n:i+1,q:"Probeeropdracht: "+it.q,status:a.ran?"uitgevoerd":"niet gedaan",ok:!!a.ran});
+  }); return {sc,mx,done,total,lines}}
+
+function reportText(ids){ids=ids||CHAPTERS.map(c=>c.id); const d=new Date(); let t=`CURSUS PYTHON – RESULTAAT\nLeerling: ${S.name||"(geen naam ingevuld)"}\nDatum: ${d.toLocaleDateString("nl-BE")} ${d.toLocaleTimeString("nl-BE",{hour:"2-digit",minute:"2-digit"})}\n`;
+  CHAPTERS.filter(c=>ids.includes(c.id)).forEach(ch=>{const s=chapterStats(ch); t+=`\n== ${ch.title} ==\nScore: ${s.sc}/${s.mx} (${s.mx?Math.round(100*s.sc/s.mx):0}%) – ${s.done}/${s.total} onderdelen afgewerkt\n`;
+    s.lines.forEach(l=>{ const qq=String(l.q).replace(/<[^>]+>/g,"").replace(/&quot;/g,'"'); const short=qq.length>55?qq.slice(0,52)+"…":qq; if(l.open!==undefined) t+=`  V${l.n} ${short}\n     → ${l.open||"(niet ingevuld)"}\n`; else t+=`  V${l.n} ${short}\n     → ${l.status}\n`})});
+  return t}
+
+function renderReport(m){
+  const c=$(`<div class="card"><div class="kicker">Overzicht</div><h2>Mijn resultaat</h2><p>${S.name?("Leerling: <b>"+esc(S.name)+"</b>"):"<i>Vul je naam in op de startpagina.</i>"}</p></div>`); m.appendChild(c);
+  CHAPTERS.forEach(ch=>{const s=chapterStats(ch); const pct=s.mx?Math.round(100*s.sc/s.mx):0;
+    const card=$(`<div class="card"><h3>${esc(ch.title)}</h3><div style="display:flex;gap:20px;align-items:baseline;flex-wrap:wrap"><span class="score">${s.sc}/${s.mx}</span><span>${pct}% juist • ${s.done} van ${s.total} onderdelen afgewerkt</span></div></div>`);
+    s.lines.forEach(l=>{ if(l.open!==undefined){card.appendChild($(`<div class="rep-line"><span>V${l.n}</span><span style="margin-left:0;white-space:normal;color:var(--ink)">${esc(l.q)}<br><i style="color:var(--muted)">${esc(l.open||"nog niet ingevuld")}</i></span></div>`))}
+      else card.appendChild($(`<div class="rep-line"><span>V${l.n}</span><span style="margin-left:0;white-space:normal;color:var(--ink)">${esc(l.q)}</span><span><span class="pill ${l.ok?"ok":l.part?"mid":l.status.includes("afgevinkt")?"mid":"bad"}">${esc(l.status)}</span></span></div>`))});
+    m.appendChild(card)});
+  const send=$(`<div class="card" id="sendcard"><h3>Stuur je resultaat naar je leerkracht</h3>
+   <p><b>Welke lessen wil je doorsturen?</b> Vink de lessen aan die je sinds de vorige keer gemaakt hebt.</p><div id="chlist"></div>
+   <div class="actions" style="margin-top:12px"><button class="btn" id="outlook">✉ Mail via Outlook (schoolaccount)</button><button class="btn secondary" id="copy">Kopieer resultaat</button><button class="btn secondary" id="dl">Download als bestand</button></div>
+   <p style="font-size:14px;color:var(--muted);margin-top:8px">Outlook opent in een nieuw tabblad met een kant-en-klare mail aan je leerkracht. Controleer of je aangemeld bent met je schoolaccount en klik op <b>Verzenden</b>. Lukt dat niet? Kopieer dan je resultaat en plak het in een bericht via Smartschool. <a href="#" id="mailto">Ander mailprogramma gebruiken</a></p>
+   <div class="fb" id="sendfb"></div>
+   <details style="margin-top:14px"><summary>Opnieuw beginnen</summary><p style="font-size:14px">Hiermee wis je al je antwoorden op deze computer. Doe dit alleen als je leerkracht dat vraagt.</p><button class="btn secondary" id="reset">Alles wissen</button></details></div>`);
+  m.appendChild(send);
+  S.sent=S.sent||{};
+  const list=send.querySelector("#chlist");
+  CHAPTERS.forEach(ch=>{const st=chapterStats(ch); const sig=chapterSig(ch); const prev=S.sent[ch.id];
+    const active=st.done>0; const changed=!prev||prev.sig!==sig;
+    const row=$(`<label class="check"><input type="checkbox" value="${ch.id}"><span><b>${esc(ch.title)}</b><br><span style="font-size:14px;color:var(--muted)">${st.sc}/${st.mx} punten • ${st.done} van ${st.total} onderdelen afgewerkt${prev?` • al doorgestuurd op ${esc(prev.at)}${changed?" (sindsdien verder gewerkt)":""}`:""}</span></span></label>`);
+    const cb=row.querySelector("input"); cb.checked=active&&changed; list.appendChild(row)});
+  const sel=()=>[...list.querySelectorAll("input:checked")].map(i=>i.value);
+  const sf=send.querySelector("#sendfb");
+  const need=()=>{const ids=sel(); if(!ids.length){sf.className="fb info";sf.textContent="Vink eerst minstens één les aan.";return null} return ids};
+  const markSent=(ids)=>{const at=new Date().toLocaleDateString("nl-BE"); ids.forEach(id=>{S.sent[id]={sig:chapterSig(CHAPTERS.find(c=>c.id===id)),at}}); save()};
+  const subject=(ids)=>"Resultaat cursus Python – "+(S.name||"leerling")+" – "+ids.map(id=>CHAPTERS.find(c=>c.id===id).short.split(".")[0]).map(n=>"H"+n).join(", ");
+  send.querySelector("#outlook").onclick=()=>{const ids=need(); if(!ids)return; let body=reportText(ids); if(body.length>6000) body=body.slice(0,6000)+"\n…(ingekort – stuur ook het gedownloade bestand mee)";
+    const url=`https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(TEACHER_EMAIL)}&subject=${encodeURIComponent(subject(ids))}&body=${encodeURIComponent(body)}`;
+    window.open(url,"_blank","noopener"); markSent(ids);
+    sf.className="fb ok"; sf.textContent="✔ Outlook wordt geopend in een nieuw tabblad. Vergeet niet op Verzenden te klikken!"};
+  send.querySelector("#mailto").onclick=(e)=>{e.preventDefault(); const ids=need(); if(!ids)return; let body=reportText(ids); if(body.length>1800)body=body.slice(0,1800)+"\n…(ingekort – stuur ook het gedownloade bestand mee)";
+    location.href=`mailto:${TEACHER_EMAIL}?subject=${encodeURIComponent(subject(ids))}&body=${encodeURIComponent(body)}`; markSent(ids)};
+  send.querySelector("#copy").onclick=async()=>{const ids=need(); if(!ids)return; try{await navigator.clipboard.writeText(reportText(ids));markSent(ids);sf.className="fb ok";sf.textContent="✔ Gekopieerd! Plak het in een bericht aan je leerkracht."}catch(e){sf.className="fb bad";sf.textContent="Kopiëren lukte niet. Gebruik ‘Download als bestand’."}};
+  send.querySelector("#dl").onclick=()=>{const ids=need(); if(!ids)return; const b=new Blob([reportText(ids)],{type:"text/plain;charset=utf-8"}); const u=URL.createObjectURL(b); const l=document.createElement("a"); l.href=u; l.download=`Resultaat_Python_${(S.name||"leerling").replace(/\s+/g,"_")}.txt`; document.body.appendChild(l); l.click(); l.remove(); setTimeout(()=>URL.revokeObjectURL(u),1000); markSent(ids); sf.className="fb ok"; sf.textContent="✔ Het bestand staat in je map Downloads. Stuur het naar je leerkracht."};
+  send.querySelector("#reset").onclick=()=>{if(confirm("Weet je zeker dat je alle antwoorden wilt wissen?")){S={name:"",answers:{},current:"start",sent:{}};save();render()}};
+}
+function chapterSig(ch){const o=allItems(ch).map(it=>{const a=S.answers[it.id]||{};return [it.id,a.attempts||0,a.locked||0,a.score||0,a.ran||0,JSON.stringify(a.value===undefined?null:a.value)]});
+  let h=0; const str=JSON.stringify(o); for(let i=0;i<str.length;i++){h=(h*31+str.charCodeAt(i))|0} return String(h)}
+
+/* ---------- theme ---------- */
+(function(){let th=null;try{th=localStorage.getItem(COURSE_ID+"-theme")}catch(e){} if(th)document.documentElement.dataset.theme=th;
+  document.getElementById("themeBtn").onclick=()=>{const cur=document.documentElement.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"); const nx=cur==="dark"?"light":"dark"; document.documentElement.dataset.theme=nx; try{localStorage.setItem(COURSE_ID+"-theme",nx)}catch(e){}}})();
+
+render(); updateBar();
+</script>
+</body>
+</html>
