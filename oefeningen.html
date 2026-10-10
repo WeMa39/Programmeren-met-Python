@@ -98,6 +98,8 @@ table.api code{word-break:break-word}
 .exlist .groep{font-weight:800;color:var(--brand);margin:18px 0 2px;font-size:15px}
 .exlist .groep:first-child{margin-top:4px}
 .groepintro{margin:22px 0 4px;padding:12px 14px;border-radius:10px;background:var(--warn-soft);font-size:15px}
+.card{scroll-margin-top:72px}
+select.mist,input.mist{border:2px solid var(--bad);background:var(--bad-soft)}
 ul.stijl{margin:6px 0 0;padding-left:20px;color:var(--ink);font-size:15px}
 ul.stijl li{margin:3px 0}
 details.afspraken{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:var(--card)}
@@ -1541,8 +1543,8 @@ function renderStart(m){
   const kl=c.querySelector("#klas"), nw=c.querySelector("#naamwrap");
   const tekenNaam=()=>{ const lijst=KLASSEN[S.klas]||[];
     if(lijst.length){ nw.innerHTML=`Naam<select id="naam"><option value="">— kies je naam —</option>${lijst.map(n=>`<option ${S.naam===n?"selected":""}>${esc(n)}</option>`).join("")}</select>`; nw.querySelector("select").onchange=e=>{S.naam=e.target.value;save()} }
-    else { nw.innerHTML=`Voornaam en familienaam<input type="text" id="naam" placeholder="bv. Sara Peeters" value="${esc(S.naam)}">`; nw.querySelector("input").oninput=e=>{S.naam=e.target.value.replace(/\s+/g," ").trimStart();save()} } };
-  kl.onchange=()=>{S.klas=kl.value; if((KLASSEN[S.klas]||[]).length&&!KLASSEN[S.klas].includes(S.naam)) S.naam=""; save(); tekenNaam()};
+    else { nw.innerHTML=`Voornaam en familienaam<input type="text" id="naam" placeholder="bv. Sara Peeters" value="${esc(S.naam)}">`; nw.querySelector("input").oninput=e=>{e.target.classList.remove("mist"); S.naam=e.target.value.replace(/\s+/g," ").trimStart();save()} } };
+  kl.onchange=()=>{kl.classList.remove("mist"); S.klas=kl.value; if((KLASSEN[S.klas]||[]).length&&!KLASSEN[S.klas].includes(S.naam)) S.naam=""; save(); tekenNaam()};
   tekenNaam();
 
   const lijst=$(`<div class="card"><h3>Oefeningen</h3><div class="exlist"></div></div>`); m.appendChild(lijst);
@@ -1557,7 +1559,12 @@ function renderStart(m){
     else pill="";
     const b=$(`<button ${o.klaar?"":"disabled"}><span class="t">${esc(o.titel)}</span>${pill}</button>`);
     b.onclick=()=>{ const f=c.querySelector("#startfb");
-      if(!S.klas||!S.naam.trim()){f.className="fb info";f.textContent="Kies eerst je klas en vul je naam in.";c.scrollIntoView({behavior:"smooth"});return}
+      const geenKlas=!S.klas, geenNaam=!S.naam.trim();
+      if(geenKlas||geenNaam){
+        f.className="fb bad"; f.innerHTML="✋ <b>Nog even:</b> "+(geenKlas&&geenNaam?"kies hierboven je <b>klas</b> en vul je <b>naam</b> in.":geenKlas?"kies hierboven je <b>klas</b>.":"vul hierboven je <b>voornaam en familienaam</b> in.")+" Daarna kun je de oefening openen.";
+        c.querySelectorAll("#klas,#naam").forEach(el=>el.classList.remove("mist"));
+        if(geenKlas) c.querySelector("#klas").classList.add("mist"); if(geenNaam) c.querySelector("#naam").classList.add("mist");
+        c.scrollIntoView({behavior:"smooth"}); setTimeout(()=>{const el=c.querySelector(geenKlas?"#klas":"#naam"); if(el) el.focus()},350); return}
       S.naam=S.naam.trim(); go(o.id)};
     ex.appendChild(b)});
   if(KLASAFSPRAKEN) m.appendChild($(`<div class="card"><h3>📏 Klasafspraken voor je code</h3><p style="margin-top:0">Bij <b>✓ Controleer</b> kijkt de app ook na of je code deze afspraken volgt. Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</div>`));
