@@ -87,6 +87,17 @@ select,input[type=text]{font:inherit;color:var(--ink);background:var(--card);bor
 .formrow label{display:flex;flex-direction:column;gap:4px;font-weight:600}
 .flow{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;margin:12px 0;text-align:center}
 .flow img{max-width:100%;height:auto}
+.wereld{margin:12px 0}
+.stage{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#cfe8f7;min-height:120px}
+.sits{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;font-size:14px}
+.sits span{font-weight:700;color:var(--muted)}
+.sits button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 11px;cursor:pointer}
+.sits button.aan{background:var(--brand);color:var(--card);border-color:var(--brand)}
+table.api{margin:10px 0;font-size:14.5px}
+table.api code{word-break:break-word}
+.exlist .groep{font-weight:800;color:var(--brand);margin:18px 0 2px;font-size:15px}
+.exlist .groep:first-child{margin-top:4px}
+.groepintro{margin:22px 0 4px;padding:12px 14px;border-radius:10px;background:var(--warn-soft);font-size:15px}
 ul.stijl{margin:6px 0 0;padding-left:20px;color:var(--ink);font-size:15px}
 ul.stijl li{margin:3px 0}
 details.afspraken{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:var(--card)}
@@ -160,6 +171,616 @@ const FLOW_62="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABCoAAAXjBAMAAADj68c
 /* Startcode met bug (6.3 en 6.4) */
 const QUIZ_BUG="print(\"Welkom bij de kleine quiz!\")\nscore = 0\n\n# Vraag 1\nantwoord1 = input(\"Wat is de som van 15 en 7? \")\nif antwoord1 == 22:\n    score = score + 1\n\n# Vraag 2\nantwoord2 = input(\"Hoeveel is 10.5 plus 5? \")\nif float(antwoord2) == 15.5:\n    score = score + 1\n\nprint(\"-\" * 20)\nprint(\"Je score is\", score, \"op 2.\")\n\n# Evalueer de score\nif score == 2:\n    print(\"Goed gedaan, een perfecte score!\")\nelif score == 1:\n    print(\"Dat is de helft goed. Oefening baart kunst!\")\nelse:\n    print(\"Niet slecht. Probeer het nog een keer.\")";
 const STAP_BUG="print(\"Welkom bij de stappenteller!\")\nprint(\"Bereken hoeveel stappen je hebt gezet.\")\n\n# Vraag 1\nafstand = input(\"Hoeveel kilometer heb je gelopen? \")\n\n# Vraag 2\npaslengte = input(\"Wat is je gemiddelde paslengte in centimeters? \")\n\n# De berekening!\nstappen = float(afstand) / float(paslengte)\n\nprint(\"-\" * 30)\nprint(\"Je hebt ongeveer \", stappen, \"stappen gezet.\")\n\n# Bepaal het fitness-niveau\nif stappen > 10000:\n    print(\"Goed bezig! Je hebt je dagelijkse doel behaald.\")\nelif stappen > 5000:\n    print(\"Dat is een mooi aantal stappen. Blijf bewegen!\")\nelse:\n    print(\"Je kunt er nog een schepje bovenop doen.\")";
+/* Python-code van de programmeerwerelden (wordt vóór de code van de leerling geladen) */
+const WERELD_PY=String.raw`import sys, types, json
+
+
+class WereldFout(Exception):
+    pass
+
+
+_W = {"sc": json.loads(_WSC), "log": [], "staat": {}}
+_SC = _W["sc"]
+_ST = _W["staat"]
+
+
+def _ev(**k):
+    _W["log"].append(k)
+
+
+def _fout(msg):
+    _ev(t="fout", msg=msg)
+    raise WereldFout(msg)
+
+
+def _getal(n, wat):
+    if isinstance(n, bool):
+        _fout(wat + " verwacht een getal.")
+    if isinstance(n, str):
+        _fout(wat + " verwacht een getal, maar je gaf tekst ('" + n + "'). Zet de tekst eerst om met int().")
+    if isinstance(n, float):
+        if n == int(n):
+            return int(n)
+        _fout(wat + " verwacht een geheel getal, geen kommagetal (" + str(n) + ").")
+    if not isinstance(n, int):
+        _fout(wat + " verwacht een getal.")
+    return n
+
+
+def _wereld_json():
+    return json.dumps({"log": _W["log"], "staat": _W["staat"]})
+
+
+# ---------------- De Havenkraan ----------------
+class _Kraan:
+    def __init__(self):
+        self.pos = 0
+        self.vast = False
+        _ST["geplaatst"] = None
+        _ST["gepakt"] = False
+
+    def _rijd(self, stappen, richting):
+        n = _getal(stappen, richting + "()")
+        if n < 0:
+            ander = "links()" if richting == "rechts" else "rechts()"
+            _fout("Gebruik een positief getal. Wil je de andere kant op, gebruik dan " + ander + ".")
+        for i in range(n):
+            nieuw = self.pos + (1 if richting == "rechts" else -1)
+            if nieuw < 0 or nieuw > 7:
+                _fout("De kraan rijdt van de rails! De rails lopen van vak 0 tot vak 7.")
+            self.pos = nieuw
+            _ev(t="pos", v=self.pos)
+
+    def rechts(self, stappen=1):
+        self._rijd(stappen, "rechts")
+
+    def links(self, stappen=1):
+        self._rijd(stappen, "links")
+
+    def pak(self):
+        if self.vast:
+            _fout("De kraan heeft al een container vast.")
+        if self.pos != 0 or _ST["gepakt"]:
+            _fout("Hier staat geen container. De container staat op de kade, op vak 0.")
+        if _SC.get("gewicht", 0) > _SC.get("max", 999):
+            _ev(t="te_zwaar")
+            _fout("De kraan kan deze container niet tillen: hij weegt " + str(_SC["gewicht"]) + " ton en de kraan kan maximaal " + str(_SC["max"]) + " ton tillen.")
+        self.vast = True
+        _ST["gepakt"] = True
+        _ev(t="pak")
+
+    def zet(self):
+        if not self.vast:
+            _fout("De kraan heeft geen container vast. Gebruik eerst kraan.pak().")
+        if self.pos not in _SC.get("schepen", []):
+            _ev(t="plons")
+            self.vast = False
+            _fout("Plons! Op vak " + str(self.pos) + " ligt geen schip: de container valt in het water.")
+        self.vast = False
+        _ST["geplaatst"] = self.pos
+        _ev(t="zet")
+
+    def lees_kleur(self):
+        return _SC["kleur"]
+
+    def lees_afstand(self):
+        return str(_SC["afstand"])
+
+    def lees_gewicht(self):
+        return str(_SC["gewicht"])
+
+
+# ---------------- Het Station ----------------
+class _Wissel:
+    def __init__(self, naam):
+        self.naam = naam
+        self.stand = None
+
+    def _zet(self, stand):
+        if _ST.get("vertrokken"):
+            _fout("De trein is al vertrokken: zet de wissels vóór trein.rijd().")
+        self.stand = stand
+        _ev(t="wissel", w=self.naam, v=stand)
+
+    def boven(self):
+        self._zet("boven")
+
+    def onder(self):
+        self._zet("onder")
+
+
+class _Trein:
+    def __init__(self):
+        _ST["vertrokken"] = False
+        _ST["spoor"] = None
+
+    def lees_bestemming(self):
+        return _SC["bestemming"]
+
+    def lees_wagons(self):
+        return str(_SC["wagons"])
+
+    def rijd(self):
+        if _ST["vertrokken"]:
+            _fout("De trein is al vertrokken.")
+        if _w1.stand is None:
+            _fout("Wissel 1 staat nog niet goed. Zet ze eerst met wissel1.boven() of wissel1.onder().")
+        if _w1.stand == "boven":
+            spoor = "A"
+        elif not _SC.get("wissel2"):
+            spoor = "B"
+        else:
+            if _w2.stand is None:
+                _ev(t="rijd", spoor="W2")
+                _fout("De trein komt aan wissel 2, maar die staat nog niet goed. Zet ze met wissel2.boven() of wissel2.onder().")
+            spoor = "B" if _w2.stand == "boven" else "C"
+        _ST["vertrokken"] = True
+        _ST["spoor"] = spoor
+        _ev(t="rijd", spoor=spoor)
+
+
+# ---------------- Het Magazijn ----------------
+class _Robot:
+    def __init__(self):
+        self.pos = 0
+        self.vast = True
+        _ST["bak"] = None
+
+    def lees_postcode(self):
+        return str(_SC["postcode"])
+
+    def lees_gewicht(self):
+        return str(_SC["gewicht"])
+
+    def naar(self, bak):
+        b = _getal(bak, "naar()")
+        n = _SC.get("bakken", 2)
+        if b < 1 or b > n:
+            _fout("Bak " + str(b) + " bestaat niet. Kies een bak van 1 tot " + str(n) + ".")
+        while self.pos != b:
+            self.pos = self.pos + (1 if b > self.pos else -1)
+            _ev(t="pos", v=self.pos)
+
+    def leg(self):
+        if not self.vast:
+            _fout("De robot heeft geen pakje meer vast.")
+        if self.pos == 0:
+            _fout("De robot staat nog aan de start. Rijd eerst naar een bak met robot.naar().")
+        self.vast = False
+        _ST["bak"] = self.pos
+        _ev(t="leg")
+
+
+# ---------------- Het Verkeer ----------------
+class _Auto:
+    def __init__(self):
+        self.v = _SC.get("snelheid", 50)
+        self.l = _SC.get("brandstof", 0)
+        _ST["actie"] = None
+        _ST["snelheid"] = self.v
+        _ST["getankt"] = False
+
+    def _nog_niet_weg(self):
+        if _ST["actie"]:
+            _fout("De auto heeft al gereden of is al gestopt.")
+
+    def lees_licht(self):
+        return _SC["licht"]
+
+    def lees_bord(self):
+        return str(_SC["bord"])
+
+    def lees_snelheid(self):
+        return str(self.v)
+
+    def lees_brandstof(self):
+        return str(self.l)
+
+    def lees_afstand(self):
+        return str(_SC["afstand"])
+
+    def rem(self, n):
+        self._nog_niet_weg()
+        n = _getal(n, "rem()")
+        if n < 0:
+            _fout("rem() verwacht een positief getal. Wil je sneller, gebruik dan versnel().")
+        if n > self.v:
+            _fout("Zo hard kun je niet remmen: de auto rijdt maar " + str(self.v) + " km/u.")
+        self.v = self.v - n
+        _ST["snelheid"] = self.v
+        _ev(t="snelheid", v=self.v)
+
+    def versnel(self, n):
+        self._nog_niet_weg()
+        n = _getal(n, "versnel()")
+        if n < 0:
+            _fout("versnel() verwacht een positief getal. Wil je trager, gebruik dan rem().")
+        if self.v + n > 130:
+            _fout("Te snel! De auto mag nergens sneller dan 130 km/u.")
+        self.v = self.v + n
+        _ST["snelheid"] = self.v
+        _ev(t="snelheid", v=self.v)
+
+    def tank(self):
+        self._nog_niet_weg()
+        self.l = _SC.get("tank_vol", 50)
+        _ST["getankt"] = True
+        _ev(t="tank", v=self.l)
+
+    def stop(self):
+        self._nog_niet_weg()
+        _ST["actie"] = "stop"
+        _ev(t="stop")
+
+    def rijd(self):
+        self._nog_niet_weg()
+        if "afstand" in _SC:
+            bereik = self.l * _SC["km_per_liter"]
+            if bereik < _SC["afstand"]:
+                _ST["actie"] = "leeg"
+                _ev(t="leeg", f=bereik / _SC["afstand"])
+                _fout("De auto staat stil zonder brandstof na " + str(bereik) + " km, nog " + str(_SC["afstand"] - bereik) + " km van de bestemming!")
+        _ST["actie"] = "rijd"
+        _ev(t="rijd")
+
+
+def _module(naam, **objecten):
+    m = types.ModuleType(naam)
+    for k, v in objecten.items():
+        setattr(m, k, v)
+    sys.modules[naam] = m
+
+
+_w1 = _Wissel("1")
+_w2 = _Wissel("2")
+_module("haven", kraan=_Kraan())
+_module("station", trein=_Trein(), wissel1=_w1, wissel2=_w2)
+_module("magazijn", robot=_Robot())
+_module("verkeer", auto=_Auto())
+`;
+/* ================================================================
+   PROGRAMMEERWERELDEN: kraan, trein, pakjesrobot en auto
+   ================================================================ */
+const W_KLEUR={rood:"#d64545",blauw:"#3b6fd6",groen:"#3fa45b",geel:"#e8c228"};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const svgTxt=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function wRand(st){ if(!st.rand) return ""; const k=st.rand==="ok"?"#2a9d4b":"#d33a2c"; return `<rect x="3" y="3" width="594" height="244" rx="10" fill="none" stroke="${k}" stroke-width="6"/>` }
+function wPaneel(tekst,x,y){ if(!tekst) return ""; const w=Math.max(120,tekst.length*7.2+20); return `<g><rect x="${x}" y="${y}" width="${w}" height="24" rx="6" fill="#ffffff" fill-opacity=".92" stroke="#1f4e79" stroke-opacity=".35"/><text x="${x+10}" y="${y+16.5}" font-size="13" fill="#1d2433" font-family="system-ui,sans-serif">${svgTxt(tekst)}</text></g>` }
+const wSvg=inhoud=>`<svg viewBox="0 0 600 250" role="img" aria-label="Programmeerwereld" style="width:100%;height:auto;display:block;font-family:system-ui,sans-serif">${inhoud}</svg>`;
+
+const WERELDEN={
+/* ---------------- De Havenkraan ---------------- */
+haven:{
+  cx:i=>40+i*74,
+  frames(sc,log){
+    let st={x:0,hy:50,cont:"kade",contX:0,cy:0,zwaar:false};
+    const fr=[{...st}], push=o=>{st={...st,...o};fr.push({...st})};
+    for(const e of log){
+      if(e.t==="pos"){ const a=st.x; for(let k=1;k<=6;k++) push({x:lerp(a,e.v,k/6)}) }
+      else if(e.t==="pak"){ const a=st.hy; for(let k=1;k<=5;k++) push({hy:lerp(a,124,k/5)}); push({cont:"haak"}); for(let k=1;k<=5;k++) push({hy:lerp(124,60,k/5)}) }
+      else if(e.t==="zet"){ const a=st.hy; for(let k=1;k<=5;k++) push({hy:lerp(a,139,k/5)}); push({cont:"schip",contX:st.x}); for(let k=1;k<=5;k++) push({hy:lerp(139,50,k/5)}) }
+      else if(e.t==="plons"){ const a=st.hy; push({cont:"val",contX:st.x,cy:a}); for(let k=1;k<=8;k++) push({cy:lerp(a,208,k/8)}); push({cont:"water",hy:50}) }
+      else if(e.t==="te_zwaar"){ const a=st.hy; for(let k=1;k<=5;k++) push({hy:lerp(a,124,k/5)}); push({zwaar:true}) }
+      else if(e.t==="fout"){ push({rand:"fout"}) }
+    }
+    return fr },
+  render(sc,st){ const cx=this.cx;
+    let s=`<rect width="600" height="250" fill="#cfe8f7"/><rect y="170" width="600" height="80" fill="#2f6fae"/>`;
+    s+=`<path d="M0 182 q15 -5 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0" fill="none" stroke="#5b93cc" stroke-width="2"/>`;
+    s+=`<rect x="0" y="150" width="78" height="100" fill="#9aa1ab"/><rect x="0" y="150" width="78" height="4" fill="#6f7680"/>`;
+    s+=`<rect x="8" y="24" width="584" height="6" fill="#4a4f57"/><rect x="10" y="24" width="7" height="126" fill="#4a4f57"/>`;
+    for(let i=0;i<8;i++) s+=`<text x="${cx(i)}" y="17" text-anchor="middle" font-size="11" fill="#3b4350">${i}</text>`;
+    for(const p of (sc.schepen||[])){ const x=cx(p); const nm=(sc.namen||{})[p]||"";
+      s+=`<polygon points="${x-36},165 ${x+36},165 ${x+27},190 ${x-27},190" fill="#7a3b2e"/><rect x="${x-36}" y="163" width="72" height="4" fill="#5a2a20"/><text x="${x}" y="182" text-anchor="middle" font-size="11" fill="#fff" font-weight="700">${svgTxt(nm)}</text>` }
+    const kl=W_KLEUR[sc.kleur]||"#d08a2c", lab=sc.label||"";
+    const cont=(X,Y,op)=>`<g opacity="${op||1}"><rect x="${X-28}" y="${Y}" width="56" height="26" rx="2" fill="${kl}" stroke="rgba(0,0,0,.35)"/><line x1="${X-14}" y1="${Y+3}" x2="${X-14}" y2="${Y+23}" stroke="rgba(0,0,0,.2)"/><line x1="${X}" y1="${Y+3}" x2="${X}" y2="${Y+23}" stroke="rgba(0,0,0,.2)"/><line x1="${X+14}" y1="${Y+3}" x2="${X+14}" y2="${Y+23}" stroke="rgba(0,0,0,.2)"/>${lab?`<rect x="${X-18}" y="${Y+6}" width="36" height="14" rx="2" fill="#fff" fill-opacity=".85"/><text x="${X}" y="${Y+17}" text-anchor="middle" font-size="10.5" fill="#1d2433" font-weight="700">${svgTxt(lab)}</text>`:""}</g>`;
+    if(st.cont==="kade") s+=cont(cx(0),124);
+    if(st.cont==="schip") s+=cont(cx(st.contX),139);
+    if(st.cont==="val") s+=cont(cx(st.contX),st.cy);
+    if(st.cont==="water") s+=cont(cx(st.contX),208,.35)+`<circle cx="${cx(st.contX)-22}" cy="196" r="6" fill="none" stroke="#fff"/><circle cx="${cx(st.contX)+20}" cy="192" r="4" fill="none" stroke="#fff"/>`;
+    const X=cx(st.x);
+    s+=`<line x1="${X}" y1="36" x2="${X}" y2="${st.hy}" stroke="#333" stroke-width="2"/><rect x="${X-10}" y="${st.hy-4}" width="20" height="5" fill="#333"/>`;
+    if(st.cont==="haak") s+=cont(X,st.hy);
+    s+=`<rect x="${X-24}" y="18" width="48" height="18" rx="3" fill="#f2b705" stroke="#b38600"/>`;
+    if(st.zwaar) s+=`<text x="${cx(0)}" y="112" text-anchor="middle" font-size="26" font-weight="800" fill="#d33a2c">!</text>`;
+    s+=wPaneel(sc.paneel,330,214)+wRand(st);
+    return wSvg(s) }
+},
+/* ---------------- Het Station ---------------- */
+station:{
+  routes(sc){ const S=[10,125],W1=[190,125];
+    const A=[S,W1,[250,60],[590,60]];
+    const B=sc.wissel2?[S,W1,[250,190],[330,190],[390,150],[590,150]]:[S,W1,[250,190],[590,190]];
+    const C=[S,W1,[250,190],[330,190],[390,228],[590,228]];
+    const W2=[S,W1,[250,190],[322,190]];
+    return {A,B,C,W2,start:[S,W1,[300,125]]} },
+  len(r){let L=0;for(let i=1;i<r.length;i++)L+=Math.hypot(r[i][0]-r[i-1][0],r[i][1]-r[i-1][1]);return L},
+  pt(r,d){ for(let i=1;i<r.length;i++){const [x1,y1]=r[i-1],[x2,y2]=r[i];const l=Math.hypot(x2-x1,y2-y1); if(d<=l||i===r.length-1){const t=Math.max(0,Math.min(1,d/l));return {x:lerp(x1,x2,t),y:lerp(y1,y2,t),a:Math.atan2(y2-y1,x2-x1)*180/Math.PI}} d-=l} },
+  frames(sc,log){ const R=this.routes(sc);
+    let st={d:110,route:"start",w1:null,w2:null};
+    const fr=[{...st}], push=o=>{st={...st,...o};fr.push({...st})};
+    for(const e of log){
+      if(e.t==="wissel"){ push(e.w==="1"?{w1:e.v}:{w2:e.v}); for(let k=0;k<4;k++) push({}) }
+      else if(e.t==="rijd"){ const r=R[e.spoor]; const eind=this.len(r)-(e.spoor==="W2"?0:12); for(let k=1;k<=34;k++) push({route:e.spoor,d:lerp(110,eind,k/34)}) }
+      else if(e.t==="fout"){ push({rand:"fout"}) }
+    }
+    return fr },
+  render(sc,st){ const R=this.routes(sc);
+    let s=`<rect width="600" height="250" fill="#e7efe1"/>`;
+    const lijn=r=>{const p=r.map(q=>q.join(",")).join(" ");return `<polyline points="${p}" fill="none" stroke="#b9a58c" stroke-width="13" stroke-dasharray="3 8"/><polyline points="${p}" fill="none" stroke="#6b5b4b" stroke-width="5"/>`};
+    s+=lijn(R.A)+lijn(R.B)+(sc.wissel2?lijn(R.C):"");
+    const bord=(sp,y)=>{const t=sp+" · "+((sc.sporen||{})[sp]||""); const w=t.length*7.2+16; return `<rect x="${590-w}" y="${y-30}" width="${w}" height="19" rx="4" fill="#1f4e79"/><text x="${590-w/2}" y="${y-16}" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">${svgTxt(t)}</text>`};
+    s+=bord("A",60)+bord("B",sc.wissel2?150:190)+(sc.wissel2?bord("C",228):"");
+    const wissel=(x,y,stand,naam,boven,onder)=>{ let p=`<circle cx="${x}" cy="${y}" r="11" fill="#fff" stroke="#1f4e79" stroke-width="2"/>`;
+      if(stand){const [tx,ty]=stand==="boven"?boven:onder; const a=Math.atan2(ty-y,tx-x); p+=`<line x1="${x}" y1="${y}" x2="${x+Math.cos(a)*9}" y2="${y+Math.sin(a)*9}" stroke="#2a9d4b" stroke-width="4" stroke-linecap="round"/>`}
+      else p+=`<text x="${x}" y="${y+4.5}" text-anchor="middle" font-size="12" fill="#888" font-weight="700">?</text>`;
+      return p+`<text x="${x-14}" y="${y-15}" text-anchor="end" font-size="11" fill="#1f4e79" font-weight="700">wissel ${naam}</text>` };
+    s+=wissel(190,125,st.w1,"1",[250,60],[250,190]);
+    if(sc.wissel2) s+=wissel(330,190,st.w2,"2",[390,150],[390,228]);
+    const r=R[st.route], n=Math.min(sc.wagons||4,12);
+    for(let i=n;i>=0;i--){ const d=st.d-i*29; if(d<0) continue; const p=this.pt(r,d);
+      s+=`<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${p.a.toFixed(1)})"><rect x="-13" y="-8" width="26" height="16" rx="3" fill="${i===0?"#c0392b":"#e0b33a"}" stroke="rgba(0,0,0,.35)"/>${i===0?'<rect x="4" y="-5" width="6" height="10" fill="#fde9c8"/>':""}</g>` }
+    s+=wPaneel(sc.paneel,10,8)+wRand(st);
+    return wSvg(s) }
+},
+/* ---------------- Het Magazijn ---------------- */
+magazijn:{
+  bx(sc,b){ const n=sc.bakken||2; return b===0?60:60+b*(480/n) },
+  frames(sc,log){ let st={x:0,pak:"robot",py:0,bak:null};
+    const fr=[{...st}], push=o=>{st={...st,...o};fr.push({...st})};
+    for(const e of log){
+      if(e.t==="pos"){ const a=st.x; for(let k=1;k<=6;k++) push({x:lerp(a,e.v,k/6)}) }
+      else if(e.t==="leg"){ for(let k=1;k<=7;k++) push({pak:"val",py:lerp(0,80,k/7)}); push({pak:"bak",bak:st.x}) }
+      else if(e.t==="fout"){ push({rand:"fout"}) }
+    }
+    return fr },
+  render(sc,st){ const n=sc.bakken||2, bx=b=>this.bx(sc,b);
+    let s=`<rect width="600" height="250" fill="#eef0f3"/><rect y="170" width="600" height="8" fill="#5b6470"/>`;
+    s+=`<rect x="${bx(0)-40}" y="178" width="80" height="62" fill="#c9ced6"/><text x="${bx(0)}" y="214" text-anchor="middle" font-size="12" fill="#3b4350" font-weight="700">Start</text>`;
+    for(let b=1;b<=n;b++){ const x=bx(b), lab=(sc.labels||{})[b]||"";
+      s+=`<rect x="${x-42}" y="192" width="84" height="52" rx="4" fill="#d9e6f2" stroke="#1f4e79" stroke-width="2"/><circle cx="${x-29}" cy="205" r="10" fill="#1f4e79"/><text x="${x-29}" y="209.5" text-anchor="middle" font-size="13" fill="#fff" font-weight="800">${b}</text><text x="${x}" y="239" text-anchor="middle" font-size="${lab.length>11?9:10.5}" fill="#1f4e79" font-weight="700">${svgTxt(lab)}</text>` }
+    const doos=(X,Y)=>`<rect x="${X-20}" y="${Y}" width="40" height="28" rx="2" fill="#c98b4a" stroke="#8a5a2b"/><line x1="${X}" y1="${Y}" x2="${X}" y2="${Y+28}" stroke="#8a5a2b"/><rect x="${X-18}" y="${Y+8}" width="36" height="13" fill="#fff" fill-opacity=".9"/><text x="${X}" y="${Y+18}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1d2433">${svgTxt(sc.label||"")}</text>`;
+    if(st.pak==="bak") s+=doos(bx(st.bak)+6,196);
+    const X=lerp(bx(Math.floor(st.x)),bx(Math.ceil(st.x)),st.x-Math.floor(st.x));
+    s+=`<rect x="${X-26}" y="122" width="52" height="40" rx="9" fill="#5b6b7d"/><circle cx="${X-10}" cy="138" r="5" fill="#fff"/><circle cx="${X+10}" cy="138" r="5" fill="#fff"/><circle cx="${X-10}" cy="138" r="2.2" fill="#1d2433"/><circle cx="${X+10}" cy="138" r="2.2" fill="#1d2433"/><circle cx="${X-16}" cy="166" r="6" fill="#2b2f36"/><circle cx="${X+16}" cy="166" r="6" fill="#2b2f36"/><line x1="${X}" y1="122" x2="${X}" y2="112" stroke="#5b6b7d" stroke-width="4"/>`;
+    if(st.pak==="robot") s+=doos(X,84);
+    if(st.pak==="val") s+=doos(X,84+st.py*1.4);
+    s+=wPaneel(sc.paneel,10,8)+wRand(st);
+    return wSvg(s) }
+},
+/* ---------------- Het Verkeer ---------------- */
+verkeer:{
+  frames(sc,log){ let st={x:30,v:sc.snelheid,l:sc.brandstof,tank:false,uitroep:false};
+    const fr=[{...st}], push=o=>{st={...st,...o};fr.push({...st})};
+    for(const e of log){
+      if(e.t==="snelheid"){ const a=st.v; for(let k=1;k<=6;k++) push({v:Math.round(lerp(a,e.v,k/6))}); for(let k=0;k<3;k++) push({}) }
+      else if(e.t==="tank"){ push({tank:true}); for(let k=1;k<=6;k++) push({l:Math.round(lerp(sc.brandstof,e.v,k/6))}); push({tank:false}) }
+      else if(e.t==="stop"){ const a=st.x; for(let k=1;k<=20;k++) push({x:lerp(a,300,Math.sin(k/20*Math.PI/2))}) }
+      else if(e.t==="rijd"){ const a=st.x; for(let k=1;k<=30;k++) push({x:lerp(a,515,k/30)}) }
+      else if(e.t==="leeg"){ const a=st.x, b=30+e.f*485; for(let k=1;k<=26;k++) push({x:lerp(a,b,Math.sin(k/26*Math.PI/2))}); push({uitroep:true}) }
+      else if(e.t==="fout"){ push({rand:"fout"}) }
+    }
+    return fr },
+  render(sc,st){
+    let s=`<rect width="600" height="250" fill="#a8d38c"/><rect y="150" width="600" height="72" fill="#55595f"/><line x1="0" y1="186" x2="600" y2="186" stroke="#fff" stroke-width="3" stroke-dasharray="22 16"/>`;
+    if(sc.licht){ const aan={rood:"#e53935",oranje:"#fb8c00",groen:"#43a047"}, uit="#3a3a3a";
+      s+=`<rect x="398" y="150" width="7" height="72" fill="#fff"/><rect x="438" y="60" width="5" height="90" fill="#444"/><rect x="424" y="22" width="33" height="82" rx="6" fill="#222"/>`;
+      ["rood","oranje","groen"].forEach((k,i)=>{ s+=`<circle cx="440.5" cy="${37+i*25}" r="9" fill="${sc.licht===k?aan[k]:uit}"/>` }) }
+    if(sc.bord){ s+=`<rect x="298" y="104" width="4" height="46" fill="#666"/><circle cx="300" cy="84" r="24" fill="#fff" stroke="#d32f2f" stroke-width="6"/><text x="300" y="91" text-anchor="middle" font-size="18" font-weight="800" fill="#1d2433">${sc.bord}</text>` }
+    if(sc.afstand){ s+=`<rect x="574" y="96" width="3" height="54" fill="#444"/><polygon points="577,96 597,104 577,112" fill="#d32f2f"/><text x="595" y="86" text-anchor="end" font-size="12" font-weight="700" fill="#1d2433">bestemming: ${sc.afstand} km</text>` }
+    const x=st.x;
+    s+=`<g><rect x="${x}" y="160" width="72" height="28" rx="8" fill="#2f80ed"/><rect x="${x+16}" y="146" width="36" height="18" rx="6" fill="#2f80ed"/><rect x="${x+20}" y="149" width="13" height="11" rx="2" fill="#d6ecff"/><rect x="${x+36}" y="149" width="13" height="11" rx="2" fill="#d6ecff"/><circle cx="${x+16}" cy="190" r="8" fill="#222"/><circle cx="${x+56}" cy="190" r="8" fill="#222"/><rect x="${x+66}" y="166" width="6" height="7" rx="2" fill="#ffe082"/></g>`;
+    if(st.uitroep) s+=`<text x="${x+36}" y="138" text-anchor="middle" font-size="26" font-weight="800" fill="#d33a2c">!</text>`;
+    if(st.tank) s+=`<text x="${x+36}" y="138" text-anchor="middle" font-size="22">⛽</text>`;
+    let p=sc.paneel||"";
+    if(sc.bord) p="Snelheid: "+st.v+" km/u";
+    if(sc.afstand) p="Brandstof: "+st.l+" liter · bereik "+(st.l*sc.km_per_liter)+" km";
+    s+=wPaneel(p,10,8)+wRand(st);
+    return wSvg(s) }
+}
+};
+
+let W_ANIM=0;
+function speelWereld(stage,wid,sc,log,uitslag){
+  const W=WERELDEN[wid]; const fr=W.frames(sc,log||[]); const id=++W_ANIM;
+  if(uitslag) fr[fr.length-1]={...fr[fr.length-1],rand:uitslag};
+  let i=0; const stap=()=>{ if(id!==W_ANIM) return; stage.innerHTML=W.render(sc,fr[i]); i++; if(i<fr.length) setTimeout(stap,55) };
+  stap();
+}
+function toonWereld(stage,wid,sc){ W_ANIM++; const W=WERELDEN[wid]; stage.innerHTML=W.render(sc,W.frames(sc,[])[0]) }
+
+/* ---------------- Levels van de programmeerwerelden ---------------- */
+const W_UITLEG=`<div class="box"><b>Zo werk je</b><br>Schrijf je code en klik op <b>▶ Uitvoeren</b>: je ziet meteen wat er gebeurt. Kies boven de animatie een andere <b>situatie</b> om je code ook daarmee uit te proberen. Bij <b>✓ Controleer</b> test de computer je code in <b>alle</b> situaties. Een vaste reeks bevelen werkt dus maar één keer: je programma moet zelf kiezen met <code>if</code>.</div>`;
+const apiTabel=rijen=>`<table class="api"><tr><th>Bevel</th><th>Wat het doet</th></tr>${rijen.map(([c,u])=>`<tr><td><code>${c}</code></td><td>${u}</td></tr>`).join("")}</table>`;
+const API_HAVEN=apiTabel([["kraan.pak()","Pakt de container op. Die staat op de kade, op vak 0."],["kraan.rechts(3)","Rijdt 3 vakken naar rechts."],["kraan.links(2)","Rijdt 2 vakken naar links."],["kraan.zet()","Zet de container neer op het schip onder de kraan."],["kraan.lees_kleur()","Geeft de kleur van de container, bv. <code>\"rood\"</code>."],["kraan.lees_afstand()","Geeft de afstand tot het schip als <b>tekst</b>, bv. <code>\"3\"</code>."],["kraan.lees_gewicht()","Geeft het gewicht in ton als <b>tekst</b>, bv. <code>\"24\"</code>."]]);
+const API_STATION=apiTabel([["wissel1.boven()","Zet wissel 1 naar het bovenste spoor."],["wissel1.onder()","Zet wissel 1 naar het onderste spoor."],["wissel2.boven() / wissel2.onder()","Zet wissel 2 (alleen in Station 2)."],["trein.rijd()","De trein vertrekt en volgt de wissels. Zet de wissels dus eerst!"],["trein.lees_bestemming()","Geeft de bestemming, bv. <code>\"Gent\"</code>."],["trein.lees_wagons()","Geeft het aantal wagons als <b>tekst</b>, bv. <code>\"9\"</code>."]]);
+const API_MAGAZIJN=apiTabel([["robot.naar(2)","Rijdt naar bak 2."],["robot.leg()","Legt het pakje in de bak waar de robot staat."],["robot.lees_postcode()","Geeft de postcode als <b>tekst</b>, bv. <code>\"9000\"</code>."],["robot.lees_gewicht()","Geeft het gewicht in kg als <b>tekst</b>, bv. <code>\"3.5\"</code>."]]);
+const API_VERKEER=apiTabel([["auto.rijd()","De auto rijdt door tot het einde van de weg."],["auto.stop()","De auto stopt voor de stopstreep."],["auto.lees_licht()","Geeft de kleur van het verkeerslicht: <code>\"groen\"</code>, <code>\"oranje\"</code> of <code>\"rood\"</code>."],["auto.lees_bord()","Geeft de snelheid op het verkeersbord als <b>tekst</b>, bv. <code>\"50\"</code>."],["auto.lees_snelheid()","Geeft de snelheid van de auto als <b>tekst</b>."],["auto.rem(10) / auto.versnel(10)","Rijdt 10 km/u trager of sneller."],["auto.lees_brandstof()","Geeft de liters in de tank als <b>tekst</b>."],["auto.lees_afstand()","Geeft de afstand tot de bestemming in km als <b>tekst</b>."],["auto.tank()","Tankt de auto vol (50 liter)."]]);
+
+function havenDoel(sc,st,out){
+  if(sc.teZwaar){ if(!/zwaar/i.test(out)) return "Deze container is te zwaar. Laat hem staan en toon met print() een melding met het woord ‘zwaar’."; return null }
+  if(!st.gepakt&&/zwaar/i.test(out)) return `Deze container is niet te zwaar: de kraan kan tot en met ${sc.max} ton tillen.`;
+  if(!st.gepakt) return "De kraan heeft de container nog niet opgepakt. Gebruik kraan.pak().";
+  if(st.geplaatst==null) return "De container hangt nog aan de kraan. Zet hem neer met kraan.zet().";
+  if(st.geplaatst!==sc.doel) return `De container staat op het schip op vak ${st.geplaatst}, maar hij moest naar ${sc.doelNaam} op vak ${sc.doel}.`;
+  return null }
+function stationDoel(sc,st,out){
+  if(!st.vertrokken) return "De trein is niet vertrokken. Vergeet trein.rijd() niet.";
+  if(st.spoor!==sc.doel) return `De trein reed naar spoor ${st.spoor} (${sc.sporen[st.spoor]}), maar moest naar spoor ${sc.doel} (${sc.sporen[sc.doel]}).`;
+  if(sc.lengte!=null && !bevat(out,[sc.lengte],0.01)) return `De trein reed juist, maar ik vind de lengte van de trein (${sc.lengte} meter) niet in je uitvoer.`;
+  return null }
+function magazijnDoel(sc,st,out){
+  if(st.bak==null) return "Het pakje ligt nog op de robot. Leg het in een bak met robot.leg().";
+  if(st.bak!==sc.doel) return `Het pakje ligt in bak ${st.bak} (${sc.labels[st.bak]}), maar het moest in bak ${sc.doel} (${sc.labels[sc.doel]}).`;
+  if(sc.kosten!=null && !bevat(out,[sc.kosten],0.01)) return `Het pakje ligt in de juiste bak, maar ik vind de verzendkosten (${sc.kosten} euro) niet in je uitvoer.`;
+  return null }
+function verkeerDoel(sc,st,out){
+  if(sc.licht){
+    if(!st.actie) return "De auto doet niets. Gebruik auto.rijd() of auto.stop().";
+    if(sc.licht==="groen"&&st.actie!=="rijd") return "Het licht is groen: de auto mag doorrijden.";
+    if(sc.licht!=="groen"&&st.actie==="rijd") return `De auto reed door het ${sc.licht==="rood"?"rode":"oranje"} licht!`;
+    return null }
+  if(st.actie!=="rijd") return "De auto vertrekt niet. Vergeet auto.rijd() niet.";
+  if(sc.bord){ if(st.snelheid!==sc.bord) return `De auto rijdt ${st.snelheid} km/u, maar het bord zegt ${sc.bord} km/u.`; return null }
+  const bereik=sc.brandstof*sc.km_per_liter, nodig=bereik<sc.afstand;
+  if(st.getankt&&!nodig) return `Je tankte, maar met ${bereik} km bereik kom je al ${sc.afstand} km ver: tanken was niet nodig.`;
+  if(!bevat(out,[bereik],0.01)) return `De auto kwam aan, maar ik vind het bereik (${bereik} km) niet in je uitvoer.`;
+  return null }
+
+const H_SCHEPEN3={2:"Schip A",6:"Schip B"}, H_SCHEPEN4={2:"Schip A",4:"Schip B",6:"Schip C"}, H_SCHEPEN5={3:"Boot",7:"Vrachtschip"};
+const hSc=(o)=>({kleur:"rood",label:"",...o});
+const ST_LIJN1={A:"Gent",B:"Brugge"}, ST_LIJN2={A:"Gent",B:"Brugge",C:"Oostende"}, ST_LANG={A:"perron A, max 8 wagons",B:"perron B"};
+const MZ1={1:"even",2:"oneven"}, MZ2={1:"Brussel",2:"Antwerpen",3:"Oost-Vlaanderen",4:"rest"}, MZ3={1:"klein",2:"middel",3:"groot"};
+const wLevel=o=>({klaar:true,stappen:[],...o,opdracht:o.opdracht+W_UITLEG});
+const regNaam="# {NAAM}\n";
+
+const WERELD_OEFENINGEN=[
+/* ======== DE HAVENKRAAN ======== */
+wLevel({ id:"H1", groep:"🏗️ De Havenkraan", titel:"Haven 1 - De eerste lading",
+  opdracht:`<p>Welkom in de haven van Antwerpen! Jij bestuurt de containerkraan. Op de kade, op vak 0, staat een container. Breng hem naar het schip op <b>vak 4</b>.</p>${API_HAVEN}`,
+  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
+    html:`<p>Begin je programma met <code>from haven import kraan</code>. Dan kun je de bevelen uit de tabel gebruiken.</p>`,
+    starter:"from haven import kraan\n\n",
+    scenarios:[hSc({naam:"rode container",schepen:[4],namen:{4:"Schip A"},doel:4,doelNaam:"schip A",paneel:"Breng de container naar vak 4."})],
+    doel:havenDoel,
+    moet:[[/from\s+haven\s+import\s+kraan/, "Begin met: from haven import kraan"]],
+    hulp:["Welke drie dingen moet de kraan doen? Denk aan: oppakken, rijden, neerzetten.","Gebruik kraan.pak(), daarna kraan.rechts(...) met het juiste aantal vakken, en tot slot kraan.zet().","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nkraan.pak()\nkraan.rechts(4)\nkraan.zet()</pre>"],
+    ok:"De container staat op het schip. Je eerste lading is binnen!" } }),
+wLevel({ id:"H2", groep:"🏗️ De Havenkraan", titel:"Haven 2 - Lees de afstand",
+  opdracht:`<p>Het schip ligt niet altijd op dezelfde plaats. De kraan kan de <b>afstand</b> tot het schip lezen met <code>kraan.lees_afstand()</code>. Maar let op: die afstand komt binnen als <b>tekst</b>.</p>${API_HAVEN}`,
+  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
+    html:`<p>Lees de afstand, zet ze om naar een getal en rijd zo ver naar rechts.</p>`,
+    starter:"from haven import kraan\n\n",
+    scenarios:[3,5,7,2].map((a,i)=>hSc({naam:`schip op ${a} vakken`,schepen:[a],namen:{[a]:"Schip"},doel:a,doelNaam:"het schip",afstand:a,kleur:["rood","blauw","groen","geel"][i],paneel:`📟 Afstand tot het schip: ${a}`})),
+    doel:havenDoel,
+    moet:[[/lees_afstand\s*\(/, "Lees de afstand met kraan.lees_afstand(): het schip ligt telkens ergens anders."]],
+    hulp:["Een vast getal in kraan.rechts() werkt maar in één situatie. Hoe gebruik je de afstand die de kraan leest?","kraan.lees_afstand() geeft tekst, zoals bij input(). Zet ze om met int() en bewaar ze in een variabele: <code>afstand = int(kraan.lees_afstand())</code>.","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nafstand = int(kraan.lees_afstand())\nkraan.pak()\nkraan.rechts(afstand)\nkraan.zet()</pre>"],
+    ok:"Je kraan vindt het schip, waar het ook ligt!" } }),
+wLevel({ id:"H3", groep:"🏗️ De Havenkraan", titel:"Haven 3 - Rood of niet",
+  opdracht:`<p>Er liggen twee schepen. <b>Rode</b> containers gaan naar <b>schip A</b> op vak 2. Alle <b>andere</b> containers gaan naar <b>schip B</b> op vak 6.</p>${API_HAVEN}`,
+  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
+    html:`<p>Lees de kleur en laat je programma kiezen met <code>if</code> en <code>else</code>.</p>`,
+    starter:"from haven import kraan\n\n",
+    scenarios:[["rood",2,"schip A"],["blauw",6,"schip B"],["groen",6,"schip B"]].map(([k,d,n])=>hSc({naam:`${k}e container`.replace("roode","rode").replace("blauwe","blauwe"),kleur:k,schepen:[2,6],namen:H_SCHEPEN3,doel:d,doelNaam:n,paneel:`📟 Kleur: ${k}`})),
+    doel:havenDoel,
+    moet:[[/lees_kleur\s*\(/, "Lees de kleur met kraan.lees_kleur()."],[/^\s*if\b/m,"Gebruik een if om de kleur te controleren."],[/^\s*else\b/m,"Gebruik een else voor alle andere kleuren."]],
+    hulp:["Wat moet de kraan altijd doen, en wat hangt af van de kleur? Alleen het aantal vakken is anders.","<pre>kleur = kraan.lees_kleur()\nif kleur == \"rood\":\n    kraan.rechts(2)\nelse:\n    kraan.rechts(6)</pre>Pak de container vóór de if en zet hem na de if neer.","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nkleur = kraan.lees_kleur()\nkraan.pak()\nif kleur == \"rood\":\n    kraan.rechts(2)\nelse:\n    kraan.rechts(6)\nkraan.zet()</pre>"],
+    ok:"Elke container komt op het juiste schip!" } }),
+wLevel({ id:"H4", groep:"🏗️ De Havenkraan", titel:"Haven 4 - Drie schepen",
+  opdracht:`<p>Nu liggen er drie schepen. <b>Rood</b> gaat naar <b>schip A</b> (vak 2), <b>blauw</b> naar <b>schip B</b> (vak 4) en <b>groen</b> naar <b>schip C</b> (vak 6).</p>${API_HAVEN}`,
+  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
+    html:`<p>Drie mogelijkheden: gebruik <code>if</code>, <code>elif</code> en <code>else</code>.</p>`,
+    starter:"from haven import kraan\n\n",
+    scenarios:[["groen",6,"schip C"],["rood",2,"schip A"],["blauw",4,"schip B"]].map(([k,d,n])=>hSc({naam:`${k==="rood"?"rode":k+"e"} container`,kleur:k,schepen:[2,4,6],namen:H_SCHEPEN4,doel:d,doelNaam:n,paneel:`📟 Kleur: ${k}`})),
+    doel:havenDoel,
+    moet:[[/lees_kleur\s*\(/, "Lees de kleur met kraan.lees_kleur()."],[/^\s*if\b/m,"Gebruik een if."],[/^\s*elif\b/m,"Gebruik een elif voor de tweede kleur."]],
+    hulp:["Hoe kies je in Python tussen méér dan twee mogelijkheden?","<pre>if kleur == \"rood\":\n    kraan.rechts(2)\nelif kleur == \"blauw\":\n    kraan.rechts(4)\nelse:\n    kraan.rechts(6)</pre>","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nkleur = kraan.lees_kleur()\nkraan.pak()\nif kleur == \"rood\":\n    kraan.rechts(2)\nelif kleur == \"blauw\":\n    kraan.rechts(4)\nelse:\n    kraan.rechts(6)\nkraan.zet()</pre>"],
+    ok:"Drie kleuren, drie schepen: alles staat juist!" } }),
+wLevel({ id:"H5", groep:"🏗️ De Havenkraan", titel:"Haven 5 - Zware containers",
+  opdracht:`<p>De kraan kiest nu op <b>gewicht</b>:</p><ul><li>meer dan <b>30 ton</b>: te zwaar! Laat de container staan en toon met <code>print()</code> een melding met het woord <i>zwaar</i>;</li><li><b>20 ton of meer</b>: naar het <b>vrachtschip</b> op vak 7;</li><li>lichter: naar de <b>boot</b> op vak 3.</li></ul>${API_HAVEN}`,
+  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
+    html:`<p>Let op de grenzen: wat gebeurt er met een container van precies 20 ton? En van precies 30 ton?</p>`,
+    starter:"from haven import kraan\n\n",
+    scenarios:[[12,3,"de boot"],[27,7,"het vrachtschip"],[20,7,"het vrachtschip"],[19,3,"de boot"],[30,7,"het vrachtschip"],[34,null,""]].map(([g,d,n])=>hSc({naam:`${g} ton`,kleur:"geel",label:g+" t",gewicht:g,max:30,schepen:[3,7],namen:H_SCHEPEN5,doel:d,doelNaam:n,teZwaar:g>30,paneel:`📟 Gewicht: ${g} ton`,tip:g===20?"Precies 20 ton gaat óók naar het vrachtschip: > of >= ?":g===30?"Precies 30 ton is nog niet te zwaar: alleen méér dan 30 ton.":""})),
+    doel:havenDoel,
+    moet:[[/lees_gewicht\s*\(/, "Lees het gewicht met kraan.lees_gewicht()."],[/^\s*elif\b/m,"Drie mogelijkheden: gebruik if, elif en else."]],
+    hulp:["Welke grens controleer je eerst? Denk aan 6.2: Python stopt bij de eerste voorwaarde die waar is. En vergeet niet dat het gewicht tekst is.","<pre>gewicht = int(kraan.lees_gewicht())\nif gewicht &gt; 30:\n    print(...)\nelif gewicht &gt;= 20:\n    ...\nelse:\n    ...</pre>Een te zware container pak je niet op.","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\ngewicht = int(kraan.lees_gewicht())\n\n# Kies het juiste schip\nif gewicht &gt; 30:\n    print(\"Deze container is te zwaar.\")\nelif gewicht &gt;= 20:\n    kraan.pak()\n    kraan.rechts(7)\n    kraan.zet()\nelse:\n    kraan.pak()\n    kraan.rechts(3)\n    kraan.zet()</pre>"],
+    ok:"Je kraan kent zijn grenzen: elke container belandt juist!" } }),
+/* ======== HET STATION ======== */
+wLevel({ id:"T1", groep:"🚆 Het Station", titel:"Station 1 - De eerste wissel",
+  opdracht:`<p>Jij bedient de wissels in het station. Treinen naar <b>Gent</b> rijden over het <b>bovenste</b> spoor, treinen naar <b>Brugge</b> over het <b>onderste</b>.</p>${API_STATION}`,
+  hoofd:{ titel:"Programmeer de wissel", wereld:"station",
+    html:`<p>Begin met <code>from station import trein, wissel1</code>. Zet de wissel juist en laat dan de trein vertrekken.</p>`,
+    starter:"from station import trein, wissel1\n\n",
+    scenarios:["Gent","Brugge"].map(b=>({naam:`trein naar ${b}`,bestemming:b,sporen:ST_LIJN1,doel:b==="Gent"?"A":"B",paneel:`🚆 Trein naar ${b}`})),
+    doel:stationDoel,
+    moet:[[/lees_bestemming\s*\(/, "Lees de bestemming met trein.lees_bestemming()."],[/^\s*if\b/m,"Gebruik een if."]],
+    hulp:["Wat moet je eerst doen: de wissel zetten of de trein laten rijden? En waarvan hangt de stand van de wissel af?","<pre>bestemming = trein.lees_bestemming()\nif bestemming == \"Gent\":\n    wissel1.boven()\nelse:\n    wissel1.onder()</pre>Laat daarna de trein rijden.","Zo kan het:<pre>"+regNaam+"from station import trein, wissel1\n\nbestemming = trein.lees_bestemming()\nif bestemming == \"Gent\":\n    wissel1.boven()\nelse:\n    wissel1.onder()\ntrein.rijd()</pre>"],
+    ok:"Elke trein rijdt naar de juiste stad!" } }),
+wLevel({ id:"T2", groep:"🚆 Het Station", titel:"Station 2 - Twee wissels",
+  opdracht:`<p>Er is een derde bestemming bij: <b>Oostende</b>. Op het onderste spoor ligt <b>wissel 2</b>: boven gaat naar <b>Brugge</b>, onder naar <b>Oostende</b>. <b>Gent</b> blijft het bovenste spoor van wissel 1.</p>${API_STATION}`,
+  hoofd:{ titel:"Programmeer de wissels", wereld:"station",
+    html:`<p>Begin met <code>from station import trein, wissel1, wissel2</code>.</p>`,
+    starter:"from station import trein, wissel1, wissel2\n\n",
+    scenarios:["Brugge","Oostende","Gent"].map(b=>({naam:`trein naar ${b}`,bestemming:b,wissel2:true,sporen:ST_LIJN2,doel:{Gent:"A",Brugge:"B",Oostende:"C"}[b],paneel:`🚆 Trein naar ${b}`})),
+    doel:stationDoel,
+    moet:[[/lees_bestemming\s*\(/, "Lees de bestemming met trein.lees_bestemming()."],[/^\s*elif\b/m,"Drie bestemmingen: gebruik if, elif en else."]],
+    hulp:["Volg met je vinger het spoor naar Oostende: over welke wissels rijdt de trein, en in welke stand moeten ze staan?","Naar Brugge: <code>wissel1.onder()</code> en <code>wissel2.boven()</code>. Naar Oostende: <code>wissel1.onder()</code> en <code>wissel2.onder()</code>. Gebruik if, elif en else.","Zo kan het:<pre>"+regNaam+"from station import trein, wissel1, wissel2\n\nbestemming = trein.lees_bestemming()\nif bestemming == \"Gent\":\n    wissel1.boven()\nelif bestemming == \"Brugge\":\n    wissel1.onder()\n    wissel2.boven()\nelse:\n    wissel1.onder()\n    wissel2.onder()\ntrein.rijd()</pre>"],
+    ok:"Twee wissels, drie steden: alle treinen komen juist aan!" } }),
+wLevel({ id:"T3", groep:"🚆 Het Station", titel:"Station 3 - Lange treinen",
+  opdracht:`<p><b>Perron A</b> (boven) is kort: er passen maximaal <b>8 wagons</b>. Langere treinen moeten naar <b>perron B</b> (onder). Elke wagon is <b>25 meter</b> lang: toon met <code>print()</code> hoe lang de trein is.</p>${API_STATION}`,
+  hoofd:{ titel:"Programmeer de wissel", wereld:"station",
+    html:`<p>Lees het aantal wagons, bereken de lengte en kies het juiste perron. Wat doe je met een trein van precies 8 wagons?</p>`,
+    starter:"from station import trein, wissel1\n\n",
+    scenarios:[5,9,8,12].map(n=>({naam:`${n} wagons`,bestemming:"Gent",wagons:n,sporen:ST_LANG,doel:n<=8?"A":"B",lengte:n*25,paneel:`🚆 Trein met ${n} wagons`,tip:n===8?"8 wagons passen nog net op perron A: < of <= ?":""})),
+    doel:stationDoel,
+    moet:[[/lees_wagons\s*\(/, "Lees het aantal wagons met trein.lees_wagons()."],[/^\s*if\b/m,"Gebruik een if."]],
+    hulp:["trein.lees_wagons() geeft tekst. Wat moet je doen voor je ermee kunt rekenen of vergelijken?","<pre>wagons = int(trein.lees_wagons())\nlengte = wagons * 25\nprint(...)\nif wagons &lt;= 8:\n    wissel1.boven()\nelse:\n    wissel1.onder()</pre>","Zo kan het:<pre>"+regNaam+"from station import trein, wissel1\n\nwagons = int(trein.lees_wagons())\nlengte = wagons * 25\nprint(\"De trein is\", lengte, \"meter lang.\")\nif wagons &lt;= 8:\n    wissel1.boven()\nelse:\n    wissel1.onder()\ntrein.rijd()</pre>"],
+    ok:"Korte en lange treinen staan allemaal aan het juiste perron!" } }),
+/* ======== HET MAGAZIJN ======== */
+wLevel({ id:"M1", groep:"📦 Het Magazijn", titel:"Magazijn 1 - Even of oneven",
+  opdracht:`<p>Jij programmeert de pakjesrobot. Pakjes met een <b>even</b> postcode gaan in <b>bak 1</b>, pakjes met een <b>oneven</b> postcode in <b>bak 2</b>.</p>${API_MAGAZIJN}`,
+  hoofd:{ titel:"Programmeer de robot", wereld:"magazijn",
+    html:`<p>Begin met <code>from magazijn import robot</code>. Tip: een getal is even als de rest bij deling door 2 gelijk is aan 0. Welke operator geeft de rest?</p>`,
+    starter:"from magazijn import robot\n\n",
+    scenarios:[9000,8501,2610,3001,1000].map(p=>({naam:`postcode ${p}`,postcode:p,bakken:2,labels:MZ1,label:String(p),doel:p%2===0?1:2,paneel:`📦 Pakje voor postcode ${p}`})),
+    doel:magazijnDoel,
+    moet:[[/lees_postcode\s*\(/, "Lees de postcode met robot.lees_postcode()."],[/%/,"Gebruik de rest-operator % om te zien of de postcode even is."],[/^\s*if\b/m,"Gebruik een if."]],
+    hulp:["Hoe weet je of een getal even is? Denk aan oefening 3.1: welke operator geeft de rest van een deling?","<code>postcode % 2</code> is 0 bij een even getal. Vergeet niet de postcode eerst om te zetten met int().","Zo kan het:<pre>"+regNaam+"from magazijn import robot\n\npostcode = int(robot.lees_postcode())\nif postcode % 2 == 0:\n    robot.naar(1)\nelse:\n    robot.naar(2)\nrobot.leg()</pre>"],
+    ok:"Even en oneven netjes gesorteerd!" } }),
+wLevel({ id:"M2", groep:"📦 Het Magazijn", titel:"Magazijn 2 - Per provincie",
+  opdracht:`<p>Het <b>eerste cijfer</b> van een postcode vertelt waar het pakje naartoe moet:</p><ul><li><b>1</b>xxx: Brussel → <b>bak 1</b></li><li><b>2</b>xxx: Antwerpen → <b>bak 2</b></li><li><b>9</b>xxx: Oost-Vlaanderen → <b>bak 3</b></li><li>alle andere: <b>bak 4</b></li></ul>${API_MAGAZIJN}`,
+  hoofd:{ titel:"Programmeer de robot", wereld:"magazijn",
+    html:`<p>Tip: met de gehele deling <code>//</code> haal je het eerste cijfer uit een postcode van 4 cijfers.</p>`,
+    starter:"from magazijn import robot\n\n",
+    scenarios:[2610,1000,9000,3500,9940,8000,2000].map(p=>{const c=Math.floor(p/1000);return {naam:`postcode ${p}`,postcode:p,bakken:4,labels:MZ2,label:String(p),doel:c===1?1:c===2?2:c===9?3:4,paneel:`📦 Pakje voor postcode ${p}`}}),
+    doel:magazijnDoel,
+    moet:[[/lees_postcode\s*\(/, "Lees de postcode met robot.lees_postcode()."],[/\/\//,"Gebruik de gehele deling // om het eerste cijfer te vinden."],[/^\s*elif\b/m,"Vier bakken: gebruik if, elif en else."]],
+    hulp:["Hoeveel is 9000 // 1000? En 2610 // 1000?","<code>provincie = postcode // 1000</code> geeft het eerste cijfer. Vergelijk dat daarna met 1, 2 en 9.","Zo kan het:<pre>"+regNaam+"from magazijn import robot\n\npostcode = int(robot.lees_postcode())\nprovincie = postcode // 1000\nif provincie == 1:\n    robot.naar(1)\nelif provincie == 2:\n    robot.naar(2)\nelif provincie == 9:\n    robot.naar(3)\nelse:\n    robot.naar(4)\nrobot.leg()</pre>"],
+    ok:"Elk pakje vertrekt naar de juiste provincie!" } }),
+wLevel({ id:"M3", groep:"📦 Het Magazijn", titel:"Magazijn 3 - Verzendkosten",
+  opdracht:`<p>Nu sorteert de robot op <b>gewicht</b>. Toon ook de <b>verzendkosten</b> met <code>print()</code>:</p><table class="api" style="max-width:420px"><tr><th>Gewicht</th><th>Bak</th><th>Kosten</th></tr><tr><td>minder dan 2 kg</td><td>bak 1 (klein)</td><td>4.5 euro</td></tr><tr><td>minder dan 10 kg</td><td>bak 2 (middel)</td><td>7 euro</td></tr><tr><td>10 kg of meer</td><td>bak 3 (groot)</td><td>12 euro</td></tr></table>${API_MAGAZIJN}`,
+  hoofd:{ titel:"Programmeer de robot", wereld:"magazijn",
+    html:`<p>Het gewicht is een kommagetal, bv. <code>"3.5"</code>. Let op de grenzen: in welke bak hoort een pakje van precies 2 kg? En van precies 10 kg?</p>`,
+    starter:"from magazijn import robot\n\n",
+    scenarios:[[0.8,1,4.5],[5.5,2,7],[2.0,2,7],[14.2,3,12],[9.9,2,7],[10.0,3,12]].map(([g,b,k])=>({naam:`${g} kg`,gewicht:g,bakken:3,labels:MZ3,label:String(g).includes(".")?g+" kg":g.toFixed(1)+" kg",doel:b,kosten:k,paneel:`📦 Pakje van ${String(g).includes(".")?g:g.toFixed(1)} kg`,tip:g===2?"Precies 2 kg is niet ‘minder dan 2 kg’.":g===10?"Precies 10 kg hoort bij ‘10 kg of meer’.":""})),
+    doel:magazijnDoel,
+    moet:[[/lees_gewicht\s*\(/, "Lees het gewicht met robot.lees_gewicht()."],[/float\s*\(/,"Het gewicht is een kommagetal: zet het om met float()."],[/^\s*elif\b/m,"Drie bakken: gebruik if, elif en else."]],
+    hulp:["Welke omzetting gebruik je voor een kommagetal? En welke grens controleer je eerst?","<pre>gewicht = float(robot.lees_gewicht())\nif gewicht &lt; 2:\n    robot.naar(1)\n    kosten = 4.5\nelif gewicht &lt; 10:\n    ...\nelse:\n    ...</pre>Toon de kosten na de if.","Zo kan het:<pre>"+regNaam+"from magazijn import robot\n\ngewicht = float(robot.lees_gewicht())\nif gewicht &lt; 2:\n    robot.naar(1)\n    kosten = 4.5\nelif gewicht &lt; 10:\n    robot.naar(2)\n    kosten = 7\nelse:\n    robot.naar(3)\n    kosten = 12\nrobot.leg()\nprint(\"De verzendkosten zijn\", kosten, \"euro.\")</pre>"],
+    ok:"Elk pakje zit in de juiste bak, met de juiste prijs!" } }),
+/* ======== HET VERKEER ======== */
+wLevel({ id:"V1", groep:"🚗 Het Verkeer", titel:"Verkeer 1 - Het verkeerslicht",
+  opdracht:`<p>Jij programmeert een zelfrijdende auto. Aan het kruispunt staat een verkeerslicht. Bij <b>groen</b> rijdt de auto door. Bij <b>oranje</b> en <b>rood</b> stopt de auto.</p>${API_VERKEER}`,
+  hoofd:{ titel:"Programmeer de auto", wereld:"verkeer",
+    html:`<p>Begin met <code>from verkeer import auto</code>.</p>`,
+    starter:"from verkeer import auto\n\n",
+    scenarios:["rood","groen","oranje"].map(l=>({naam:`${l} licht`,licht:l,paneel:"🚦 Verkeerslicht"})),
+    doel:verkeerDoel,
+    moet:[[/lees_licht\s*\(/, "Lees het licht met auto.lees_licht()."],[/^\s*if\b/m,"Gebruik een if."]],
+    hulp:["In hoeveel gevallen mag de auto doorrijden? Begin je if met dat geval.","<pre>licht = auto.lees_licht()\nif licht == \"groen\":\n    auto.rijd()\nelse:\n    auto.stop()</pre>","Zo kan het:<pre>"+regNaam+"from verkeer import auto\n\nlicht = auto.lees_licht()\nif licht == \"groen\":\n    auto.rijd()\nelse:\n    auto.stop()</pre>"],
+    ok:"Je auto rijdt veilig door het kruispunt!" } }),
+wLevel({ id:"V2", groep:"🚗 Het Verkeer", titel:"Verkeer 2 - Snelheid aanpassen",
+  opdracht:`<p>Langs de weg staat een snelheidsbord. Rijdt de auto <b>te snel</b>, dan remt hij. Rijdt hij <b>te traag</b>, dan versnelt hij. Daarna rijdt hij verder, precies aan de toegelaten snelheid.</p>${API_VERKEER}`,
+  hoofd:{ titel:"Programmeer de auto", wereld:"verkeer",
+    html:`<p>Hoeveel moet de auto remmen of versnellen? Dat bereken je met het verschil tussen de twee snelheden. En wat als de auto al precies juist rijdt?</p>`,
+    starter:"from verkeer import auto\n\n",
+    scenarios:[[50,65],[70,50],[30,30],[90,120]].map(([b,v])=>({naam:`bord ${b}, auto ${v} km/u`,bord:b,snelheid:v,tip:b===v?"De auto rijdt al juist: hij hoeft niet te remmen of te versnellen.":""})),
+    doel:verkeerDoel,
+    moet:[[/lees_bord\s*\(/, "Lees het verkeersbord met auto.lees_bord()."],[/lees_snelheid\s*\(/, "Lees de snelheid van de auto met auto.lees_snelheid()."],[/^\s*if\b/m,"Gebruik een if."]],
+    hulp:["Rijdt de auto 65 km/u en mag hij 50, hoeveel moet hij dan remmen? Hoe bereken je dat in Python?","<pre>limiet = int(auto.lees_bord())\nsnelheid = int(auto.lees_snelheid())\nif snelheid &gt; limiet:\n    auto.rem(snelheid - limiet)\nelif snelheid &lt; limiet:\n    auto.versnel(limiet - snelheid)</pre>","Zo kan het:<pre>"+regNaam+"from verkeer import auto\n\nlimiet = int(auto.lees_bord())\nsnelheid = int(auto.lees_snelheid())\nif snelheid &gt; limiet:\n    auto.rem(snelheid - limiet)\nelif snelheid &lt; limiet:\n    auto.versnel(limiet - snelheid)\nauto.rijd()</pre>"],
+    ok:"Je auto houdt zich altijd aan de snelheid!" } }),
+wLevel({ id:"V3", groep:"🚗 Het Verkeer", titel:"Verkeer 3 - Genoeg brandstof",
+  opdracht:`<p>Voor een lange rit kijkt de auto of hij genoeg brandstof heeft. Met <b>1 liter</b> rijdt de auto <b>15 km</b>. Bereken het <b>bereik</b> en toon het met <code>print()</code>. Is het bereik kleiner dan de afstand, dan tankt de auto eerst. Anders rijdt hij meteen.</p>${API_VERKEER}`,
+  hoofd:{ titel:"Programmeer de auto", wereld:"verkeer",
+    html:`<p>Tanken kost tijd: tank alleen als het nodig is. Wat als het bereik precies even groot is als de afstand?</p>`,
+    starter:"from verkeer import auto\n\n",
+    scenarios:[[20,250],[10,200],[12,180],[30,500]].map(([l,d])=>({naam:`${l} liter, ${d} km`,brandstof:l,afstand:d,km_per_liter:15,tank_vol:50,tip:l*15===d?"Met precies genoeg brandstof hoef je niet te tanken.":""})),
+    doel:verkeerDoel,
+    moet:[[/lees_brandstof\s*\(/, "Lees de brandstof met auto.lees_brandstof()."],[/lees_afstand\s*\(/, "Lees de afstand met auto.lees_afstand()."],[/^\s*if\b/m,"Gebruik een if."]],
+    hulp:["Met 20 liter en 15 km per liter: hoe ver kom je? Wanneer moet je dus tanken?","<pre>bereik = brandstof * 15\nprint(...)\nif bereik &lt; afstand:\n    auto.tank()\nauto.rijd()</pre>Een if zonder else mag: de auto rijdt in beide gevallen.","Zo kan het:<pre>"+regNaam+"from verkeer import auto\n\nbrandstof = int(auto.lees_brandstof())\nafstand = int(auto.lees_afstand())\nbereik = brandstof * 15\nprint(\"Met deze brandstof kan de auto\", bereik, \"km ver rijden.\")\nif bereik &lt; afstand:\n    auto.tank()\nauto.rijd()</pre>"],
+    ok:"Je auto komt altijd aan, zonder onnodig te tanken!" } })
+];
+
 const OEFENINGEN = [
 { id:"3.1", titel:"3.1 De Magische Rekenmachine", klaar:false },
 { id:"4.1", titel:"4.1 De Korte Vragenlijst", klaar:false },
@@ -595,6 +1216,7 @@ Je ticket kost 6.25 euro.</pre>
     ok:"Bug gevonden! Je stappenteller rekent nu met de juiste eenheden." }
 }
 ];
+OEFENINGEN.push(...WERELD_OEFENINGEN);
 
 /* ---------------- Python in een worker ---------------- */
 let worker=null, pyReady=null;
@@ -606,9 +1228,11 @@ function startWorker(){
     py.setStdout({write:b=>{out+=dec.decode(b,{stream:true});return b.length}});
     py.setStderr({write:b=>{out+=dec.decode(b,{stream:true});return b.length}});
     py.setStdin({stdin:()=>{if(!q.length)return undefined; const v=q.shift(); if(echo) out+=v+"\\n"; else out+="\\n\\u0007"; return v;}});
+    const wj=()=>{ if(!e.data.wsrc) return null; try{ return py.runPython("_wereld_json()") }catch(x){ return null } };
     try{ py.runPython("for _k in [k for k in list(globals()) if not k.startswith('_')]: del globals()[_k]");
-      await py.runPythonAsync(e.data.code); postMessage({type:"done",out,err:null}); }
-    catch(err){ postMessage({type:"done",out,err:String(err.message||err)}); }
+      if(e.data.wsrc){ py.globals.set("_WSRC",e.data.wsrc); py.globals.set("_WSC",e.data.wsc); py.runPython("exec(compile(_WSRC, '<wereld>', 'exec'), globals())"); }
+      await py.runPythonAsync(e.data.code); postMessage({type:"done",out,err:null,wereld:wj()}); }
+    catch(err){ postMessage({type:"done",out,err:String(err.message||err),wereld:wj()}); }
   };`;
   worker=new Worker(URL.createObjectURL(new Blob([src],{type:"text/javascript"})));
   pyReady=new Promise((res,rej)=>{worker.onmessage=e=>{if(e.data.type==="ready")res();if(e.data.type==="loadfail")rej(e.data.msg)}; worker.onerror=()=>rej("worker")});
@@ -618,6 +1242,7 @@ function friendlyError(raw){
   const lines=raw.trim().split("\n"), last=lines[lines.length-1];
   let ln=null; for(const l of lines){const m=l.match(/File "<exec>", line (\d+)/); if(m) ln=m[1]}
   const m2=last.match(/\(detected at line (\d+)\)/); if(m2) ln=ln||m2[1];
+  if(/^WereldFout: /.test(last)) return {line:ln,text:last.slice(12),type:"WereldFout",uitleg:null};
   if(/^EOFError/.test(last)) return {line:ln,text:"Je programma vraagt om invoer, maar er is niet genoeg invoer ingevuld. Vul het vak ‘Invoer’ aan: één antwoord per regel.",type:"EOFError"};
   let uitleg=null; for(const [re,f] of UITLEG){const m=last.match(re); if(m){uitleg=f(m);break}}
   return {line:ln,text:last,uitleg,type:(last.match(/^(\w+(Error|Exception))/)||[])[1]||"Fout"};
@@ -747,12 +1372,14 @@ function klasafspraken(code,naam){
   });
   return fouten.sort((a,b)=>a.line-b.line);
 }
-function runPython(code,inputs,echo){
+function runPython(code,inputs,echo,wereld){
   if(!worker) startWorker();
   return pyReady.then(()=>new Promise(res=>{
     const t=setTimeout(()=>{worker.terminate();worker=null;res({out:"",err:{line:null,text:"Je programma bleef te lang lopen en werd gestopt.",type:"Tijd"}})},8000);
-    worker.onmessage=e=>{if(e.data.type==="done"){clearTimeout(t);res({out:e.data.out,err:friendlyError(e.data.err)})}};
-    worker.postMessage({code,inputs:inputs||[],echo:echo!==false});
+    worker.onmessage=e=>{if(e.data.type==="done"){clearTimeout(t); let w=null; try{w=e.data.wereld?JSON.parse(e.data.wereld):null}catch(x){} res({out:e.data.out,err:friendlyError(e.data.err),wereld:w})}};
+    const msg={code,inputs:inputs||[],echo:echo!==false};
+    if(wereld){ msg.wsrc=WERELD_PY; msg.wsc=JSON.stringify(wereld.sc) }
+    worker.postMessage(msg);
   }));
 }
 
@@ -761,7 +1388,25 @@ function getallenIn(txt){ return (txt.match(/-?\d+(?:[.,]\d+)?/g)||[]).map(s=>pa
 function bevat(out,verwacht,tol){ const g=getallenIn(out); return verwacht.every(v=>g.some(x=>Math.abs(x-v)<=tol)) }
 function fmt(n){ return String(n).replace(".",",") }
 /* geeft {ok, msg, toon:{invoer,out,err}} */
+async function nakijkenWereld(code,deel){
+  const stijl=KLASAFSPRAKEN?klasafspraken(code,S.naam):[];
+  for(const [re,msg] of (deel.moet||[])) if(!re.test(code)) return {ok:false,msg};
+  let laatste=null;
+  for(let i=0;i<deel.scenarios.length;i++){ const sc=deel.scenarios[i];
+    const r=await runPython(code,[],true,{sc});
+    const w=r.wereld||{log:[],staat:{}}, wat=`In situatie ${i+1} (${sc.naam})`, toon={out:r.out,err:r.err};
+    const anim={i,sc,log:w.log,uitslag:"fout"};
+    if(r.err&&r.err.type!=="WereldFout") return {ok:false,toon,anim,msg:`${wat} geeft je programma een foutmelding${r.err.line?" op regel "+r.err.line:""}. `+(r.err.uitleg||"Lees ze rustig en verbeter je code.")};
+    if(r.err) return {ok:false,toon,anim,msg:`${wat} ging het mis${r.err.line?" op regel "+r.err.line:""}: ${r.err.text}`+(sc.tip?" "+sc.tip:"")};
+    const f=deel.doel(sc,w.staat||{},r.out||"");
+    if(f) return {ok:false,toon,anim,msg:`${wat}: ${f}`+(sc.tip?" "+sc.tip:"")};
+    laatste={i,sc,log:w.log,uitslag:"ok"};
+  }
+  if(stijl.length) return {ok:false,stijlFout:true,stijl,anim:laatste,msg:"Je programma werkt in alle situaties, maar je code volgt nog niet alle klasafspraken:"};
+  return {ok:true,anim:laatste,msg:deel.ok||"Juist!"};
+}
 async function nakijken(code,deel,namen){
+  if(deel.wereld) return nakijkenWereld(code,deel);
   const stijl=KLASAFSPRAKEN?klasafspraken(code,S.naam):[];
   for(const [re,msg] of (deel.moet||[])) if(!re.test(code)) return {ok:false,msg};
   for(const t of deel.tests){
@@ -845,6 +1490,7 @@ function invoerVak(waarde,onChange,getCode){
 }
 function toonUit(el,r){el.style.display="block"; el.innerHTML="";
   const o=document.createElement("div"); o.textContent=r.out||(r.err?"":"(je programma toonde niets)"); el.appendChild(o);
+  if(r.err&&r.err.type==="WereldFout"){const e=document.createElement("div"); e.className="errl"; e.textContent=(r.out?"\n":"")+"🚧 "+(r.err.line?"Regel "+r.err.line+": ":"")+r.err.text; el.appendChild(e); return}
   if(r.err){const e=document.createElement("div"); e.className="errl"; e.textContent=(r.out?"\n":"")+"⚠ Foutmelding"+(r.err.line?" op regel "+r.err.line:"")+":\n"+r.err.text+(r.err.uitleg?"\n💡 "+r.err.uitleg:""); el.appendChild(e)}}
 
 const AFSPRAKEN_HTML=`<ol class="afspr">
@@ -859,7 +1505,7 @@ const AFSPRAKEN_HTML=`<ol class="afspr">
 function fbVak(box){let f=box.querySelector(":scope > .fb"); if(!f){f=$(`<div class="fb"></div>`);box.appendChild(f)} return f}
 
 /* code-blok met Uitvoeren (+ optioneel Controleer) */
-function codeBlok({waarde,onCode,invoer,onInvoer,controleer}){
+function codeBlok({waarde,onCode,invoer,onInvoer,controleer,uitvoeren}){
   const wrap=$(`<div></div>`);
   const ed=editor(waarde,v=>{onCode(v);iv.ververs()}); wrap.appendChild(ed);
   const iv=invoerVak(invoer,onInvoer,()=>ed.ta.value); wrap.appendChild(iv); iv.ververs();
@@ -868,7 +1514,7 @@ function codeBlok({waarde,onCode,invoer,onInvoer,controleer}){
   const st=act.querySelector(".st"), knoppen=()=>[...act.querySelectorAll("button")];
   const bezig=(b)=>{knoppen().forEach(k=>k.disabled=b||k.dataset.lock==="1"); st.textContent=b?(worker?"Bezig…":"Python wordt geladen (de eerste keer duurt dit even)…"):""};
   act.querySelector(".run").onclick=async()=>{ if(!ed.ta.value.trim()) return; bezig(true);
-    try{ const r=await runPython(ed.ta.value,iv.regels(),true); toonUit(out,r); wrap.onRun&&wrap.onRun(r) }
+    try{ if(uitvoeren){ await uitvoeren(ed.ta.value,out) } else { const r=await runPython(ed.ta.value,iv.regels(),true); toonUit(out,r); wrap.onRun&&wrap.onRun(r) } }
     catch(e){ out.style.display="block"; out.textContent="Python kon niet geladen worden. Controleer je internetverbinding."; worker=null }
     bezig(false) };
   if(controleer) act.querySelector(".chk").onclick=async()=>{ if(!ed.ta.value.trim()) return; bezig(true);
@@ -900,8 +1546,10 @@ function renderStart(m){
   tekenNaam();
 
   const lijst=$(`<div class="card"><h3>Oefeningen</h3><div class="exlist"></div></div>`); m.appendChild(lijst);
-  const ex=lijst.querySelector(".exlist");
+  const exl=lijst.querySelector(".exlist"); let groep=null, ex=exl;
   OEFENINGEN.forEach(o=>{ const a=S.oef[o.id]; let pill;
+    const g=o.groep||"Klasoefeningen";
+    if(g!==groep){ groep=g; exl.appendChild($(`<div class="groep">${esc(g)}</div>`)); if(g!=="Klasoefeningen"&&o.id==="H1") exl.lastChild.insertAdjacentHTML("beforebegin",`<div class="groepintro"><b>🎮 Programmeerwerelden</b><br>Bestuur een kraan, een trein, een robot en een auto met Python. Je ziet meteen wat je code doet!</div>`) }
     if(!o.klaar) pill='<span class="pill off">binnenkort</span>';
     else if(a&&a.verstuurd) pill=`<span class="pill ok">verstuurd • ${fmt(a.verstuurd.cijfer)}/10</span>`;
     else if(a&&a.ok) pill='<span class="pill mid">klaar, nog versturen</span>';
@@ -939,9 +1587,25 @@ function renderOef(m,oef){
   /* hoofdopdracht */
   const h=oef.hoofd;
   const hc=$(`<div class="card step ${a.ok?"done":""}"><h3>${esc(h.titel)}</h3>${h.html}</div>`);
+  /* programmeerwereld: speelveld met situaties */
+  let stage=null, kiesSit=null;
+  if(h.wereld){
+    const wv=$(`<div class="wereld"><div class="sits"><span>Situatie:</span></div><div class="stage"></div></div>`); hc.appendChild(wv);
+    stage=wv.querySelector(".stage"); const sits=wv.querySelector(".sits");
+    if(a.sit==null||a.sit>=h.scenarios.length) a.sit=0;
+    kiesSit=(i,teken)=>{ a.sit=i; save(); sits.querySelectorAll("button").forEach((b,k)=>b.classList.toggle("aan",k===i)); if(teken!==false) toonWereld(stage,h.wereld,h.scenarios[i]) };
+    h.scenarios.forEach((sc,i)=>{ const b=$(`<button type="button">${i+1}. ${esc(sc.naam)}</button>`); b.onclick=()=>kiesSit(i); sits.appendChild(b) });
+    kiesSit(a.sit);
+  }
   const blok=codeBlok({waarde:a.code??h.starter, onCode:v=>{a.code=v;save()}, invoer:a.invoer??h.invoer, onInvoer:v=>{a.invoer=v;save()},
+    uitvoeren:h.wereld?async(code,out)=>{ const sc=h.scenarios[a.sit]; const r=await runPython(code,[],true,{sc}); const w=r.wereld||{log:[],staat:{}};
+      let uitslag="fout", doelMsg=null;
+      if(!r.err){ doelMsg=h.doel(sc,w.staat||{},r.out||""); uitslag=doelMsg?"fout":"ok" }
+      toonUit(out,{out:r.out+(doelMsg?(r.out?"\n":"")+"🎯 "+doelMsg:(r.err?"":(r.out?"\n":"")+"🎯 Gelukt in deze situatie! Probeer ook de andere situaties.")),err:r.err});
+      speelWereld(stage,h.wereld,sc,w.log,uitslag) }:null,
     controleer:async(code,out)=>{
       const r=await nakijken(code,h,h.invoerNamen);
+      if(h.wereld&&r.anim){ kiesSit(r.anim.i,false); speelWereld(stage,h.wereld,r.anim.sc,r.anim.log,r.anim.uitslag) }
       const werktNu=r.ok||r.stijlFout;
       // Afspraken verbeteren nadat het programma al werkte, kost geen pogingen meer.
       if(!(a.werkt&&werktNu)) a.controles++;
