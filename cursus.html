@@ -596,6 +596,226 @@ print(getal_1 + getal_2)</pre>
     {id:"h7-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
   ]}
   ]
+},
+{ id:"h8", short:"8. Datatypes", title:"Hoofdstuk 8 – Datatypes: type(), str() en float()",
+  video:"https://youtu.be/RRPAAJ8mW80", videoTitle:"Video 10: Datatypes en de functie type()",
+  video2:"https://youtu.be/RG4yR9EmR_k", video2Title:"Video 12: De functie str()",
+  video3:"https://youtu.be/EQ26girUxyI", video3Title:"Video 18: De functie float()",
+  intro:`<p>Je kent al drie datatypes: <b>int</b>, <b>float</b> en <b>string</b>. In dit hoofdstuk leer je hoe je met <code>type()</code> het datatype van een waarde opvraagt, en hoe je met <code>str()</code> en <code>float()</code> van het ene datatype naar het andere gaat.</p>
+  <div class="box"><b>Zo werk je</b><br>Bij dit hoofdstuk horen drie korte filmpjes. Bekijk <b>video 10</b> voor 8.1, <b>video 12</b> voor 8.2 en <b>video 18</b> voor 8.3. Maak daarna de oefeningen.</div>`,
+  sections:[
+  { title:"8.1 Het datatype opvragen met type()", html:`<p>Elke waarde in Python heeft een <b>datatype</b>. Met de functie <code>type()</code> vraag je op welk datatype een waarde heeft:</p>
+    <table><tr><th>Code</th><th>Python toont</th><th>Betekenis</th></tr>
+    <tr><td><code>print(type(15))</code></td><td><code>&lt;class 'int'&gt;</code></td><td>geheel getal</td></tr>
+    <tr><td><code>print(type(1.5))</code></td><td><code>&lt;class 'float'&gt;</code></td><td>kommagetal</td></tr>
+    <tr><td><code>print(type("15"))</code></td><td><code>&lt;class 'str'&gt;</code></td><td>string (tekst)</td></tr></table>
+    <p style="margin-top:10px">Let op: <code>"15"</code> tussen aanhalingstekens is een <b>string</b>, geen getal! In Python heet het datatype string kortweg <b>str</b>.</p>
+    <p>Je kunt ook het datatype van een expressie opvragen. Weet je nog? Een deling geeft altijd een float.</p>`,
+    items:[
+    {id:"h8-try1", type:"play", q:"Voer uit en bekijk het datatype van elke waarde.", starter:'print(type(15))\nprint(type(1.5))\nprint(type("15"))\nprint(type(3 * 4))\nprint(type(7 / 2))'},
+    {id:"h8-match1", type:"match", q:"Welk datatype hoort bij welke waarde?", pairs:[["42","int"],["\"42\"","str"],["4.2","float"],["10 / 5","float (want een deling)"]]},
+    {id:"h8-mc1", type:"mc", q:"Wat toont <code>print(type(&quot;3.14&quot;))</code>?", options:["<class 'float'>","<class 'str'>","<class 'int'>"], correct:1, explain:"De aanhalingstekens maken er een string van, ook al staan er cijfers in."},
+    {id:"h8-mc2", type:"mc", q:"Welk datatype geeft <code>input()</code> altijd terug?", options:["int","float","str"], correct:2, explain:"input() geeft altijd een string (str), wat de gebruiker ook typt."}
+  ]},
+  { title:"8.2 Een getal omzetten naar tekst met str()", html:`<p>In hoofdstuk 7 zag je dat het plusteken twee dingen kan doen: bij getallen <b>optellen</b>, bij strings <b>plakken</b>. Maar wat als je een string en een getal wilt combineren?</p>
+    <pre>saldo = 123
+print("Je saldo is " + saldo + " euro")</pre>
+    <p>Dat lukt niet: Python geeft een <b>TypeError</b>. Het weet niet of het moet optellen of plakken. De oplossing is de functie <code>str()</code>: die zet een getal om naar een <b>string</b>, zodat je het kunt plakken.</p>
+    <pre>saldo = 123
+print("Je saldo is " + str(saldo) + " euro")</pre>
+    <p><code>str()</code> verandert de variabele zelf niet: <code>saldo</code> blijft het getal 123, waarmee je verder kunt rekenen.</p>`,
+    items:[
+    {id:"h8-try2", type:"play", q:"Voer uit en bekijk de foutmelding. Verbeter daarna de code met str() en voer opnieuw uit.", starter:'saldo = 123\nprint("Je saldo is " + saldo + " euro")'},
+    {id:"h8-mc3", type:"mc", q:"Welke foutmelding krijg je als je een string en een getal aan elkaar plakt met +?", options:["SyntaxError","TypeError","NameError"], correct:1, explain:"Een TypeError: je gebruikt + met twee verschillende datatypes."},
+    {id:"h8-fill1", type:"fill", q:"Wat toont <code>print(&quot;Level &quot; + str(5))</code>?", answers:["Level 5"], explain:"str(5) wordt de string \"5\", en die wordt aan \"Level \" geplakt."},
+    {id:"h8-code1", type:"code", q:"Verbeter het programma met <code>str()</code>, zodat het <b>Ik ben 15 jaar</b> toont. Laat de eerste regel staan zoals hij is.", starter:'leeftijd = 15\nprint("Ik ben " + leeftijd + " jaar")',
+      expect:["Ik ben 15 jaar"], must:[[/leeftijd\s*=\s*15\b/,"Laat de eerste regel leeftijd = 15 staan."],[/(^|[^a-z_])str\(\s*leeftijd\s*\)/,"Gebruik str(leeftijd) om het getal om te zetten naar tekst."]],
+      hint:'leeftijd = 15\nprint("Ik ben " + str(leeftijd) + " jaar")', ok:"Juist! Met str() kun je een getal in een zin plakken."}
+  ]},
+  { title:"8.3 Kommagetallen omzetten met float()", html:`<p><code>float()</code> is de ‘tweelingbroer’ van <code>int()</code>. Het zet een string om naar een <b>kommagetal</b> (float):</p>
+    <pre>getal = float("3.14")</pre>
+    <p>Dat is handig bij <code>input()</code>: wil je dat de gebruiker een kommagetal kan intypen, zoals een prijs, gebruik dan <code>float(input(...))</code>. Met <code>int()</code> zou dat een foutmelding geven.</p>
+    <p><code>float()</code> werkt ook op gehele getallen: <code>float(5)</code> wordt <code>5.0</code>.</p>
+    <div class="box warm"><b>Let op: een punt, geen komma!</b><br><code>float("3.5")</code> werkt, maar <code>float("3,5")</code> geeft een <b>ValueError</b>. Ook de gebruiker moet dus een punt typen.</div>`,
+    items:[
+    {id:"h8-try3", type:"play", q:"Voer uit met 2.5. Probeer daarna eens 2,5 (met een komma) in het vak Invoer.", starter:'prijs = float(input("Wat kost één stuk? "))\nprint(prijs * 2)', stdin:"2.5"},
+    {id:"h8-fill2", type:"fill", q:"Wat toont <code>print(float(5))</code>?", answers:["5.0"], explain:"float() maakt van het gehele getal 5 het kommagetal 5.0."},
+    {id:"h8-mc4", type:"mc", q:"De gebruiker moet een prijs zoals 4.99 kunnen intypen. Wat gebruik je?", options:["int(input(...))","float(input(...))","str(input(...))"], correct:1, explain:"int() kan alleen gehele getallen omzetten. Voor kommagetallen gebruik je float()."},
+    {id:"h8-mc5", type:"mc", q:"Wat gebeurt er bij <code>float(&quot;3,5&quot;)</code>?", options:["Python geeft 3.5","Python geeft een foutmelding (ValueError)","Python geeft 35.0"], correct:1, explain:"Python gebruikt een punt als decimaalteken. Met een komma lukt de omzetting niet."}
+  ]},
+  { title:"8.4 Overzicht: de conversiefuncties", html:`<p>Je kent nu drie functies om een waarde om te zetten naar een ander datatype. Zo’n functie heet een <b>conversiefunctie</b>.</p>
+    <table><tr><th>Functie</th><th>Zet om naar</th><th>Voorbeeld</th></tr>
+    <tr><td><code>int()</code></td><td>geheel getal</td><td><code>int("15")</code> → <code>15</code></td></tr>
+    <tr><td><code>float()</code></td><td>kommagetal</td><td><code>float("2.5")</code> → <code>2.5</code></td></tr>
+    <tr><td><code>str()</code></td><td>string (tekst)</td><td><code>str(15)</code> → <code>"15"</code></td></tr></table>`,
+    items:[
+    {id:"h8-match2", type:"match", q:"Welke functie heb je nodig?", pairs:[["Een getal in een zin plakken met +","str()"],["De gebruiker typt een geheel getal","int()"],["De gebruiker typt een kommagetal","float()"],["Het datatype van een waarde opvragen","type()"]]}
+  ]},
+  { title:"8.5 Oefeningen", html:`<p>Ook hier test <b>✓ Controleer</b> je programma met verschillende antwoorden.</p>`, items:[
+    {id:"h8-code2", type:"code", q:"Schrijf een programma dat vraagt hoe oud de gebruiker is, en toont hoe oud hij volgend jaar is, in een volledige zin. Typt de gebruiker <b>15</b>, dan toont het: <b>Volgend jaar ben je 16 jaar.</b>", starter:"",
+      tests:[{inputs:["15"],last:"Volgend jaar ben je 16 jaar."},{inputs:["9"],last:"Volgend jaar ben je 10 jaar."}],
+      must:[[/(^|[^a-z_])int\(/,"Zet het antwoord om naar een getal met int(), zodat je er 1 kunt bijtellen."],[/(^|[^a-z_])str\(/,"Gebruik str() om het getal in de zin te plakken."]], stdin:"15",
+      hint:'leeftijd = int(input("Hoe oud ben je? "))\nprint("Volgend jaar ben je " + str(leeftijd + 1) + " jaar.")', ok:"Juist! Je gebruikte int() om te rekenen en str() om te plakken."},
+    {id:"h8-code3", type:"code", q:"Schrijf een programma dat de <b>prijs van één stuk</b> vraagt (dat mag een kommagetal zijn) en het <b>aantal stuks</b> (een geheel getal), en dan de totale prijs toont. Toon alleen de uitkomst.", starter:"",
+      tests:[{inputs:["2.5","4"],last:"10.0"},{inputs:["1.5","3"],last:"4.5"}],
+      must:[[/(^|[^a-z_])float\(/,"De prijs kan een kommagetal zijn: gebruik float()."]], stdin:"2.5\n4",
+      hint:'prijs = float(input("Prijs van één stuk? "))\naantal = int(input("Aantal stuks? "))\nprint(prijs * aantal)', ok:"Juist! Met float() kan de gebruiker ook kommagetallen intypen."},
+    {id:"h8-code4", type:"code", q:"Uitdaging: maak het programma van de vorige oefening af met een mooie zin. Bij prijs <b>2.5</b> en aantal <b>4</b> toont het: <b>Je betaalt 10.0 euro.</b>", starter:"",
+      tests:[{inputs:["2.5","4"],last:"Je betaalt 10.0 euro."},{inputs:["1.5","3"],last:"Je betaalt 4.5 euro."}],
+      must:[[/(^|[^a-z_])float\(/,"De prijs kan een kommagetal zijn: gebruik float()."],[/(^|[^a-z_])str\(/,"Gebruik str() om de uitkomst in de zin te plakken."]], stdin:"2.5\n4",
+      hint:'prijs = float(input("Prijs van één stuk? "))\naantal = int(input("Aantal stuks? "))\ntotaal = prijs * aantal\nprint("Je betaalt " + str(totaal) + " euro.")', ok:"Knap! Je combineerde int(), float() en str() in één programma."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h8-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan het datatype opvragen met type().","Ik weet dat \"15\" een string is en 15 een int.","Ik kan een getal in een zin plakken met str().","Ik kan een kommagetal vragen met float(input(...)).","Ik weet welke conversiefunctie ik wanneer gebruik."]},
+    {id:"h8-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h9", short:"9. Rekenen", title:"Hoofdstuk 9 – Rekenen: machten, voorrang, // en %",
+  video:"https://youtu.be/yymBPl5lF3A", videoTitle:"Video 13: De machtsverheffing",
+  video2:"https://youtu.be/N2N80yazET4", video2Title:"Video 14: De voorrangsregels",
+  video3:"https://youtu.be/wf8hx2QRitg", video3Title:"Video 15: Floor division & modulo",
+  intro:`<p>In hoofdstuk 3 leerde je de vier basisbewerkingen. Nu komen er drie operatoren bij: <b>machtsverheffing</b>, <b>gehele deling</b> en <b>modulo</b>. En je leert in welke volgorde Python rekent als er meerdere bewerkingen in één expressie staan.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk <b>video 13</b> voor 9.1, <b>video 14</b> voor 9.2 en <b>video 15</b> voor 9.3. Maak daarna de oefeningen.</div>`,
+  sections:[
+  { title:"9.1 Machtsverheffing met **", html:`<p>Een macht schrijf je in Python met <b>twee sterretjes</b> <code>**</code>:</p>
+    <pre>print(2 ** 3)    # 2 x 2 x 2 = 8
+print(7 ** 5)    # 16807</pre>
+    <p>Ook een <b>wortel</b> kun je zo berekenen: de vierkantswortel van een getal is hetzelfde als dat getal tot de macht ½. Zet de exponent wel tussen haakjes: <code>9 ** (1/2)</code> geeft <code>3.0</code>.</p>
+    <div class="box warm"><b>Let op</b><br>Het dakje <code>^</code> dat je misschien kent van je rekenmachine, is in Python <b>geen</b> machtsverheffing! <code>2 ^ 3</code> geeft 1 in plaats van 8, zonder foutmelding. Gebruik altijd <code>**</code>.</div>`,
+    items:[
+    {id:"h9-try1", type:"play", q:"Voer uit en vergelijk.", starter:'print(2 ** 3)\nprint(2 ^ 3)\nprint(9 ** (1/2))'},
+    {id:"h9-fill1", type:"fill", q:"Wat toont <code>print(10 ** 3)</code>?", answers:["1000"], explain:"10 x 10 x 10 = 1000"},
+    {id:"h9-fill2", type:"fill", q:"Wat toont <code>print(2 ** 10)</code>?", answers:["1024"], explain:"2 tot de tiende macht is 1024."},
+    {id:"h9-mc1", type:"mc", q:"Hoe schrijf je ‘5 tot de derde macht’ in Python?", options:["5 ^ 3","5 ** 3","5 * 3"], correct:1, explain:"Een macht schrijf je met twee sterretjes: 5 ** 3."}
+  ]},
+  { title:"9.2 De voorrangsregels", html:`<p>Wat is de uitkomst van <code>3 + 4 * 2</code>? Python volgt dezelfde voorrangsregels als in de wiskundeles. Van hoog naar laag:</p>
+    <table><tr><th>Voorrang</th><th>Bewerking</th><th>Operatoren</th></tr>
+    <tr><td>1 (hoogste)</td><td>haakjes</td><td><code>( )</code></td></tr>
+    <tr><td>2</td><td>machten</td><td><code>**</code></td></tr>
+    <tr><td>3</td><td>vermenigvuldigen en delen</td><td><code>*</code> <code>/</code> <code>//</code> <code>%</code></td></tr>
+    <tr><td>4 (laagste)</td><td>optellen en aftrekken</td><td><code>+</code> <code>-</code></td></tr></table>
+    <p style="margin-top:10px">Bewerkingen met <b>dezelfde voorrang</b> voert Python uit van <b>links naar rechts</b>: <code>13 - 6 + 5</code> geeft 12.</p>
+    <p>Twijfel je? Zet <b>haakjes</b>. Die maken je code ook duidelijker voor wie ze leest.</p>`,
+    items:[
+    {id:"h9-try2", type:"play", q:"Voer uit. Zie je het verschil dat haakjes maken?", starter:'print(3 + 4 * 2)\nprint((3 + 4) * 2)\nprint(2 ** 3 * 4)\nprint(2 + (5 - 6 / 2) ** 2 * 7)'},
+    {id:"h9-fill3", type:"fill", q:"Wat toont <code>print(3 + 4 * 2)</code>?", answers:["11"], explain:"Eerst vermenigvuldigen: 4 * 2 = 8. Dan optellen: 3 + 8 = 11."},
+    {id:"h9-fill4", type:"fill", q:"Wat toont <code>print(10 - 2 ** 3)</code>?", answers:["2"], explain:"Eerst de macht: 2 ** 3 = 8. Dan aftrekken: 10 - 8 = 2."},
+    {id:"h9-fill5", type:"fill", q:"Wat toont <code>print(20 / 4 * 2 + 1)</code>?", answers:["11.0"], explain:"Delen en vermenigvuldigen van links naar rechts: 20 / 4 = 5.0, 5.0 * 2 = 10.0. Dan optellen: 11.0. Het is een float door de deling."},
+    {id:"h9-mc2", type:"mc", q:"Wat heeft de hoogste voorrang?", options:["Vermenigvuldigen","Machten","Haakjes"], correct:2, explain:"Wat tussen haakjes staat, rekent Python altijd eerst uit."},
+    {id:"h9-code1", type:"code", q:"Je haalde 14, 16 en 12 op drie toetsen. Laat Python je <b>gemiddelde</b> berekenen en tonen. (Tip: tel de drie getallen op en deel door 3. Denk aan de voorrang!)", starter:"",
+      expect:["14.0"], must:[[/\([^)]*\+[^)]*\+[^)]*\)\s*\/\s*3/,"Zet de som tussen haakjes en deel daarna door 3."]],
+      hint:'print((14 + 16 + 12) / 3)', ok:"Juist! Zonder haakjes zou Python alleen 12 door 3 delen."}
+  ]},
+  { title:"9.3 Gehele deling // en modulo %", html:`<p>Stel: 317 leerlingen worden verdeeld in groepen van 23. Hoeveel <b>volledige groepen</b> zijn er, en hoeveel leerlingen <b>blijven over</b>?</p>
+    <ul><li>De <b>gehele deling</b> <code>//</code> geeft het aantal volledige groepen: <code>317 // 23</code> → <code>13</code></li>
+    <li>De <b>modulo</b> <code>%</code> geeft wat overblijft, de <b>rest</b>: <code>317 % 23</code> → <code>18</code></li></ul>
+    <p>Controle: 13 groepen van 23 zijn 299 leerlingen, en 299 + 18 = 317. Klopt!</p>
+    <p>Een handige toepassing: seconden omrekenen. Een minuut is een ‘groep’ van 60 seconden. Dus 125 seconden zijn <code>125 // 60</code> = 2 minuten en <code>125 % 60</code> = 5 seconden.</p>
+    <div class="box"><b>Handig om te weten</b><br>Met <code>% 2</code> zie je of een getal even of oneven is: een even getal gedeeld door 2 heeft rest 0, een oneven getal rest 1.</div>`,
+    items:[
+    {id:"h9-try3", type:"play", q:"Voer uit.", starter:'print(317 // 23)\nprint(317 % 23)\nprint(125 // 60)\nprint(125 % 60)'},
+    {id:"h9-fill6", type:"fill", q:"Wat toont <code>print(17 // 5)</code>?", answers:["3"], explain:"In 17 passen 3 volledige groepen van 5."},
+    {id:"h9-fill7", type:"fill", q:"Wat toont <code>print(17 % 5)</code>?", answers:["2"], explain:"3 groepen van 5 is 15. Er blijft 17 - 15 = 2 over."},
+    {id:"h9-mc3", type:"mc", q:"Wat toont <code>print(15 % 2)</code>?", options:["7","1","0"], correct:1, explain:"15 is oneven: 15 gedeeld door 2 is 7, rest 1."},
+    {id:"h9-match", type:"match", q:"Welke operator hoort bij welke bewerking?", pairs:[["/","gewone deling (geeft een float)"],["//","gehele deling (aantal volledige groepen)"],["%","modulo (de rest)"],["**","machtsverheffing"]]}
+  ]},
+  { title:"9.4 Oefeningen", html:`<p>Ook hier test <b>✓ Controleer</b> je programma met verschillende antwoorden.</p>`, items:[
+    {id:"h9-code2", type:"code", q:"Eieren gaan in doosjes van 6. Schrijf een programma dat vraagt hoeveel eieren er zijn, en toont hoeveel doosjes je <b>volledig</b> kunt vullen. Toon alleen het getal.", starter:"",
+      tests:[{inputs:["20"],last:"3"},{inputs:["36"],last:"6"},{inputs:["5"],last:"0"}],
+      must:[[/\/\//,"Gebruik de gehele deling //."]], stdin:"20",
+      hint:'eieren = int(input("Hoeveel eieren? "))\nprint(eieren // 6)', ok:"Juist!"},
+    {id:"h9-code3", type:"code", q:"Schrijf een programma dat een temperatuur in graden <b>Celsius</b> vraagt en ze omzet naar <b>Fahrenheit</b>. De formule is: Celsius maal 9, gedeeld door 5, plus 32. Toon alleen de uitkomst.", starter:"",
+      tests:[{inputs:["100"],last:"212.0"},{inputs:["0"],last:"32.0"},{inputs:["20"],last:"68.0"}], stdin:"100",
+      hint:'celsius = int(input("Temperatuur in Celsius? "))\nprint(celsius * 9 / 5 + 32)', ok:"Juist! Water kookt bij 100 °C, en dat is 212 °F."},
+    {id:"h9-code4", type:"code", q:"Uitdaging: schrijf een programma dat een aantal <b>seconden</b> vraagt en dat omzet naar minuten en seconden. Typt de gebruiker <b>125</b>, dan toont het: <b>2 minuten en 5 seconden</b>", starter:"",
+      tests:[{inputs:["125"],last:"2 minuten en 5 seconden"},{inputs:["3600"],last:"60 minuten en 0 seconden"},{inputs:["59"],last:"0 minuten en 59 seconden"}],
+      must:[[/\/\//,"Bereken de minuten met de gehele deling //."],[/%/,"Bereken de overige seconden met modulo %."]], stdin:"125",
+      hint:'totaal = int(input("Hoeveel seconden? "))\nminuten = totaal // 60\nseconden = totaal % 60\nprint(str(minuten) + " minuten en " + str(seconden) + " seconden")', ok:"Knap! Dit is precies hoe een klok of timer rekent."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h9-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan een macht berekenen met **.","Ik ken de voorrangsregels en gebruik haakjes waar nodig.","Ik kan de gehele deling // gebruiken.","Ik kan de rest berekenen met %."]},
+    {id:"h9-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
+},
+{ id:"h10", short:"10. Strings", title:"Hoofdstuk 10 – Meer over strings en printen",
+  video:"https://youtu.be/81YEEXJAk8U", videoTitle:"Video 16: Meer over strings en aanhalingstekens",
+  video2:"https://youtu.be/hc5m5YPZ564", video2Title:"Video 17: Meerdere waarden printen + Python User Manual",
+  intro:`<p>In dit hoofdstuk leer je hoe je aanhalingstekens <b>in</b> een string zet, wanneer je een getal beter als string bewaart, en hoe je met één <code>print()</code> meerdere waarden tegelijk toont.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk <b>video 16</b> voor 10.1 tot en met 10.3, en <b>video 17</b> voor 10.4 en 10.5. Maak daarna de oefeningen.</div>`,
+  sections:[
+  { title:"10.1 Enkele of dubbele aanhalingstekens", html:`<p>Een string mag je afbakenen met <b>dubbele</b> aanhalingstekens <code>"…"</code> of met <b>enkele</b> <code>'…'</code>. Beide zijn even goed:</p>
+    <pre>print("Hallo")
+print('Hallo')</pre>
+    <p>Belangrijk: het <b>openings- en sluitteken moeten gelijk zijn</b>. <code>"Hallo'</code> geeft een foutmelding. De aanhalingstekens zelf horen niet bij de string: Python toont ze niet.</p>
+    <p>Alles tussen de aanhalingstekens hoort bij de string, ook <b>spaties</b>. Een string zonder iets ertussen, <code>""</code>, heet een <b>lege string</b>.</p>`,
+    items:[
+    {id:"h10-mc1", type:"mc", q:"Welke string is <b>fout</b>?", options:["\"Hallo\"","'Hallo'","\"Hallo'"], correct:2, explain:"Het openings- en sluitteken moeten gelijk zijn."},
+    {id:"h10-tf1", type:"tf", q:"Juist of fout?", parts:[
+      {s:"Enkele en dubbele aanhalingstekens zijn allebei goed.", a:true, explain:"Je mag kiezen, zolang begin en einde gelijk zijn."},
+      {s:"Python toont de aanhalingstekens rond een string mee op het scherm.", a:false, explain:"De aanhalingstekens bakenen de string af, maar horen er niet bij."},
+      {s:"Een spatie telt ook als teken in een string.", a:true, explain:"\" \" is een string met één teken: een spatie."}
+    ]}
+  ]},
+  { title:"10.2 Aanhalingstekens in een string", html:`<p>Wat als je string zelf een aanhalingsteken bevat? Neem de titel van het eerste Harry Potter-boek:</p>
+    <pre>print('Harry Potter and the Philosopher's Stone')</pre>
+    <p>Dit geeft een foutmelding. Het apostrofje in <i>Philosopher's</i> is ook een enkel aanhalingsteken, dus Python denkt dat de string daar al eindigt.</p>
+    <p><b>Oplossing:</b> kies voor de afbakening het <b>andere</b> soort aanhalingsteken:</p>
+    <pre>print("Harry Potter and the Philosopher's Stone")
+print('Ze riep "Hallo!"')</pre>
+    <p>Staan er <b>beide</b> soorten in je tekst? Gebruik dan <b>drie</b> aanhalingstekens als afbakening: <code>"""…"""</code>. Een string met drie aanhalingstekens mag zelfs over meerdere regels lopen.</p>`,
+    items:[
+    {id:"h10-try1", type:"play", q:"Voer uit. Verbeter daarna de fout door de juiste aanhalingstekens te kiezen.", starter:"print('Harry Potter and the Philosopher's Stone')"},
+    {id:"h10-try2", type:"play", q:"Voer uit: een string met drie aanhalingstekens.", starter:'print("""Ze zei: "Dat is Sara\'s boek."\nEn dit staat op een nieuwe regel.""")'},
+    {id:"h10-mc2", type:"mc", q:"Je wilt de tekst <b>Het is Sara's beurt</b> tonen. Welke regel werkt?", options:["print('Het is Sara's beurt')","print(\"Het is Sara's beurt\")","print(\"Het is Sara's beurt')"], correct:1, explain:"Met dubbele aanhalingstekens als afbakening kan het apostrofje er gewoon in."}
+  ]},
+  { title:"10.3 Getallen als string bewaren", html:`<p>Moet je met een getal <b>niet rekenen</b>? Bewaar het dan als string. Denk aan een <b>huisnummer</b>, een <b>postcode</b> of een <b>telefoonnummer</b>. Niemand telt twee telefoonnummers bij elkaar op!</p>
+    <p>Bij een telefoonnummer is het zelfs nodig: een getal mag in Python niet met een 0 beginnen.</p>
+    <pre>telefoon = 0475123456     # foutmelding!
+telefoon = "0475123456"   # goed</pre>`,
+    items:[
+    {id:"h10-mc3", type:"mc", q:"Welke waarde bewaar je best als <b>string</b>?", options:["De prijs van een broodje","Je postcode","Het aantal leerlingen in een klas"], correct:1, explain:"Met een postcode reken je niet. Met een prijs of een aantal wel."}
+  ]},
+  { title:"10.4 Meerdere waarden printen", html:`<p>Elke <code>print()</code> begint op een <b>nieuwe regel</b>. Wil je meerdere waarden op <b>één regel</b>, zet ze dan in één <code>print()</code>, gescheiden door <b>komma’s</b>:</p>
+    <pre>print("Courtois", "Vertonghen", "Alderweireld")</pre>
+    <p>Python zet automatisch een <b>spatie</b> tussen de waarden: <code>Courtois Vertonghen Alderweireld</code>.</p>
+    <p>Een groot voordeel: met komma’s mag je verschillende datatypes mengen, <b>zonder</b> <code>str()</code>:</p>
+    <pre>leeftijd = 15
+print("Ik ben", leeftijd, "jaar")      # met komma's
+print("Ik ben " + str(leeftijd) + " jaar")   # met + en str()</pre>
+    <p>Beide regels tonen <code>Ik ben 15 jaar</code>. Let op het verschil: met <code>+</code> moet je de spaties zelf toevoegen, met komma’s doet Python dat voor jou.</p>`,
+    items:[
+    {id:"h10-try3", type:"play", q:"Voer uit en vergelijk de twee regels.", starter:'leeftijd = 15\nprint("Ik ben", leeftijd, "jaar")\nprint("Ik ben " + str(leeftijd) + " jaar")'},
+    {id:"h10-fill1", type:"fill", q:"Wat toont <code>print(&quot;Score:&quot;, 8, &quot;op&quot;, 10)</code>?", answers:["Score: 8 op 10"], explain:"De waarden komen op één regel, met telkens een spatie ertussen."},
+    {id:"h10-mc4", type:"mc", q:"Wat is een voordeel van komma’s in <code>print()</code> tegenover plakken met +?", options:["Je hebt geen str() nodig en Python zet zelf spaties","Het programma werkt sneller","Je kunt dan ook rekenen met tekst"], correct:0, explain:"Met komma’s mag je datatypes mengen, en Python voegt automatisch spaties toe."}
+  ]},
+  { title:"10.5 De Python-handleiding", html:`<p>Niemand kent alle functies van Python vanbuiten. Programmeurs zoeken daarom vaak dingen op in de officiële <b>Python-documentatie</b>, een soort handleiding.</p>
+    <p>Op de pagina <a href="https://docs.python.org/3/library/functions.html" target="_blank" rel="noopener">Built-in Functions</a> vind je alle ingebouwde functies van Python, ook de functies die je al kent: <code>print()</code>, <code>input()</code>, <code>int()</code>, <code>float()</code>, <code>str()</code> en <code>type()</code>. De handleiding is in het Engels.</p>`,
+    items:[
+    {id:"h10-mc5", type:"mc", q:"Waarvoor gebruik je de Python-documentatie?", options:["Om Python te installeren","Om op te zoeken hoe een functie werkt","Om je code automatisch te verbeteren"], correct:1, explain:"De documentatie is de handleiding van Python: daar zoek je op hoe functies werken."}
+  ]},
+  { title:"10.6 Oefeningen", items:[
+    {id:"h10-code1", type:"code", q:"Laat het programma deze titel tonen: <b>Harry Potter and the Philosopher's Stone</b>", starter:"",
+      expect:["Harry Potter and the Philosopher's Stone"], hint:'print("Harry Potter and the Philosopher\'s Stone")', ok:"Juist! Met dubbele aanhalingstekens kan het apostrofje er gewoon in."},
+    {id:"h10-code2", type:"code", q:"Laat het programma precies deze zin tonen, met de aanhalingstekens erbij: <b>Ze riep \"Hallo!\" en zwaaide.</b>", starter:"",
+      expect:["Ze riep \"Hallo!\" en zwaaide."], hint:'print(\'Ze riep "Hallo!" en zwaaide.\')', ok:"Juist! Met enkele aanhalingstekens als afbakening kunnen de dubbele erin."},
+    {id:"h10-code3", type:"code", q:"In dit programma zit een fout. Verbeter de eerste regel zodat het programma <b>Mijn nummer is 0475123456</b> toont.", starter:'telefoon = 0475123456\nprint("Mijn nummer is", telefoon)',
+      expect:["Mijn nummer is 0475123456"], must:[[/telefoon\s*=\s*["']0475123456["']/,"Bewaar het telefoonnummer als string: tussen aanhalingstekens."]],
+      hint:'telefoon = "0475123456"\nprint("Mijn nummer is", telefoon)', ok:"Juist! Een telefoonnummer bewaar je als string."},
+    {id:"h10-code4", type:"code", q:"Toon de zin <b>Ik ben 15 jaar oud</b>. Gebruik daarvoor de variabele <code>leeftijd</code> en <b>komma’s</b> in <code>print()</code>, zonder <code>str()</code> en zonder <code>+</code>.", starter:'leeftijd = 15\n',
+      expect:["Ik ben 15 jaar oud"], must:[[/leeftijd\s*=\s*15\b/,"Laat de regel leeftijd = 15 staan."],[/print\([^)]*,\s*leeftijd\s*,/,"Zet de variabele leeftijd tussen komma’s in print()."],[/^(?![\s\S]*(\+|(^|[^a-z_])str\())/,"Gebruik geen + en geen str(): de komma’s doen het werk."]],
+      hint:'leeftijd = 15\nprint("Ik ben", leeftijd, "jaar oud")', ok:"Juist! Met komma’s heb je geen str() nodig."},
+    {id:"h10-code5", type:"code", q:"Uitdaging: schrijf een programma dat de <b>naam</b> en de <b>leeftijd</b> van de gebruiker vraagt, en toont hoe oud hij over 5 jaar is. Gebruik komma’s in <code>print()</code>. Bij <b>Sara</b> en <b>15</b> toont het: <b>Sara is over 5 jaar 20 jaar oud</b>", starter:"",
+      tests:[{inputs:["Sara","15"],last:"Sara is over 5 jaar 20 jaar oud"},{inputs:["Tom","8"],last:"Tom is over 5 jaar 13 jaar oud"}],
+      must:[[/(^|[^a-z_])int\(/,"Zet de leeftijd om naar een getal met int(), zodat je er 5 kunt bijtellen."]], stdin:"Sara\n15",
+      hint:'naam = input("Hoe heet je? ")\nleeftijd = int(input("Hoe oud ben je? "))\nprint(naam, "is over 5 jaar", leeftijd + 5, "jaar oud")', ok:"Knap! Je combineerde input(), int() en print() met komma’s."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h10-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan een string afbakenen met enkele of dubbele aanhalingstekens.","Ik kan aanhalingstekens in een string zetten.","Ik weet wanneer ik een getal beter als string bewaar.","Ik kan meerdere waarden printen met komma’s.","Ik weet waar ik de Python-documentatie vind."]},
+    {id:"h10-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
 }
 ];
 
@@ -671,7 +891,9 @@ function friendlyError(raw){
   const m2=last.match(/\(detected at line (\d+)\)/); if(m2) ln=ln||m2[1];
   if(/^EOFError/.test(last)) return {line:ln,text:"Je programma vraagt om invoer, maar er is (niet genoeg) invoer ingevuld. Vul het vak ‘Invoer’ aan: één antwoord per regel.",type:"EOFError"};
   let extra="";
-  if(/invalid literal for int\(\)/.test(last)) extra="\n→ int() kan alleen een geheel getal omzetten, zoals \"15\". Tekst of een kommagetal lukt niet.";
+  if(/could not convert string to float/.test(last)) extra="\n→ float() kan alleen een getal omzetten, zoals \"3.5\". Gebruik een punt, geen komma!";
+  else if(/leading zeros in decimal integer literals/.test(last)) extra="\n→ Een getal mag niet met een 0 beginnen. Bewaar zo’n nummer als string, tussen aanhalingstekens.";
+  else if(/invalid literal for int\(\)/.test(last)) extra="\n→ int() kan alleen een geheel getal omzetten, zoals \"15\". Tekst of een kommagetal lukt niet.";
   else if(/can only concatenate str \(not "(int|float)"\) to str/.test(last)) extra="\n→ Je probeert tekst en een getal aan elkaar te plakken met +. Dat kan niet.";
   else if(/unsupported operand type\(s\) for [-*\/+]: 'str' and 'int'|unsupported operand type\(s\) for [-*\/+]: 'int' and 'str'/.test(last)) extra="\n→ Je rekent met tekst (een string) en een getal. Gebruik int() om tekst om te zetten naar een getal.";
   return {line:ln,text:last+extra,type:(last.match(/^(\w+(Error|Exception))/)||[])[1]||"Fout"};
@@ -793,7 +1015,7 @@ function renderScratch(m){
 function renderChapter(m,ch){
   let n=0;
   m.appendChild($(`<div class="card"><div class="kicker">Cursus Python</div><h2>${esc(ch.title)}</h2>
-   <p style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn secondary" href="${ch.video}" target="_blank" rel="noopener">▶ ${esc(ch.videoTitle)}</a>${ch.video2?`<a class="btn secondary" href="${ch.video2}" target="_blank" rel="noopener">▶ ${esc(ch.video2Title)}</a>`:""}</p>${ch.intro}</div>`));
+   <p style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn secondary" href="${ch.video}" target="_blank" rel="noopener">▶ ${esc(ch.videoTitle)}</a>${ch.video2?`<a class="btn secondary" href="${ch.video2}" target="_blank" rel="noopener">▶ ${esc(ch.video2Title)}</a>`:""}${ch.video3?`<a class="btn secondary" href="${ch.video3}" target="_blank" rel="noopener">▶ ${esc(ch.video3Title)}</a>`:""}</p>${ch.intro}</div>`));
   ch.sections.forEach(sec=>{
     const card=$(`<div class="card"><h3>${esc(sec.title)}</h3>${sec.html||""}</div>`);
     sec.items.forEach(it=>{n++; card.appendChild(renderItem(it,n))});
