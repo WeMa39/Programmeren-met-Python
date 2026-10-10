@@ -458,6 +458,65 @@ pi = 3.14</pre>
     {id:"h5-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
   ]}
   ]
+},
+{ id:"h6", short:"6. Expressies", title:"Hoofdstuk 6 – Expressies en commentaar",
+  video:"https://youtu.be/KIQjDof8V-k", videoTitle:"Video 7: Werken met variabelen, expressies en commentaarregels",
+  intro:`<p>Nu je variabelen kent, ga je ermee <b>rekenen</b>. Je leert wat een <b>expressie</b> is en hoe je met <b>commentaar</b> uitleg in je code zet.</p>
+  <div class="box"><b>Zo werk je</b><br>Bekijk eerst het filmpje. Lees daarna elk stukje, probeer de voorbeelden uit met <b>▶ Uitvoeren</b> en maak de vragen en oefeningen.</div>
+  <div class="box warm"><b>Let op</b><br>In het filmpje schrijft men het programma in een aparte editor en slaat men het op met een naam. Bij ons schrijf je het gewoon in het codevak: je werk wordt automatisch bewaard.</div>`,
+  sections:[
+  { title:"6.1 Een programma in stappen", html:`<p>In het filmpje wordt een programma geschreven dat twee getallen optelt. Het werkt in vier stappen:</p>
+    <ol><li>De variabele <code>getal_1</code> krijgt de waarde 15.</li><li>De variabele <code>getal_2</code> krijgt de waarde 4.</li><li>De variabele <code>som</code> krijgt de uitkomst van <code>getal_1 + getal_2</code>.</li><li>Het programma toont de waarde van <code>som</code>.</li></ol>
+    <p>Voer het programma uit. De regels die met <code>#</code> beginnen, leer je verderop kennen.</p>`,
+    items:[
+    {id:"h6-try1", type:"play", q:"Voer het programma uit.", starter:'# Eerste getal\ngetal_1 = 15\n\n# Tweede getal\ngetal_2 = 4\n\n# Som van beide getallen\nsom = getal_1 + getal_2\n\n# Toon het resultaat\nprint(som)'},
+    {id:"h6-fill1", type:"fill", q:"Welk getal toont het programma?", answers:["19"], explain:"15 + 4 = 19"}
+  ]},
+  { title:"6.2 Wat is een expressie?", html:`<p>Kijk naar deze regel:</p>
+    <pre>som = getal_1 + getal_2</pre>
+    <p>Rechts van het =-teken staat <code>getal_1 + getal_2</code>. Dat is een <b>expressie</b>: een combinatie van <b>waarden</b>, <b>variabelen</b> en <b>operatoren</b> die samen <b>één waarde</b> oplevert.</p>
+    <p>Wat doet Python met zo’n regel? Het werkt altijd <b>van rechts naar links</b>:</p>
+    <ol><li>Python vervangt de variabelen door hun waarde: <code>15 + 4</code>.</li><li>Python rekent de expressie uit: <code>19</code>.</li><li>Python kent die uitkomst toe aan de variabele links: <code>som</code> krijgt de waarde 19.</li></ol>
+    <p>Een expressie mag ook rechtstreeks tussen de haakjes van <code>print()</code> staan. Dan toont Python meteen de uitkomst: <code>print(getal_1 + getal_2)</code> toont ook 19.</p>
+    <div class="box"><b>Onthoud</b><br>Een expressie levert altijd <b>één waarde</b> op.</div>`,
+    items:[
+    {id:"h6-mc1", type:"mc", q:"Wat is een expressie?", options:["Een regel die met # begint","Een combinatie van waarden, variabelen en operatoren die samen één waarde oplevert","Een foutmelding van Python"], correct:1, explain:"Een expressie, zoals getal_1 + getal_2, levert altijd één waarde op."},
+    {id:"h6-mc2", type:"mc", q:"In <code>totaal = prijs * aantal</code>, wat is de expressie?", options:["totaal","prijs * aantal","totaal = prijs * aantal"], correct:1, explain:"De expressie staat rechts van het =-teken. De uitkomst ervan wordt toegekend aan totaal."},
+    {id:"h6-mc3", type:"mc", q:"Wat doet Python als eerste bij <code>som = getal_1 + getal_2</code>?", options:["De waarde toekennen aan som","De variabelen getal_1 en getal_2 vervangen door hun waarde","De uitkomst op het scherm tonen"], correct:1, explain:"Eerst vervangt Python de variabelen door hun waarde, dan rekent het, en pas daarna kent het de uitkomst toe aan som."},
+    {id:"h6-fill2", type:"fill", q:"Wat toont dit programma?<pre>a = 6\nb = 3\nc = a * b\nprint(c)</pre>", answers:["18"], explain:"c krijgt de waarde van 6 * 3 = 18."},
+    {id:"h6-fill3", type:"fill", q:"Wat toont dit programma?<pre>prijs = 4\naantal = 5\nprint(prijs * aantal)</pre>", answers:["20"], explain:"De expressie prijs * aantal staat rechtstreeks in print(): 4 * 5 = 20."}
+  ]},
+  { title:"6.3 Commentaar met #", html:`<p>Een regel die begint met een <b>hekje</b> <code>#</code> is <b>commentaar</b>. Python slaat zo’n regel over, alsof hij er niet staat. Commentaar is er dus niet voor de computer, maar voor <b>mensen</b>: jijzelf, of iemand anders die je code leest.</p>
+    <p>Met commentaar leg je uit wat een stuk code doet. Zo begrijp je je programma later nog, ook als je het een tijd niet bekeken hebt.</p>
+    <p>Commentaar is ook handig om een regel code <b>tijdelijk uit te schakelen</b>: zet er een <code>#</code> voor, en Python voert hem niet meer uit. Haal je het hekje weg, dan doet de regel weer mee.</p>`,
+    items:[
+    {id:"h6-try2", type:"play", q:"Voer uit. Welke regels verschijnen niet?", starter:'# Dit is commentaar: Python slaat deze regel over\nprint("Regel 1")\n# print("Regel 2")\nprint("Regel 3")'},
+    {id:"h6-mc4", type:"mc", q:"Wat doet Python met een regel die begint met <code>#</code>?", options:["Python toont de regel op het scherm","Python slaat de regel over","Python geeft een foutmelding"], correct:1, explain:"Een regel die met # begint, is commentaar. Python slaat hem over."},
+    {id:"h6-mc5", type:"mc", q:"Voor wie is commentaar bedoeld?", options:["Voor de computer","Voor mensen die de code lezen, ook voor jezelf","Voor de printer"], correct:1, explain:"Commentaar legt uit wat de code doet. De computer negeert het."},
+    {id:"h6-fill4", type:"fill", q:"Hoeveel regels toont dit programma op het scherm? (Typ een getal.)<pre>print(\"A\")\n# print(\"B\")\nprint(\"C\")\n# print(\"D\")</pre>", answers:["2"], explain:"Alleen print(\"A\") en print(\"C\") worden uitgevoerd. De andere twee regels zijn commentaar."}
+  ]},
+  { title:"6.4 Oefeningen", items:[
+    {id:"h6-code1", type:"code", q:"Een rechthoek is 8 meter lang en 5 meter breed. Maak de variabelen <code>lengte</code> en <code>breedte</code>, bereken de oppervlakte in een variabele <code>oppervlakte</code> en toon die.", starter:"",
+      expect:["40"], must:[[/lengte\s*=\s*8\b/,"Maak de variabele lengte met de waarde 8."],[/breedte\s*=\s*5\b/,"Maak de variabele breedte met de waarde 5."],[/oppervlakte\s*=\s*(lengte\s*\*\s*breedte|breedte\s*\*\s*lengte)/,"Laat Python de oppervlakte berekenen met de variabelen: oppervlakte = lengte * breedte."],[/print\(\s*oppervlakte\s*\)/,"Toon de oppervlakte met print(oppervlakte)."]],
+      hint:'lengte = 8\nbreedte = 5\noppervlakte = lengte * breedte\nprint(oppervlakte)', ok:"Juist! De oppervlakte is 40 vierkante meter."},
+    {id:"h6-code2", type:"code", q:"Pas het programma uit het filmpje aan zodat het <b>123</b> en <b>77</b> optelt. Verander alleen de waarden van de variabelen.", starter:'# Eerste getal\ngetal_1 = 15\n\n# Tweede getal\ngetal_2 = 4\n\n# Som van beide getallen\nsom = getal_1 + getal_2\n\n# Toon het resultaat\nprint(som)',
+      expect:["200"], must:[[/getal_1\s*=\s*123\b/,"Geef getal_1 de waarde 123."],[/getal_2\s*=\s*77\b/,"Geef getal_2 de waarde 77."],[/som\s*=\s*getal_1\s*\+\s*getal_2/,"Laat de regel som = getal_1 + getal_2 staan zoals hij was."]],
+      hint:'getal_1 = 123\ngetal_2 = 77\nsom = getal_1 + getal_2\nprint(som)', ok:"Juist! Zie je dat je alleen de waarden moest aanpassen? De berekening bleef dezelfde."},
+    {id:"h6-code3", type:"code", q:"Dit programma werkt, maar er staat geen uitleg bij. Zet boven elke regel code een <b>commentaarregel</b> die uitlegt wat de regel doet. Het programma moet hetzelfde blijven tonen.", starter:'prijs = 3\naantal = 6\ntotaal = prijs * aantal\nprint(totaal)',
+      expect:["18"], must:[[/^\s*#.*\n\s*prijs\s*=/m,"Zet een commentaarregel (#) boven prijs = 3."],[/^\s*#.*\n\s*aantal\s*=/m,"Zet een commentaarregel (#) boven aantal = 6."],[/^\s*#.*\n\s*totaal\s*=/m,"Zet een commentaarregel (#) boven totaal = prijs * aantal."],[/^\s*#.*\n\s*print\(\s*totaal\s*\)/m,"Zet een commentaarregel (#) boven print(totaal)."]],
+      hint:'# De prijs van één stuk\nprijs = 3\n# Hoeveel stuks ik koop\naantal = 6\n# Bereken wat ik moet betalen\ntotaal = prijs * aantal\n# Toon het totaal\nprint(totaal)', ok:"Mooi! Met commentaar is je programma veel duidelijker."},
+    {id:"h6-code4", type:"code", q:"Schakel de middelste <code>print</code>-regel uit met commentaar, zodat die niet meer verschijnt. Verwijder de regel <b>niet</b>!", starter:'print("Dit moet je zien")\nprint("Dit mag je NIET zien")\nprint("Dit moet je ook zien")',
+      expect:["Dit moet je zien","Dit moet je ook zien"], must:[[/#\s*print\(\s*["']Dit mag je NIET zien["']\s*\)/,"Laat de middelste regel staan, maar zet er een # voor."]],
+      hint:'print("Dit moet je zien")\n# print("Dit mag je NIET zien")\nprint("Dit moet je ook zien")', ok:"Juist! Met een # schakel je een regel uit zonder hem te wissen."},
+    {id:"h6-code5", type:"code", q:"Uitdaging: je koopt broodjes en drankjes voor 4 vrienden. Bereken in een variabele <code>totaal</code> hoeveel je in totaal betaalt, en toon het. Laat Python rekenen met de variabelen, niet met getallen!", starter:'# Gegevens\naantal = 4\nprijs_broodje = 3\nprijs_drankje = 2\n\n# Bereken hier het totaal\n\n\n# Toon het totaal\n',
+      expect:["20"], must:[[/^\s*totaal\s*=/m,"Maak een variabele totaal."],[/^\s*totaal\s*=[^\n]*[a-z_]{3,}/m,"Laat Python het totaal berekenen met de variabelen aantal, prijs_broodje en prijs_drankje."],[/print\(\s*totaal\s*\)/,"Toon het totaal met print(totaal)."]],
+      hint:'kost_broodjes = aantal * prijs_broodje\nkost_drankjes = aantal * prijs_drankje\ntotaal = kost_broodjes + kost_drankjes\nprint(totaal)', ok:"Knap! Je betaalt 20 euro. Omdat je met variabelen rekent, klopt je programma ook als de prijzen veranderen."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h6-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik weet wat een expressie is.","Ik kan rekenen met variabelen.","Ik weet dat Python eerst de expressie uitrekent en dan de uitkomst toekent.","Ik kan commentaar schrijven met #.","Ik kan een regel tijdelijk uitschakelen met #."]},
+    {id:"h6-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
 }
 ];
 
