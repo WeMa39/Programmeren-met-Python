@@ -1952,7 +1952,7 @@ function startWorker(){
     try{ py.runPython("for _k in [k for k in list(globals()) if not k.startswith('_')]: del globals()[_k]");
       if(e.data.wsrc){ py.globals.set("_WSRC",e.data.wsrc); py.globals.set("_WSC",e.data.wsc); py.runPython("exec(compile(_WSRC, '<wereld>', 'exec'), globals())"); }
       await py.runPythonAsync(e.data.code); postMessage({type:"done",out,err:null,wereld:wj()}); }
-    catch(err){ postMessage({type:"done",out:teveel?out.slice(0,3000)+"\n…":out,err:teveel?"OneindigeLus: Je programma bleef maar uitvoer tonen en werd gestopt.":String(err.message||err),wereld:wj()}); }
+    catch(err){ postMessage({type:"done",out:teveel?out.slice(0,3000)+"\\n…":out,err:teveel?"OneindigeLus: Je programma bleef maar uitvoer tonen en werd gestopt.":String(err.message||err),wereld:wj()}); }
   };`;
   worker=new Worker(URL.createObjectURL(new Blob([src],{type:"text/javascript"})));
   pyReady=new Promise((res,rej)=>{worker.onmessage=e=>{if(e.data.type==="ready")res();if(e.data.type==="loadfail")rej(e.data.msg)}; worker.onerror=()=>rej("worker")});
@@ -2243,6 +2243,11 @@ const AFSPRAKEN_HTML=`<ol class="afspr">
 </ol>`;
 function fbVak(box){let f=box.querySelector(":scope > .fb"); if(!f){f=$(`<div class="fb"></div>`);box.appendChild(f)} return f}
 
+/* Foutmelding als Python niet start of de app zelf een fout geeft */
+function toonLaadFout(out,e){ out.style.display="block";
+  const laden=(typeof e==="string")||!worker;
+  if(laden){ out.textContent="Python kon niet geladen worden. Controleer je internetverbinding en herlaad de pagina."; worker=null }
+  else out.textContent="Er liep iets mis in de app ("+(e&&e.message||e)+"). Herlaad de pagina en probeer opnieuw. Blijft dit gebeuren, meld het dan aan je leerkracht."; }
 /* code-blok met Uitvoeren (+ optioneel Controleer) */
 function codeBlok({waarde,onCode,invoer,onInvoer,controleer,uitvoeren}){
   const wrap=$(`<div></div>`);
@@ -2254,10 +2259,10 @@ function codeBlok({waarde,onCode,invoer,onInvoer,controleer,uitvoeren}){
   const bezig=(b)=>{knoppen().forEach(k=>k.disabled=b||k.dataset.lock==="1"); st.textContent=b?(worker?"Bezig…":"Python wordt geladen (de eerste keer duurt dit even)…"):""};
   act.querySelector(".run").onclick=async()=>{ if(!ed.ta.value.trim()) return; bezig(true);
     try{ if(uitvoeren){ await uitvoeren(ed.ta.value,out) } else { const r=await runPython(ed.ta.value,iv.regels(),true); toonUit(out,r); wrap.onRun&&wrap.onRun(r) } }
-    catch(e){ out.style.display="block"; out.textContent="Python kon niet geladen worden. Controleer je internetverbinding."; worker=null }
+    catch(e){ toonLaadFout(out,e) }
     bezig(false) };
   if(controleer) act.querySelector(".chk").onclick=async()=>{ if(!ed.ta.value.trim()) return; bezig(true);
-    try{ await controleer(ed.ta.value,out) } catch(e){ out.style.display="block"; out.textContent="Python kon niet geladen worden. Controleer je internetverbinding."; worker=null }
+    try{ await controleer(ed.ta.value,out) } catch(e){ toonLaadFout(out,e) }
     bezig(false) };
   wrap.ed=ed; wrap.act=act; wrap.out=out;
   wrap.vergrendel=()=>{ed.ta.readOnly=true; const c=act.querySelector(".chk"); if(c){c.dataset.lock="1";c.disabled=true}};
