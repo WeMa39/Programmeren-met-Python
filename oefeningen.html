@@ -95,9 +95,42 @@ select,input[type=text]{font:inherit;color:var(--ink);background:var(--card);bor
 .sits button.aan{background:var(--brand);color:var(--card);border-color:var(--brand)}
 table.api{margin:10px 0;font-size:14.5px}
 table.api code{word-break:break-word}
-.exlist .groep{font-weight:800;color:var(--brand);margin:18px 0 2px;font-size:15px}
-.exlist .groep:first-child{margin-top:4px}
-.groepintro{margin:22px 0 4px;padding:12px 14px;border-radius:10px;background:var(--warn-soft);font-size:15px}
+.tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin:-4px 0 14px;flex-wrap:wrap}
+.tabs button{font:inherit;font-weight:700;font-size:15.5px;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:8px 12px;color:var(--muted);cursor:pointer;display:flex;gap:8px;align-items:center}
+.tabs button.aan{color:var(--brand);border-bottom-color:var(--brand)}
+.tel{font-size:12.5px;font-weight:700;background:var(--brand-soft);color:var(--brand);border-radius:999px;padding:1px 8px;white-space:nowrap}
+.voortgang{margin:0 0 14px}
+.vg-tekst{font-size:14px;color:var(--muted);margin-bottom:5px}
+.vg-balk{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.vg-balk div{height:100%;background:var(--ok);border-radius:999px}
+details.hfd{border:1px solid var(--line);border-radius:12px;margin:10px 0;background:var(--card)}
+details.hfd summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:12px 14px;font-weight:700}
+details.hfd summary::-webkit-details-marker{display:none}
+details.hfd summary::after{content:"▾";margin-left:6px;color:var(--muted);transition:transform .15s}
+details.hfd:not([open]) summary::after{transform:rotate(-90deg)}
+.hfd-nr{flex:none;width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--card);display:grid;place-items:center;font-size:15px}
+.hfd-t{flex:1}
+details.hfd .exlist{padding:0 12px 6px}
+details.hfd .exlist button{margin:0 0 8px;padding:10px 12px}
+.w-intro{margin:0 0 12px;color:var(--muted)}
+.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wtegel{border:1px solid var(--line);border-top:5px solid var(--wk);border-radius:12px;padding:12px;background:var(--card)}
+.w-kop{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.w-icoon{font-size:30px;line-height:1}
+.w-kop>div{flex:1}
+.w-naam{font-weight:800;color:var(--ink)}
+.w-sub{font-size:13px;color:var(--muted)}
+.w-levels{display:flex;flex-direction:column;gap:6px}
+.lvl{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;font-size:14.5px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:7px 10px;cursor:pointer}
+.lvl:hover{border-color:var(--wk)}
+.lvl-nr{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:var(--card);border:2px solid var(--wk);color:var(--wk)}
+.lvl.verstuurd .lvl-nr{background:var(--ok);border-color:var(--ok);color:var(--card)}
+.lvl.klaar .lvl-nr,.lvl.bezig .lvl-nr{background:var(--warn-soft);border-color:var(--accent);color:var(--accent)}
+.lvl-t{flex:1;font-weight:600}
+.lvl-c{font-size:12.5px;font-weight:700;color:var(--ok)}
+.lvl-c.mid{color:var(--accent)}
+details.afspraken-kaart summary{cursor:pointer;font-weight:700;color:var(--brand);font-size:17px}
+@media (max-width:640px){ .wgrid{grid-template-columns:1fr} .tabs button{font-size:14.5px;padding:8px 8px} }
 .card{scroll-margin-top:72px}
 select.mist,input.mist{border:2px solid var(--bad);background:var(--bad-soft)}
 ul.stijl{margin:6px 0 0;padding-left:20px;color:var(--ink);font-size:15px}
@@ -783,6 +816,13 @@ wLevel({ id:"V3", groep:"🚗 Het Verkeer", titel:"Verkeer 3 - Genoeg brandstof"
     ok:"Je auto komt altijd aan, zonder onnodig te tanken!" } })
 ];
 
+/* Titels van de hoofdstukken (klasoefeningen) en info over de werelden */
+const HOOFDSTUKKEN={"3":"Rekenen met Python","4":"Variabelen, invoer en datatypes","5":"Keuzes maken met if","6":"Stroomdiagrammen en bugs zoeken"};
+const WERELD_INFO={
+  "🏗️ De Havenkraan":{icoon:"🏗️",naam:"De Havenkraan",sub:"Containers naar het juiste schip",kleur:"#2f6fae"},
+  "🚆 Het Station":{icoon:"🚆",naam:"Het Station",sub:"Zet de wissels voor elke trein",kleur:"#c0392b"},
+  "📦 Het Magazijn":{icoon:"📦",naam:"Het Magazijn",sub:"Sorteer de pakjes met een robot",kleur:"#b9762f"},
+  "🚗 Het Verkeer":{icoon:"🚗",naam:"Het Verkeer",sub:"Een zelfrijdende auto veilig op weg",kleur:"#2a9d4b"}};
 const OEFENINGEN = [
 { id:"3.1", titel:"3.1 De Magische Rekenmachine", klaar:false },
 { id:"4.1", titel:"4.1 De Korte Vragenlijst", klaar:false },
@@ -1547,27 +1587,60 @@ function renderStart(m){
   kl.onchange=()=>{kl.classList.remove("mist"); S.klas=kl.value; if((KLASSEN[S.klas]||[]).length&&!KLASSEN[S.klas].includes(S.naam)) S.naam=""; save(); tekenNaam()};
   tekenNaam();
 
-  const lijst=$(`<div class="card"><h3>Oefeningen</h3><div class="exlist"></div></div>`); m.appendChild(lijst);
-  const exl=lijst.querySelector(".exlist"); let groep=null, ex=exl;
-  OEFENINGEN.forEach(o=>{ const a=S.oef[o.id]; let pill;
-    const g=o.groep||"Klasoefeningen";
-    if(g!==groep){ groep=g; exl.appendChild($(`<div class="groep">${esc(g)}</div>`)); if(g!=="Klasoefeningen"&&o.id==="H1") exl.lastChild.insertAdjacentHTML("beforebegin",`<div class="groepintro"><b>🎮 Programmeerwerelden</b><br>Bestuur een kraan, een trein, een robot en een auto met Python. Je ziet meteen wat je code doet!</div>`) }
-    if(!o.klaar) pill='<span class="pill off">binnenkort</span>';
-    else if(a&&a.verstuurd) pill=`<span class="pill ok">verstuurd • ${fmt(a.verstuurd.cijfer)}/10</span>`;
-    else if(a&&a.ok) pill='<span class="pill mid">klaar, nog versturen</span>';
-    else if(a&&(a.controles||a.code)) pill='<span class="pill mid">bezig</span>';
-    else pill="";
-    const b=$(`<button ${o.klaar?"":"disabled"}><span class="t">${esc(o.titel)}</span>${pill}</button>`);
-    b.onclick=()=>{ const f=c.querySelector("#startfb");
-      const geenKlas=!S.klas, geenNaam=!S.naam.trim();
-      if(geenKlas||geenNaam){
-        f.className="fb bad"; f.innerHTML="✋ <b>Nog even:</b> "+(geenKlas&&geenNaam?"kies hierboven je <b>klas</b> en vul je <b>naam</b> in.":geenKlas?"kies hierboven je <b>klas</b>.":"vul hierboven je <b>voornaam en familienaam</b> in.")+" Daarna kun je de oefening openen.";
-        c.querySelectorAll("#klas,#naam").forEach(el=>el.classList.remove("mist"));
-        if(geenKlas) c.querySelector("#klas").classList.add("mist"); if(geenNaam) c.querySelector("#naam").classList.add("mist");
-        c.scrollIntoView({behavior:"smooth"}); setTimeout(()=>{const el=c.querySelector(geenKlas?"#klas":"#naam"); if(el) el.focus()},350); return}
-      S.naam=S.naam.trim(); go(o.id)};
-    ex.appendChild(b)});
-  if(KLASAFSPRAKEN) m.appendChild($(`<div class="card"><h3>📏 Klasafspraken voor je code</h3><p style="margin-top:0">Bij <b>✓ Controleer</b> kijkt de app ook na of je code deze afspraken volgt. Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</div>`));
+  /* ---- overzicht van de oefeningen ---- */
+  const status=o=>{ const a=S.oef[o.id]; if(!o.klaar) return "off"; if(a&&a.verstuurd) return "verstuurd"; if(a&&a.ok) return "klaar"; if(a&&(a.controles||a.code)) return "bezig"; return "nieuw" };
+  const PILL={off:'<span class="pill off">binnenkort</span>',klaar:'<span class="pill mid">klaar, nog versturen</span>',bezig:'<span class="pill mid">bezig</span>',nieuw:""};
+  const pillVan=o=>{ const s=status(o); return s==="verstuurd"?`<span class="pill ok">✔ ${fmt(S.oef[o.id].verstuurd.cijfer)}/10</span>`:PILL[s] };
+  const open=o=>{ const f=c.querySelector("#startfb");
+    const geenKlas=!S.klas, geenNaam=!S.naam.trim();
+    if(geenKlas||geenNaam){
+      f.className="fb bad"; f.innerHTML="✋ <b>Nog even:</b> "+(geenKlas&&geenNaam?"kies hierboven je <b>klas</b> en vul je <b>naam</b> in.":geenKlas?"kies hierboven je <b>klas</b>.":"vul hierboven je <b>voornaam en familienaam</b> in.")+" Daarna kun je de oefening openen.";
+      c.querySelectorAll("#klas,#naam").forEach(el=>el.classList.remove("mist"));
+      if(geenKlas) c.querySelector("#klas").classList.add("mist"); if(geenNaam) c.querySelector("#naam").classList.add("mist");
+      c.scrollIntoView({behavior:"smooth"}); setTimeout(()=>{const el=c.querySelector(geenKlas?"#klas":"#naam"); if(el) el.focus()},350); return}
+    S.naam=S.naam.trim(); go(o.id) };
+  const klasOef=OEFENINGEN.filter(o=>!o.groep), wereldOef=OEFENINGEN.filter(o=>o.groep);
+  const telKlaar=l=>l.filter(o=>status(o)==="verstuurd").length, telOpen=l=>l.filter(o=>o.klaar).length;
+  if(!S.tab) S.tab="klas"; if(!S.dicht) S.dicht={};
+
+  const kaart=$(`<div class="card"><div class="tabs" role="tablist">
+      <button type="button" data-tab="klas">📘 Klasoefeningen <span class="tel">${telKlaar(klasOef)}/${telOpen(klasOef)}</span></button>
+      <button type="button" data-tab="werelden">🎮 Programmeerwerelden <span class="tel">${telKlaar(wereldOef)}/${telOpen(wereldOef)}</span></button>
+    </div><div class="tabinhoud"></div></div>`);
+  m.appendChild(kaart);
+  const inhoud=kaart.querySelector(".tabinhoud");
+  const voortgang=(lijst,tekst)=>{ const k=telKlaar(lijst), n=telOpen(lijst), pct=n?Math.round(k/n*100):0;
+    return `<div class="voortgang"><div class="vg-tekst">${tekst}: <b>${k} van ${n}</b> verstuurd</div><div class="vg-balk"><div style="width:${pct}%"></div></div></div>` };
+
+  function tekenKlas(){
+    inhoud.innerHTML=voortgang(klasOef,"Klasoefeningen");
+    const hfd={}; klasOef.forEach(o=>{ const h=o.id.split(".")[0]; (hfd[h]=hfd[h]||[]).push(o) });
+    Object.keys(hfd).sort((x,y)=>x-y).forEach(h=>{ const lijst=hfd[h], k=telKlaar(lijst), n=telOpen(lijst);
+      const isDicht=S.dicht["h"+h]??(n>0&&k===n);
+      const d=$(`<details class="hfd" ${isDicht?"":"open"}><summary><span class="hfd-nr">${h}</span><span class="hfd-t">${esc(HOOFDSTUKKEN[h]||"Hoofdstuk "+h)}</span><span class="tel">${n?k+"/"+n:"binnenkort"}</span></summary><div class="exlist"></div></details>`);
+      d.addEventListener("toggle",()=>{S.dicht["h"+h]=!d.open; save()});
+      const ex=d.querySelector(".exlist");
+      lijst.forEach(o=>{ const b=$(`<button ${o.klaar?"":"disabled"}><span class="t">${esc(o.titel)}</span>${pillVan(o)}</button>`); b.onclick=()=>open(o); ex.appendChild(b) });
+      inhoud.appendChild(d) });
+  }
+  function tekenWerelden(){
+    inhoud.innerHTML=`<p class="w-intro">Bestuur een kraan, een trein, een robot en een auto met Python. Je ziet meteen wat je code doet!</p>`+voortgang(wereldOef,"Levels");
+    const grid=$(`<div class="wgrid"></div>`); inhoud.appendChild(grid);
+    const groepen=[...new Set(wereldOef.map(o=>o.groep))];
+    groepen.forEach(g=>{ const lijst=wereldOef.filter(o=>o.groep===g), info=WERELD_INFO[g]||{};
+      const t=$(`<div class="wtegel" style="--wk:${info.kleur||"var(--brand)"}"><div class="w-kop"><span class="w-icoon">${info.icoon||""}</span><div><div class="w-naam">${esc(info.naam||g)}</div><div class="w-sub">${esc(info.sub||"")}</div></div><span class="tel">${telKlaar(lijst)}/${lijst.length}</span></div><div class="w-levels"></div></div>`);
+      const lv=t.querySelector(".w-levels");
+      lijst.forEach((o,i)=>{ const s=status(o), naam=o.titel.replace(/^.*? - /,"");
+        const b=$(`<button type="button" class="lvl ${s}"><span class="lvl-nr">${s==="verstuurd"?"✔":i+1}</span><span class="lvl-t">${esc(naam)}</span>${s==="verstuurd"?`<span class="lvl-c">${fmt(S.oef[o.id].verstuurd.cijfer)}</span>`:s==="klaar"?'<span class="lvl-c mid">versturen</span>':s==="bezig"?'<span class="lvl-c mid">bezig</span>':""}</button>`);
+        b.onclick=()=>open(o); lv.appendChild(b) });
+      grid.appendChild(t) });
+  }
+  const tabs=[...kaart.querySelectorAll(".tabs button")];
+  const kies=tab=>{ S.tab=tab; save(); tabs.forEach(b=>b.classList.toggle("aan",b.dataset.tab===tab)); tab==="werelden"?tekenWerelden():tekenKlas() };
+  tabs.forEach(b=>b.onclick=()=>kies(b.dataset.tab));
+  kies(S.tab);
+
+  if(KLASAFSPRAKEN) m.appendChild($(`<div class="card"><details class="afspraken-kaart"><summary>📏 Klasafspraken voor je code</summary><p>Bij <b>✓ Controleer</b> kijkt de app ook na of je code deze afspraken volgt. Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details></div>`));
 }
 
 function renderOef(m,oef){
