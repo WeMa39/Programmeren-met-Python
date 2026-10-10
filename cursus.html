@@ -517,6 +517,85 @@ pi = 3.14</pre>
     {id:"h6-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
   ]}
   ]
+},
+{ id:"h7", short:"7. Invoer", title:"Hoofdstuk 7 – Invoer: input() en int()",
+  video:"https://youtu.be/BG4Ol_vLUB8", videoTitle:"Video 8: De functie input() & het plakken van strings",
+  video2:"https://youtu.be/OH2QwmtQO88", video2Title:"Video 9: De functie int()",
+  intro:`<p>Tot nu toe stonden alle waarden vast in je code. Wilde je andere getallen optellen, dan moest je je programma aanpassen. In dit hoofdstuk leer je je programma <b>vragen stellen</b> aan de gebruiker, met <code>input()</code>. En je leert waarom je daarbij <code>int()</code> nodig hebt.</p>
+  <div class="box"><b>Zo werk je</b><br>Bij dit hoofdstuk horen twee filmpjes. Bekijk eerst <b>video 8</b> en maak 7.1 tot en met 7.4. Bekijk daarna <b>video 9</b> en maak de rest.</div>`,
+  sections:[
+  { title:"7.1 Een vraag stellen met input()", html:`<p>Met de functie <code>input()</code> stelt je programma een vraag. Het programma <b>wacht</b> dan tot de gebruiker een antwoord typt en op Enter drukt. Dat antwoord kun je bewaren in een variabele:</p>
+    <pre>voornaam = input("Wat is je voornaam? ")
+print("Hallo " + voornaam)</pre>
+    <p>De tekst tussen de haakjes is de <b>vraag</b> die de gebruiker te zien krijgt. Zet er altijd een vraag bij! Zonder vraag ziet de gebruiker niets, en weet hij niet dat hij iets moet intypen. Een spatie op het einde van de vraag zorgt ervoor dat het antwoord niet tegen de vraag plakt.</p>
+    <div class="box warm"><b>Zo werkt invoer in deze cursus</b><br>Zodra je code <code>input()</code> bevat, verschijnt onder het codevak een blauw vak <b>Invoer</b>. Daar typ je <b>vooraf</b> wat de gebruiker zou antwoorden, één antwoord per regel. Klik je daarna op ▶ Uitvoeren, dan gebruikt het programma die antwoorden.<br>Bij <b>✓ Controleer</b> test de cursus je programma met eigen testantwoorden, dus dan maakt het niet uit wat in het vak Invoer staat.</div>`,
+    items:[
+    {id:"h7-try1", type:"play", q:"Voer uit. Verander daarna je naam in het vak Invoer en voer opnieuw uit.", starter:'voornaam = input("Wat is je voornaam? ")\nprint("Hallo " + voornaam)', stdin:"Sara"},
+    {id:"h7-mc1", type:"mc", q:"Wat doet <code>input()</code>?", options:["Het toont een tekst en stopt het programma","Het stelt een vraag en wacht op een antwoord van de gebruiker","Het rekent een berekening uit"], correct:1, explain:"input() toont de vraag en wacht tot de gebruiker iets intypt en op Enter drukt."},
+    {id:"h7-mc2", type:"mc", q:"Waarom zet je best een vraag tussen de haakjes van <code>input()</code>?", options:["Anders geeft Python een foutmelding","Anders weet de gebruiker niet dat hij iets moet intypen","Anders wordt het antwoord niet bewaard"], correct:1, explain:"input() werkt ook zonder vraag, maar dan ziet de gebruiker niets en weet hij niet wat hij moet doen."}
+  ]},
+  { title:"7.2 input() geeft altijd een string", html:`<p>Belangrijk om te onthouden: wat de gebruiker ook intypt, <code>input()</code> geeft <b>altijd een string</b> terug. Ook als de gebruiker een getal typt, zoals <code>15</code>, krijg je de tekst <code>"15"</code>.</p>
+    <p>Drukt de gebruiker op Enter zonder iets te typen, dan krijg je een lege string: <code>""</code>.</p>`,
+    items:[
+    {id:"h7-mc3", type:"mc", q:"De gebruiker typt <b>15</b> bij <code>leeftijd = input(&quot;Hoe oud ben je? &quot;)</code>. Welke waarde krijgt <code>leeftijd</code>?", options:["het getal 15 (een int)","de tekst \"15\" (een string)","een foutmelding"], correct:1, explain:"input() geeft altijd een string terug, ook als de gebruiker cijfers typt."}
+  ]},
+  { title:"7.3 Strings aan elkaar plakken", html:`<p>Met het <b>plusteken</b> <code>+</code> kun je strings aan elkaar <b>plakken</b>:</p>
+    <pre>print("ijs" + "beer")</pre>
+    <p>Dit toont <code>ijsbeer</code>. Let op: Python plakt de strings <b>letterlijk</b> tegen elkaar. Wil je een spatie tussen twee woorden, dan moet je die zelf toevoegen, als een aparte string <code>" "</code> of binnen de aanhalingstekens:</p>
+    <pre>voornaam = "Sara"
+achternaam = "Peeters"
+print(voornaam + " " + achternaam)</pre>`,
+    items:[
+    {id:"h7-try2", type:"play", q:"Voer uit en vergelijk de twee regels.", starter:'voornaam = "Sara"\nachternaam = "Peeters"\nprint(voornaam + achternaam)\nprint(voornaam + " " + achternaam)'},
+    {id:"h7-fill1", type:"fill", q:"Wat toont <code>print(&quot;voet&quot; + &quot;bal&quot;)</code>?", answers:["voetbal"], explain:"De twee strings worden tegen elkaar geplakt: voetbal."},
+    {id:"h7-fill2", type:"fill", q:"Wat toont dit programma?<pre>dier = \"hond\"\nprint(\"Mijn \" + dier + \" heet Max\")</pre>", answers:["Mijn hond heet Max"], explain:"De spaties staan binnen de aanhalingstekens, dus de woorden plakken niet tegen elkaar."}
+  ]},
+  { title:"7.4 Een probleem: getallen optellen", html:`<p>In het filmpje wordt het programma uit hoofdstuk 6 aangepast: het vraagt nu zelf twee getallen aan de gebruiker. Maar er loopt iets mis. Probeer maar:</p>`,
+    items:[
+    {id:"h7-try3", type:"play", q:"Voer uit met de getallen 7 en 93 (ze staan al in het vak Invoer). Klopt de uitkomst?", starter:'getal_1 = input("Wat is je eerste getal? ")\ngetal_2 = input("Wat is je tweede getal? ")\nprint(getal_1 + getal_2)', stdin:"7\n93"},
+    {id:"h7-fill3", type:"fill", q:"Wat toonde het programma als uitkomst?", answers:["793"], explain:"Python toont 793 in plaats van 100."},
+    {id:"h7-mc4", type:"mc", q:"Waarom toont het programma 793 en niet 100?", options:["Omdat Python zich verrekent","Omdat input() strings teruggeeft, en + plakt strings aan elkaar","Omdat 7 en 93 te grote getallen zijn"], correct:1, explain:"getal_1 is de string \"7\" en getal_2 de string \"93\". Het plusteken plakt ze tegen elkaar: \"793\"."}
+  ]},
+  { title:"7.5 De oplossing: int()", html:`<p>Met de functie <code>int()</code> zet je een string om naar een <b>geheel getal</b> (een int). Zo wordt <code>int("8")</code> het getal <code>8</code>, waarmee je wél kunt rekenen.</p>
+    <p>Je kunt <code>int()</code> en <code>input()</code> in elkaar zetten. Python voert dan eerst <code>input()</code> uit, en geeft het antwoord meteen door aan <code>int()</code>:</p>
+    <pre>getal_1 = int(input("Wat is je eerste getal? "))
+getal_2 = int(input("Wat is je tweede getal? "))
+print(getal_1 + getal_2)</pre>
+    <p>Let op het aantal haakjes op het einde: twee! Eén voor <code>input(</code> en één voor <code>int(</code>.</p>
+    <div class="box"><b>Let op</b><br><code>int()</code> kan alleen een tekst omzetten die er echt uitziet als een geheel getal, zoals <code>"15"</code>. Met tekst zoals <code>"hallo"</code> of een kommagetal zoals <code>"3.5"</code> krijg je een foutmelding: <b>ValueError</b>.</div>`,
+    items:[
+    {id:"h7-try4", type:"play", q:"Voer uit met 7 en 93. Klopt de uitkomst nu? Probeer daarna eens een woord als invoer.", starter:'getal_1 = int(input("Wat is je eerste getal? "))\ngetal_2 = int(input("Wat is je tweede getal? "))\nprint(getal_1 + getal_2)', stdin:"7\n93"},
+    {id:"h7-fill4", type:"fill", q:"Wat toont <code>print(&quot;5&quot; + &quot;3&quot;)</code>?", answers:["53"], explain:"Twee strings worden aan elkaar geplakt: 53."},
+    {id:"h7-fill5", type:"fill", q:"Wat toont <code>print(int(&quot;5&quot;) + int(&quot;3&quot;))</code>?", answers:["8"], explain:"int() zet beide strings om naar getallen, dus Python rekent 5 + 3 = 8."},
+    {id:"h7-mc5", type:"mc", q:"Wat gebeurt er bij <code>int(&quot;hallo&quot;)</code>?", options:["Python geeft 0","Python geeft een foutmelding (ValueError)","Python geeft het woord hallo terug"], correct:1, explain:"De tekst hallo is geen geheel getal, dus int() kan hem niet omzetten: ValueError."}
+  ]},
+  { title:"7.6 Oefeningen", html:`<p>Bij deze oefeningen test <b>✓ Controleer</b> je programma met verschillende antwoorden. Je programma moet dus werken, wat de gebruiker ook intypt!</p>`, items:[
+    {id:"h7-code1", type:"code", q:"Schrijf een programma dat vraagt hoe de gebruiker heet, en hem daarna begroet. Typt de gebruiker <b>Sara</b>, dan toont het programma: <b>Hallo Sara!</b>", starter:"",
+      tests:[{inputs:["Sara"],last:"Hallo Sara!"},{inputs:["Mohamed"],last:"Hallo Mohamed!"}],
+      must:[[/input\(\s*["']/,"Stel een vraag met input(\"...\")."]], stdin:"Sara",
+      hint:'naam = input("Hoe heet je? ")\nprint("Hallo " + naam + "!")', ok:"Juist! Je programma begroet iedereen bij naam."},
+    {id:"h7-code2", type:"code", q:"Schrijf een programma dat eerst de <b>voornaam</b> en daarna de <b>achternaam</b> vraagt, en dan de volledige naam toont, met een spatie ertussen. Bijvoorbeeld: <b>Sara Peeters</b>", starter:"",
+      tests:[{inputs:["Sara","Peeters"],last:"Sara Peeters"},{inputs:["Jan","Janssens"],last:"Jan Janssens"}],
+      must:[[/input\([\s\S]*input\(/,"Gebruik twee keer input(): één voor de voornaam en één voor de achternaam."],[/input\(\s*["'][\s\S]*input\(\s*["']/,"Zet bij elke input() een vraag tussen de haakjes."]], stdin:"Sara\nPeeters",
+      hint:'voornaam = input("Wat is je voornaam? ")\nachternaam = input("Wat is je achternaam? ")\nprint(voornaam + " " + achternaam)', ok:"Super! Vergeet nooit de spatie tussen de woorden."},
+    {id:"h7-code3", type:"code", q:"Schrijf een programma dat twee gehele getallen vraagt en hun <b>som</b> toont. Toon alleen de uitkomst.", starter:"",
+      tests:[{inputs:["3","4"],last:"7"},{inputs:["10","25"],last:"35"}],
+      must:[[/(^|[^a-z_])int\(/,"Zet de antwoorden om naar getallen met int()."]], stdin:"3\n4",
+      hint:'getal_1 = int(input("Eerste getal? "))\ngetal_2 = int(input("Tweede getal? "))\nprint(getal_1 + getal_2)', ok:"Juist! Dankzij int() rekent Python echt met de getallen."},
+    {id:"h7-code4", type:"code", q:"Schrijf een programma dat vraagt hoe oud de gebruiker is, en toont hoe oud hij <b>over 10 jaar</b> zal zijn. Toon alleen het getal.", starter:"",
+      tests:[{inputs:["15"],last:"25"},{inputs:["7"],last:"17"}],
+      must:[[/(^|[^a-z_])int\(/,"Zet het antwoord om naar een getal met int()."]], stdin:"15",
+      hint:'leeftijd = int(input("Hoe oud ben je? "))\nprint(leeftijd + 10)', ok:"Juist!"},
+    {id:"h7-code5", type:"code", q:"Uitdaging: maak een kassaprogramma voor de cinema. Het vraagt de <b>prijs van één ticket</b> en het <b>aantal tickets</b>, en toont de totale prijs. Toon alleen de uitkomst.", starter:"",
+      tests:[{inputs:["12","3"],last:"36"},{inputs:["8","5"],last:"40"}],
+      must:[[/(^|[^a-z_])int\([\s\S]*[^a-z_]int\(/,"Zet beide antwoorden om naar getallen met int()."]], stdin:"12\n3",
+      hint:'prijs = int(input("Prijs van één ticket? "))\naantal = int(input("Aantal tickets? "))\nprint(prijs * aantal)', ok:"Knap! Je eerste echte programma: het werkt voor elke prijs en elk aantal."}
+  ]},
+  { title:"Terugblik", items:[
+    {id:"h7-self", type:"checklist", q:"Wat kan ik nu? Vink af wat je kunt.", parts:["Ik kan met input() een vraag stellen aan de gebruiker.","Ik weet dat input() altijd een string teruggeeft.","Ik kan strings aan elkaar plakken met +.","Ik kan met int() een string omzetten naar een geheel getal.","Ik kan int(input(...)) gebruiken om een getal te vragen."]},
+    {id:"h7-open1", type:"open", q:"Mijn vragen voor mijn leerkracht (mag ook leeg blijven):", optional:true}
+  ]}
+  ]
 }
 ];
 
@@ -543,6 +622,14 @@ const CHECKS = {
      if(/10 x 7 = 70/.test(o)) return [false,"Je tafel stopt nog bij 10 x 7. Pas het getal 11 in range aan."];
      return [false,"Dat is nog niet de tafel van 7 tot 20 x 7 = 140. Staat getal nog op 7?"]}
 };
+function testCheck(tc,out){
+  const lines=out.replace(/\r/g,"").split("\n").map(l=>l.trim().replace(/\s+/g," ")).filter(l=>l);
+  const last=lines.length?lines[lines.length-1]:"";
+  const want=tc.last.trim().replace(/\s+/g," ");
+  if(last===want) return [true];
+  if(!lines.length) return [false,"Je programma toont nog niets."];
+  return [false,`Met de invoer ${tc.inputs.map(x=>"‘"+x+"’").join(" en ")} toont je programma als laatste regel ‘${last}’, maar het moet ‘${want}’ zijn.`];
+}
 function genericCheck(it){ return (out,code)=>{
   for(const [re,msg] of (it.must||[])) if(!re.test(code)) return [false,msg];
   let got;
@@ -583,7 +670,11 @@ function friendlyError(raw){
   let ln=null; for(const l of lines){const m=l.match(/File "<exec>", line (\d+)/); if(m) ln=m[1]}
   const m2=last.match(/\(detected at line (\d+)\)/); if(m2) ln=ln||m2[1];
   if(/^EOFError/.test(last)) return {line:ln,text:"Je programma vraagt om invoer, maar er is (niet genoeg) invoer ingevuld. Vul het vak ‘Invoer’ aan: één antwoord per regel.",type:"EOFError"};
-  return {line:ln,text:last,type:(last.match(/^(\w+(Error|Exception))/)||[])[1]||"Fout"};
+  let extra="";
+  if(/invalid literal for int\(\)/.test(last)) extra="\n→ int() kan alleen een geheel getal omzetten, zoals \"15\". Tekst of een kommagetal lukt niet.";
+  else if(/can only concatenate str \(not "(int|float)"\) to str/.test(last)) extra="\n→ Je probeert tekst en een getal aan elkaar te plakken met +. Dat kan niet.";
+  else if(/unsupported operand type\(s\) for [-*\/+]: 'str' and 'int'|unsupported operand type\(s\) for [-*\/+]: 'int' and 'str'/.test(last)) extra="\n→ Je rekent met tekst (een string) en een getal. Gebruik int() om tekst om te zetten naar een getal.";
+  return {line:ln,text:last+extra,type:(last.match(/^(\w+(Error|Exception))/)||[])[1]||"Fout"};
 }
 function runPython(code,inputs){
   if(!worker) startWorker();
@@ -769,6 +860,7 @@ function renderItem(it,n){
     const isPlay=it.type==="play";
     const box=wrap(it,n,isPlay?"probeer":"code");
     if(a.value===undefined) a.value=it.starter||"";
+    if(a.stdin===undefined&&it.stdin!==undefined) a.stdin=it.stdin;
     const ed=makeEditor(a.value,v=>{a.value=v;save();stdin.refresh()}); box.appendChild(ed);
     const stdin=makeStdin(a,()=>ed.ta.value); box.appendChild(stdin); stdin.refresh();
     const act=$(`<div class="actions"><button class="btn secondary run">▶ Uitvoeren</button>${isPlay?"":'<button class="btn chk">✓ Controleer</button>'}<button class="btn secondary rst" title="Begin opnieuw met de oorspronkelijke code" style="margin-left:auto">↺</button><span class="st" style="color:var(--muted);font-size:14px;width:100%"></span></div>`); box.appendChild(act);
@@ -780,12 +872,20 @@ function renderItem(it,n){
     async function go(grade){ const code=ed.ta.value;
       if(!code.trim()){const f=fb(box);f.className="fb info";f.textContent="Typ eerst je code in het codevak.";return}
       btns.forEach(b=>b.disabled=true); st.textContent=worker?"Bezig…":"Python wordt geladen (de eerste keer duurt dit even)…";
-      let r; try{ r=await runPython(code, it.testInputs||stdin.lines()) }catch(e){ st.textContent=""; btns.forEach(b=>b.disabled=false); const f=fb(box); f.className="fb bad"; f.textContent="Python kon niet geladen worden. Controleer je internetverbinding en probeer opnieuw."; worker=null; return }
+      const useTests=!!(grade&&it.tests); let r, failMsg=null, shownInput=null;
+      try{ if(useTests){ for(const tc of it.tests){ r=await runPython(code,tc.inputs); shownInput=tc.inputs; if(r.err) break; const tr=testCheck(tc,r.out||""); if(!tr[0]){failMsg=tr[1];break} } }
+           else r=await runPython(code, it.testInputs||stdin.lines()) }catch(e){ st.textContent=""; btns.forEach(b=>b.disabled=false); const f=fb(box); f.className="fb bad"; f.textContent="Python kon niet geladen worden. Controleer je internetverbinding en probeer opnieuw."; worker=null; return }
       st.textContent=""; btns.forEach(b=>b.disabled=false); showOut(out,r);
+      if(useTests&&shownInput){const nt=document.createElement("div"); nt.style.color="#9fb3c8"; nt.textContent="Controle met testinvoer: "+shownInput.join(", ")+"\n\n"; out.insertBefore(nt,out.firstChild)}
       if(isPlay){a.ran=true; save(); paint(); return}
       if(!grade){ const f=box.querySelector(".fb"); if(f&&!a.locked){f.className="fb"} return }
       a.attempts++;
-      if(r.err){const f=fb(box);f.className="fb bad";f.innerHTML="✘ Je code geeft een foutmelding"+(r.err.line?" op regel "+r.err.line:"")+". Lees ze rustig en verbeter je code."+(a.attempts>=3&&(it.hint||CODE_HINT[it.check])?`<div class="ex">Tip – zo kan het:<pre style="margin:6px 0 0">${esc(it.hint||CODE_HINT[it.check])}</pre></div>`:"")}
+      const tipH=a.attempts>=3&&(it.hint||CODE_HINT[it.check])?`<div class="ex">Tip – zo kan het:<pre style="margin:6px 0 0">${esc(it.hint||CODE_HINT[it.check])}</pre></div>`:"";
+      if(r.err&&useTests&&r.err.type==="EOFError"){const f=fb(box);f.className="fb bad";f.innerHTML="✘ Je programma vraagt vaker om invoer dan de opdracht vraagt. Gebruik precies zoveel keer input() als nodig."+tipH}
+      else if(!r.err&&useTests){ let bad=null; for(const [re,msg] of (it.must||[])) if(!re.test(code)){bad=msg;break}
+        if(!bad) bad=failMsg;
+        if(bad){const f=fb(box);f.className="fb bad";f.innerHTML="✘ "+esc(bad)+tipH} else {a.locked=true;a.score=1;a.msg=it.ok||"Juist!"} }
+      else if(r.err){const f=fb(box);f.className="fb bad";f.innerHTML="✘ Je code geeft een foutmelding"+(r.err.line?" op regel "+r.err.line:"")+". Lees ze rustig en verbeter je code."+(a.attempts>=3&&(it.hint||CODE_HINT[it.check])?`<div class="ex">Tip – zo kan het:<pre style="margin:6px 0 0">${esc(it.hint||CODE_HINT[it.check])}</pre></div>`:"")}
       else{const [ok,msg]=(it.check?CHECKS[it.check]:genericCheck(it))(r.out||"",code); if(ok){a.locked=true;a.score=1;a.msg=msg} else {const f=fb(box);f.className="fb bad";f.innerHTML="✘ "+esc(msg)+(a.attempts>=3&&(it.hint||CODE_HINT[it.check])?`<div class="ex">Tip – zo kan het:<pre style="margin:6px 0 0">${esc(it.hint||CODE_HINT[it.check])}</pre></div>`:"")}}
       if(a.attempts===1)a.first=!!a.locked; save(); paint(); }
     act.querySelector(".run").onclick=()=>go(false);
