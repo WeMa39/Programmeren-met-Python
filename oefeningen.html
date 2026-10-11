@@ -1199,6 +1199,130 @@ const WERELD_INFO={
 /* ---------------- Illustraties bij de oefeningen (eigen tekeningen) ---------------- */
 const B=(inhoud,bg,label)=>`<div class="beeld"><svg viewBox="0 0 600 190" role="img" aria-label="${label}" style="font-family:system-ui,sans-serif"><rect width="600" height="190" fill="${bg}"/>${inhoud}</svg></div>`;
 const BEELD={
+kassabon:B(`
+  <g transform="translate(70,22)">
+    <path d="M0 0 h150 v146 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 z" fill="#fff" stroke="#c9d1dc" stroke-width="2"/>
+    <text x="75" y="24" text-anchor="middle" font-size="14" font-weight="800" fill="#1d2433">KASSABON</text>
+    <line x1="12" y1="34" x2="138" y2="34" stroke="#c9d1dc" stroke-dasharray="4 3"/>
+    <text x="14" y="56" font-size="12.5" fill="#3b4350">Prijs</text><text x="136" y="56" text-anchor="end" font-size="12.5" fill="#1d2433" font-weight="700">2.50</text>
+    <text x="14" y="78" font-size="12.5" fill="#3b4350">Aantal</text><text x="136" y="78" text-anchor="end" font-size="12.5" fill="#1d2433" font-weight="700">4</text>
+    <line x1="12" y1="90" x2="138" y2="90" stroke="#c9d1dc" stroke-dasharray="4 3"/>
+    <text x="14" y="114" font-size="14" fill="#1d2433" font-weight="800">Totaal</text><text x="136" y="114" text-anchor="end" font-size="16" fill="#d33a2c" font-weight="800">?</text>
+  </g>
+  <g transform="translate(330,60)">
+    <path d="M-10 0 h20 l18 70 h112 l16 -50 h-138" fill="none" stroke="#1f4e79" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="22" y="2" width="30" height="34" rx="4" fill="#f4b260"/><rect x="58" y="-8" width="26" height="44" rx="4" fill="#3fa45b"/><rect x="90" y="6" width="30" height="30" rx="4" fill="#d64545"/><rect x="124" y="12" width="20" height="24" rx="4" fill="#e8c228"/>
+    <circle cx="36" cy="88" r="9" fill="#1f4e79"/><circle cx="118" cy="88" r="9" fill="#1f4e79"/>
+  </g>
+  <text x="250" y="170" font-size="15" font-weight="800" fill="#1f4e79">prijs × aantal = totaal</text>`,"#f4f8ef","Een kassabon met prijs en aantal en een winkelkar"),
+bioscoop:B(`
+  <g transform="translate(40,40)">
+    <rect width="190" height="88" rx="10" fill="#f2b705"/><circle cx="0" cy="44" r="12" fill="#fbe6e6"/><circle cx="190" cy="44" r="12" fill="#fbe6e6"/>
+    <line x1="140" y1="8" x2="140" y2="80" stroke="#b38600" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="70" y="32" text-anchor="middle" font-size="13" font-weight="800" fill="#5a3f00">KIND</text>
+    <text x="70" y="54" text-anchor="middle" font-size="12" fill="#5a3f00">12 jaar of jonger</text>
+    <text x="70" y="75" text-anchor="middle" font-size="17" font-weight="800" fill="#c0392b">−50%</text>
+    <text x="165" y="50" text-anchor="middle" font-size="22">🎬</text>
+  </g>
+  <g transform="translate(260,40)">
+    <rect width="190" height="88" rx="10" fill="#d64545"/><circle cx="0" cy="44" r="12" fill="#fbe6e6"/><circle cx="190" cy="44" r="12" fill="#fbe6e6"/>
+    <line x1="140" y1="8" x2="140" y2="80" stroke="#8f2020" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="70" y="32" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">VOLWASSENE</text>
+    <text x="70" y="54" text-anchor="middle" font-size="12" fill="#fff">ouder dan 12</text>
+    <text x="70" y="75" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">volle prijs</text>
+    <text x="165" y="50" text-anchor="middle" font-size="22">🎬</text>
+  </g>
+  <g transform="translate(530,70)">
+    <path d="M-30 0 h60 l-8 80 h-44 z" fill="#fff" stroke="#d64545" stroke-width="3"/>
+    <path d="M-20 0 v80 M0 0 v80 M20 0 v80" stroke="#d64545" stroke-width="7" opacity=".85"/>
+    ${[[-22,-6],[-6,-12],[10,-8],[24,-2],[-14,-18],[4,-22],[18,-16]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="9" fill="#fff6d6" stroke="#e8c228" stroke-width="2"/>`).join("")}
+  </g>
+  <text x="245" y="170" text-anchor="middle" font-size="14" font-weight="800" fill="#1f4e79">Hoe oud ben je? Dan weet de computer welke prijs je betaalt.</text>`,"#fbe6e6","Twee bioscooptickets: kind met korting en volwassene met volle prijs, en popcorn"),
+budget:B(`
+  <g transform="translate(95,92)">
+    <ellipse rx="66" ry="50" fill="#f19cb4"/><circle cx="52" cy="-30" r="14" fill="#f19cb4"/><ellipse cx="66" cy="2" rx="13" ry="11" fill="#e2789a"/>
+    <circle cx="70" cy="0" r="2.5" fill="#8a2f4e"/><circle cx="62" cy="0" r="2.5" fill="#8a2f4e"/><circle cx="38" cy="-14" r="4" fill="#3b2230"/>
+    <rect x="-40" y="40" width="14" height="22" rx="5" fill="#e2789a"/><rect x="22" y="40" width="14" height="22" rx="5" fill="#e2789a"/>
+    <rect x="-18" y="-52" width="34" height="6" rx="3" fill="#8a2f4e"/>
+    <text x="-6" y="12" text-anchor="middle" font-size="17" font-weight="800" fill="#fff">100 €</text>
+    <text x="0" y="86" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d2433">budget voor de week</text>
+  </g>
+  <text x="200" y="98" font-size="30" font-weight="800" fill="#1f4e79">−</text>
+  ${[["30.50 €","#3b6fd6"],["50 €","#3fa45b"],["10 €","#d08a2c"]].map(([p,k],i)=>`<g transform="translate(${250+i*96},62)"><path d="M0 14 l14 -14 h66 v56 h-66 z" fill="${k}"/><circle cx="10" cy="28" r="4" fill="#fff"/><text x="50" y="34" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">${p}</text><text x="40" y="76" text-anchor="middle" font-size="12" fill="#3b4350">product ${i+1}</text></g>`).join("")}
+  <text x="540" y="98" font-size="28" font-weight="800" fill="#1f4e79">=</text><text x="575" y="100" text-anchor="middle" font-size="26" font-weight="800" fill="#d33a2c">?</text>
+  <text x="400" y="172" text-anchor="middle" font-size="14" font-weight="800" fill="#1f4e79">Blijf je binnen je budget?</text>`,"#fdf1f4","Een spaarvarken met een budget van 100 euro en drie prijskaartjes"),
+recensie:B(`
+  <g transform="translate(70,48)">
+    <rect y="22" width="130" height="86" rx="6" fill="#2b2f36"/>
+    <g transform="rotate(-14)"><rect width="130" height="22" rx="3" fill="#2b2f36"/>${[0,1,2,3,4].map(i=>`<path d="M${8+i*26} 0 l14 0 l-10 22 l-14 0 z" fill="#fff"/>`).join("")}</g>
+    ${[0,1,2,3,4].map(i=>`<path d="M${8+i*26} 22 l14 0 l-10 18 l-14 0 z" fill="#fff"/>`).join("")}
+    <text x="14" y="68" font-size="12" fill="#fff">TITEL</text><text x="14" y="94" font-size="12" fill="#fff">SCENE 5.3</text>
+  </g>
+  <g transform="translate(300,64)">
+    ${[0,1,2,3,4].map(i=>`<polygon transform="translate(${i*38},0)" points="0,-17 5,-5 18,-5 8,3 12,16 0,8 -12,16 -8,3 -18,-5 -5,-5" fill="${i<4?"#f2b705":"#d9dde3"}"/>`).join("")}
+    <text x="76" y="42" text-anchor="middle" font-size="14" fill="#3b4350">gemiddelde score van de recensies</text>
+  </g>
+  <g transform="translate(300,130)"><rect width="110" height="40" rx="20" fill="#2a9d4b"/><text x="55" y="27" text-anchor="middle" font-size="17" font-weight="800" fill="#fff">👍 HIT</text></g>
+  <g transform="translate(430,130)"><rect width="110" height="40" rx="20" fill="#d33a2c"/><text x="55" y="27" text-anchor="middle" font-size="17" font-weight="800" fill="#fff">👎 FLOP</text></g>
+`,"#eef0f6","Een filmklapper, sterren voor de score en de knoppen hit en flop"),
+bmi:B(`
+  <g transform="translate(60,16)">
+    <rect width="26" height="160" rx="3" fill="#f2b705" stroke="#b38600" stroke-width="2"/>
+    ${Array.from({length:16},(_,i)=>`<line x1="${i%2?0:0}" y1="${8+i*9.5}" x2="${i%2?8:14}" y2="${8+i*9.5}" stroke="#5a3f00" stroke-width="1.5"/>`).join("")}
+    <text x="40" y="20" font-size="14" font-weight="800" fill="#1d2433">lengte</text><text x="40" y="38" font-size="14" fill="#1d2433">1.75 m</text>
+  </g>
+  <g transform="translate(220,100)">
+    <rect x="-55" y="0" width="110" height="64" rx="12" fill="#5b6b7d"/><rect x="-36" y="12" width="72" height="28" rx="4" fill="#d6ecff"/>
+    <text y="32" text-anchor="middle" font-size="17" font-weight="800" fill="#1d2433">70 kg</text>
+    <text y="-12" text-anchor="middle" font-size="14" font-weight="800" fill="#1d2433">gewicht</text>
+  </g>
+  <g transform="translate(330,50)">
+    <rect width="240" height="92" rx="12" fill="#fff" stroke="#1f4e79" stroke-width="2"/>
+    <text x="120" y="30" text-anchor="middle" font-size="15" font-weight="800" fill="#1f4e79">BMI =</text>
+    <text x="120" y="56" text-anchor="middle" font-size="15" font-family="ui-monospace,monospace" fill="#1d2433">gewicht</text>
+    <line x1="40" y1="64" x2="200" y2="64" stroke="#1d2433" stroke-width="2"/>
+    <text x="120" y="84" text-anchor="middle" font-size="15" font-family="ui-monospace,monospace" fill="#1d2433">(lengte * lengte)</text>
+  </g>
+  <text x="450" y="172" text-anchor="middle" font-size="13" fill="#3b4350">Vergeet de haakjes niet!</text>`,"#eef6f4","Een meetlat van 1.75 m, een weegschaal van 70 kg en de formule voor de BMI"),
+korting:B(`
+  ${[0,1,2,3,4,5].map(i=>`<g transform="translate(${40+i*54},${70+(i%2)*10})"><path d="M0 14 h44 l-4 62 h-36 z" fill="${["#3b6fd6","#3fa45b","#d08a2c","#d64545","#6a4fb3","#2a9d9d"][i]}"/><path d="M12 14 q10 -22 20 0" fill="none" stroke="#3b4350" stroke-width="3"/><text x="22" y="54" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">${i+1}</text></g>`).join("")}
+  <text x="190" y="54" text-anchor="middle" font-size="14" font-weight="800" fill="#1f4e79">meer dan 5 stuks?</text>
+  <text x="372" y="118" font-size="30" font-weight="800" fill="#1f4e79">→</text>
+  <g transform="translate(490,95)"><circle r="62" fill="#d33a2c"/><circle r="52" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="5 4"/>
+    <text y="-4" text-anchor="middle" font-size="30" font-weight="800" fill="#fff">−10%</text><text y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">korting</text></g>`,"#f6f2ea","Zes boodschappentassen en een sticker met 10 procent korting"),
+toets:B(`
+  <g transform="translate(40,12)" >
+    <rect width="160" height="166" rx="6" fill="#fff" stroke="#c9d1dc" stroke-width="2"/>
+    <text x="14" y="26" font-size="13" font-weight="800" fill="#1d2433">TOETS</text><text x="126" y="26" text-anchor="end" font-size="11" fill="#5b6475">nr. 1234</text>
+    ${[0,1,2,3].map(i=>`<line x1="14" y1="${48+i*20}" x2="${100-i%2*20}" y2="${48+i*20}" stroke="#c9d1dc" stroke-width="3"/><text x="118" y="${53+i*20}" font-size="14" fill="${i===3?"#d33a2c":"#2a9d4b"}" font-weight="800">${i===3?"✗":"✓"}</text>`).join("")}
+    <circle cx="112" cy="140" r="0"/>
+  </g>
+  <g transform="translate(150,146) rotate(-12)"><circle r="30" fill="none" stroke="#d33a2c" stroke-width="3"/><text y="6" text-anchor="middle" font-size="17" font-weight="800" fill="#d33a2c">17/20</text></g>
+  <text x="250" y="102" font-size="28" font-weight="800" fill="#1f4e79">→</text>
+  ${[["Uitstekend","80% of meer","#2a9d4b"],["Goed","65% of meer","#3b6fd6"],["Voldoende","50% of meer","#d08a2c"],["Onvoldoende","minder dan 50%","#d33a2c"]].map(([t,s,k],i)=>`<g transform="translate(300,${18+i*40})"><rect width="270" height="32" rx="8" fill="${k}"/><text x="14" y="21" font-size="14" font-weight="800" fill="#fff">${t}</text><text x="256" y="21" text-anchor="end" font-size="12.5" fill="#fff">${s}</text></g>`).join("")}`,"#f1f5fb","Een verbeterde toets met score 17 op 20 en vier beoordelingen"),
+quiz:B(`
+  <g transform="translate(50,30)"><rect width="200" height="56" rx="10" fill="#fff" stroke="#1f4e79" stroke-width="2"/><text x="100" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="#1d2433" font-family="ui-monospace,monospace">15 + 7 = ?</text></g>
+  <g transform="translate(50,104)"><rect width="200" height="56" rx="10" fill="#fff" stroke="#1f4e79" stroke-width="2"/><text x="100" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="#1d2433" font-family="ui-monospace,monospace">10.5 + 5 = ?</text></g>
+  <g transform="translate(270,30)"><circle cx="16" cy="28" r="16" fill="#2a9d4b"/><text x="16" y="34" text-anchor="middle" font-size="18" fill="#fff" font-weight="800">✓</text></g>
+  <g transform="translate(270,104)"><circle cx="16" cy="28" r="16" fill="#d33a2c"/><text x="16" y="34" text-anchor="middle" font-size="18" fill="#fff" font-weight="800">✗</text><text x="40" y="34" font-size="12.5" fill="#d33a2c" font-weight="700">huh? toch juist!</text></g>
+  <g transform="translate(480,96)">
+    <ellipse rx="34" ry="44" fill="#3fa45b"/><line x1="0" y1="-40" x2="0" y2="44" stroke="#1f6b35" stroke-width="3"/><circle cy="-50" r="16" fill="#1f6b35"/>
+    <circle cx="-14" cy="-6" r="6" fill="#1f6b35"/><circle cx="14" cy="16" r="6" fill="#1f6b35"/><circle cx="-12" cy="26" r="5" fill="#1f6b35"/>
+    ${[-20,0,20].map(y=>`<line x1="-32" y1="${y}" x2="-54" y2="${y-8}" stroke="#1f6b35" stroke-width="4" stroke-linecap="round"/><line x1="32" y1="${y}" x2="54" y2="${y-8}" stroke="#1f6b35" stroke-width="4" stroke-linecap="round"/>`).join("")}
+    <line x1="-6" y1="-62" x2="-16" y2="-80" stroke="#1f6b35" stroke-width="3"/><line x1="6" y1="-62" x2="16" y2="-80" stroke="#1f6b35" stroke-width="3"/>
+  </g>
+  <g transform="translate(405,60)"><circle r="28" fill="#fff" fill-opacity=".35" stroke="#1d2433" stroke-width="6"/><line x1="20" y1="20" x2="44" y2="44" stroke="#1d2433" stroke-width="9" stroke-linecap="round"/></g>
+  <text x="480" y="176" text-anchor="middle" font-size="14" font-weight="800" fill="#1f4e79">Vang de bug!</text>`,"#f3f7ef","Twee rekenvragen, een ervan fout nagekeken, en een kever onder een vergrootglas"),
+stappen:B(`
+  ${[0,1,2,3,4,5].map(i=>`<g transform="translate(${40+i*62},${i%2?120:84}) rotate(80)"><ellipse rx="16" ry="9" fill="#5b6b7d"/><ellipse cx="22" rx="8" ry="7" fill="#5b6b7d"/></g>`).join("")}
+  <text x="200" y="40" text-anchor="middle" font-size="14" font-weight="800" fill="#1f4e79">8 km met passen van 75 cm</text>
+  <g transform="translate(480,92)">
+    <rect x="-60" y="-56" width="120" height="112" rx="26" fill="#2b2f36"/><rect x="-46" y="-40" width="92" height="64" rx="8" fill="#a8d38c"/>
+    <text y="-12" text-anchor="middle" font-size="12" fill="#1d2433">stappen</text><text y="14" text-anchor="middle" font-size="24" font-weight="800" fill="#d33a2c" font-family="ui-monospace,monospace">0.1</text>
+    
+    <text y="46" text-anchor="middle" font-size="18">🐞</text>
+  </g>
+  <text x="480" y="176" text-anchor="middle" font-size="13" fill="#3b4350">Dat kan niet kloppen…</text>`,"#eef4fb","Voetstappen en een stappenteller die een fout getal toont"),
 lus:B(`
   <g transform="translate(95,95)">
     <circle r="58" fill="none" stroke="#1f4e79" stroke-width="10" stroke-dasharray="300 70" transform="rotate(-60)"/>
@@ -1284,7 +1408,7 @@ const OEFENINGEN = [
 { id:"4.1", titel:"4.1 De Korte Vragenlijst", klaar:false },
 { id:"4.2", titel:"4.2 De Slimme Winkelwagen", klaar:false },
 { id:"4.3", titel:"4.3 De Kassabon", klaar:true,
-  opdracht:`<p>Schrijf een Python-programma dat de gebruiker vraagt naar de <b>prijs</b> van een product en het <b>aantal</b> gekochte stuks. Het programma berekent de totale prijs en toont die netjes op het scherm.</p>
+  opdracht:`${BEELD.kassabon}<p>Schrijf een Python-programma dat de gebruiker vraagt naar de <b>prijs</b> van een product en het <b>aantal</b> gekochte stuks. Het programma berekent de totale prijs en toont die netjes op het scherm.</p>
   <div class="box"><b>Zo werk je</b><br>Volg de stappen hieronder. Met <b>▶ Uitvoeren</b> probeer je je code uit, zo vaak je wilt. Met <b>✓ Controleer</b> laat je ze nakijken. Lukt het niet? Vraag dan <b>💡 hulp</b>. Hulp en veel pogingen kosten een beetje punten, maar je komt altijd tot een correct programma.</div>`,
   stappen:[
     { titel:"Stap 1 – Herken het probleem", type:"probeer",
@@ -1338,7 +1462,7 @@ De totale prijs is 7.5 euro.
     ok:"Prima! Je kassabon toont nu ook de btw." }
 },
 { id:"5.1", titel:"5.1 Bioscoopticket met Korting", klaar:true,
-  opdracht:`<p>Schrijf een Python-programma dat de prijs van een bioscoopticket berekent. De bioscoop hanteert de volgende regels:</p>
+  opdracht:`${BEELD.bioscoop}<p>Schrijf een Python-programma dat de prijs van een bioscoopticket berekent. De bioscoop hanteert de volgende regels:</p>
   <ul><li>Kinderen van <b>12 jaar of jonger</b> krijgen <b>50% korting</b>.</li><li>Iedereen die <b>ouder is dan 12</b> betaalt de <b>volle prijs</b>.</li></ul>
   <div class="box"><b>Zo werk je</b><br>Volg de stappen hieronder. Met <b>▶ Uitvoeren</b> probeer je je code uit, zo vaak je wilt. Met <b>✓ Controleer</b> laat je ze nakijken. Lukt het niet? Vraag dan <b>💡 hulp</b>. Hulp en veel pogingen kosten een beetje punten, maar je komt altijd tot een correct programma.</div>`,
   stappen:[
@@ -1396,7 +1520,7 @@ Je ticket kost 6.25 euro.</pre>
     ok:"Je programma geeft bij elke leeftijd de juiste prijs, ook bij precies 12 jaar!" }
 },
 { id:"5.2", titel:"5.2 Budgetplanner voor de Week", klaar:true,
-  opdracht:`<p>Schrijf een Python-programma dat je helpt om je uitgaven bij te houden en te controleren of je binnen je <b>wekelijkse budget</b> blijft. Je koopt deze week <b>3 producten</b>.</p>${ZO_WERK_JE}`,
+  opdracht:`${BEELD.budget}<p>Schrijf een Python-programma dat je helpt om je uitgaven bij te houden en te controleren of je binnen je <b>wekelijkse budget</b> blijft. Je koopt deze week <b>3 producten</b>.</p>${ZO_WERK_JE}`,
   stappen:[
     { titel:"Stap 1 – Wat blijft er over?", type:"probeer",
       html:`<p>Je hebt een budget van 100 euro en koopt 3 producten van 30.50, 50 en 10 euro. Klik op <b>▶ Uitvoeren</b> en vergelijk de twee berekeningen.</p>`,
@@ -1445,7 +1569,7 @@ Je ticket kost 6.25 euro.</pre>
     ok:"Je budgetplanner werkt, ook als je precies je budget uitgeeft!" }
 },
 { id:"5.3", titel:"5.3 Het Filmrecensieprogramma", klaar:true,
-  opdracht:`<p>Schrijf een Python-programma dat de gemiddelde score van een film verwerkt en bepaalt of de film een <b>hit</b> of een <b>flop</b> is.</p>${ZO_WERK_JE}`,
+  opdracht:`${BEELD.recensie}<p>Schrijf een Python-programma dat de gemiddelde score van een film verwerkt en bepaalt of de film een <b>hit</b> of een <b>flop</b> is.</p>${ZO_WERK_JE}`,
   stappen:[
     { titel:"Stap 1 – Tekst of getal?", type:"probeer",
       html:`<p><code>input()</code> geeft altijd tekst terug. Hieronder staat de score als tekst <code>"8.9"</code>. Klik op <b>▶ Uitvoeren</b>: de eerste vergelijking lukt, de tweede geeft een foutmelding.</p>`,
@@ -1495,7 +1619,7 @@ Je ticket kost 6.25 euro.</pre>
     ok:"Je programma herkent elke hit en flop, ook bij een score van precies 7.0!" }
 },
 { id:"5.4", titel:"5.4 De BMI-calculator", klaar:true,
-  opdracht:`<p>Schrijf een Python-programma dat de <b>BMI</b> (Body Mass Index) van een persoon berekent en een beoordeling geeft op basis van die waarde. De formule is: <code>gewicht / (lengte * lengte)</code>.</p>${ZO_WERK_JE}`,
+  opdracht:`${BEELD.bmi}<p>Schrijf een Python-programma dat de <b>BMI</b> (Body Mass Index) van een persoon berekent en een beoordeling geeft op basis van die waarde. De formule is: <code>gewicht / (lengte * lengte)</code>.</p>${ZO_WERK_JE}`,
   stappen:[
     { titel:"Stap 1 – Let op de haakjes", type:"probeer",
       html:`<p>Iemand is 1.75 m groot en weegt 70 kg. Klik op <b>▶ Uitvoeren</b> en vergelijk de twee berekeningen.</p>`,
@@ -1549,7 +1673,7 @@ Je ticket kost 6.25 euro.</pre>
     ok:"Je BMI-calculator geeft altijd de juiste categorie, ook op de grenzen 18.5 en 25.0!" }
 },
 { id:"6.1", titel:"6.1 De Kassabon met Korting", klaar:true,
-  opdracht:`<p>Schrijf een Python-programma op basis van een <b>stroomdiagram</b>. Wie <b>meer dan 5 stuks</b> koopt, krijgt <b>10% korting</b>.</p>${ZO_WERK_JE}`,
+  opdracht:`${BEELD.korting}<p>Schrijf een Python-programma op basis van een <b>stroomdiagram</b>. Wie <b>meer dan 5 stuks</b> koopt, krijgt <b>10% korting</b>.</p>${ZO_WERK_JE}`,
   stappen:[
     { titel:"Stap 1 – 10% korting berekenen", type:"probeer",
       html:`<p>Een kassabon van 25 euro krijgt 10% korting. Klik op <b>▶ Uitvoeren</b> en vergelijk de drie berekeningen.</p>`,
@@ -1593,7 +1717,7 @@ Je ticket kost 6.25 euro.</pre>
     ok:"Je kassa geeft korting vanaf 6 stuks, precies zoals het stroomdiagram!" }
 },
 { id:"6.2", titel:"6.2 De Cijferberekenaar", klaar:true,
-  opdracht:`<p>Schrijf een Python-programma op basis van een <b>stroomdiagram</b>. Het programma zet de score van een leerling op een toets om naar een <b>beoordeling</b>. Het verwerkt een studentennummer, de behaalde score en het totaal aantal vragen.</p>${ZO_WERK_JE}`,
+  opdracht:`${BEELD.toets}<p>Schrijf een Python-programma op basis van een <b>stroomdiagram</b>. Het programma zet de score van een leerling op een toets om naar een <b>beoordeling</b>. Het verwerkt een studentennummer, de behaalde score en het totaal aantal vragen.</p>${ZO_WERK_JE}`,
   stappen:[
     { titel:"Stap 1 – De volgorde van de voorwaarden", type:"probeer",
       html:`<p>Een leerling haalt 85%. Klik op <b>▶ Uitvoeren</b> en kijk welke beoordeling het programma geeft.</p>`,
@@ -1639,7 +1763,7 @@ Je ticket kost 6.25 euro.</pre>
     ok:"Je cijferberekenaar geeft elke beoordeling juist, ook op de grenzen 80%, 65% en 50%!" }
 },
 { id:"6.3", titel:"6.3 De Kleine Rekenquiz", klaar:true,
-  opdracht:`<p>Het programma hieronder laat de gebruiker <b>2 rekenvragen</b> beantwoorden en geeft feedback op de score. Maar er zit een <b>bug</b> in: het programma werkt niet zoals het hoort. Jij zoekt en verbetert de bug.</p>${ZO_WERK_JE}`,
+  opdracht:`${BEELD.quiz}<p>Het programma hieronder laat de gebruiker <b>2 rekenvragen</b> beantwoorden en geeft feedback op de score. Maar er zit een <b>bug</b> in: het programma werkt niet zoals het hoort. Jij zoekt en verbetert de bug.</p>${ZO_WERK_JE}`,
   stappen:[
     { titel:"Stap 1 – Speel de quiz", type:"probeer",
       html:`<p>In het vak <b>Invoer</b> staan de <b>juiste</b> antwoorden: <code>22</code> en <code>15.5</code>. Klik op <b>▶ Uitvoeren</b> en bekijk de score.</p>`,
@@ -1675,7 +1799,7 @@ Je ticket kost 6.25 euro.</pre>
     ok:"Bug gevonden! De quiz telt nu elk juist antwoord mee." }
 },
 { id:"6.4", titel:"6.4 De Stappenteller", klaar:true,
-  opdracht:`<p>Het programma hieronder berekent hoeveel <b>stappen</b> je hebt gezet op basis van de <b>afstand</b> die je liep en je <b>paslengte</b>, en geeft feedback. Maar er zit een <b>bug</b> in: het aantal stappen klopt niet. Jij zoekt en verbetert de bug.</p>${ZO_WERK_JE}`,
+  opdracht:`${BEELD.stappen}<p>Het programma hieronder berekent hoeveel <b>stappen</b> je hebt gezet op basis van de <b>afstand</b> die je liep en je <b>paslengte</b>, en geeft feedback. Maar er zit een <b>bug</b> in: het aantal stappen klopt niet. Jij zoekt en verbetert de bug.</p>${ZO_WERK_JE}`,
   stappen:[
     { titel:"Stap 1 – Klopt het aantal stappen?", type:"probeer",
       html:`<p>Je liep <b>8 kilometer</b> met passen van <b>75 centimeter</b>. Klik op <b>▶ Uitvoeren</b> en bekijk hoeveel stappen het programma berekent.</p>`,
