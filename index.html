@@ -8,86 +8,167 @@
 :root{
   --bg:#f6f7f9; --card:#ffffff; --ink:#1d2433; --muted:#5b6475; --line:#dde2ea;
   --brand:#1f4e79; --brand-soft:#e3edf7; --accent:#d66028; --accent-soft:#fdeee5;
+  --term:#0f1720; --term-ink:#d6e2f0; --term-dim:#7f8ea3; --ok:#3fb27f; --str:#f2c46d; --kw:#8cb8e6;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#14171d; --card:#1d222b; --ink:#e7eaf0; --muted:#a2abbb; --line:#323947;
     --brand:#8cb8e6; --brand-soft:#22344a; --accent:#f08a55; --accent-soft:#3a2a1f;
+    --term:#0b0f15;
   }
 }
 :root[data-theme="dark"]{
   --bg:#14171d; --card:#1d222b; --ink:#e7eaf0; --muted:#a2abbb; --line:#323947;
   --brand:#8cb8e6; --brand-soft:#22344a; --accent:#f08a55; --accent-soft:#3a2a1f;
+  --term:#0b0f15;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:920px;margin:0 auto;padding:48px 16px 64px}
-.kicker{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-h1{font-size:36px;line-height:1.15;margin:6px 0 10px;color:var(--brand)}
-.lead{font-size:18px;color:var(--muted);max-width:620px;margin:0 0 32px}
+main{max-width:960px;margin:0 auto;padding:44px 16px 64px}
+code{font-family:ui-monospace,Consolas,"DejaVu Sans Mono",monospace}
+
+/* ---------- Hero ---------- */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:32px;align-items:center;margin-bottom:36px}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kicker .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+h1{font-size:40px;line-height:1.1;margin:8px 0 12px;color:var(--brand)}
+h1 .py{color:var(--accent)}
+.lead{font-size:18px;color:var(--muted);margin:0}
+.term{background:var(--term);border-radius:14px;box-shadow:0 10px 30px rgba(15,23,32,.18);overflow:hidden;font:14.5px/1.7 ui-monospace,Consolas,"DejaVu Sans Mono",monospace;color:var(--term-ink)}
+.term .bar{display:flex;align-items:center;gap:7px;padding:10px 14px;background:rgba(255,255,255,.06)}
+.term .bar i{width:11px;height:11px;border-radius:50%;display:block}
+.term .bar span{margin-left:8px;font-size:12.5px;color:var(--term-dim)}
+.term pre{margin:0;padding:14px 18px 6px;white-space:pre-wrap;min-height:128px}
+.term .uit{padding:8px 18px 14px;border-top:1px dashed rgba(255,255,255,.12);color:var(--ok);min-height:40px}
+.kw{color:var(--kw)} .st{color:var(--str)} .cm{color:var(--term-dim)}
+.cursor{display:inline-block;width:8px;height:1.1em;background:var(--term-ink);vertical-align:-2px;animation:knipper 1s steps(1) infinite}
+@keyframes knipper{50%{opacity:0}}
+
+/* ---------- Kaarten ---------- */
+.kies{font-size:15px;font-weight:700;color:var(--muted);margin:0 0 12px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s}
-.card:hover{border-color:var(--brand);transform:translateY(-2px)}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s,box-shadow .15s}
+.card:hover{border-color:var(--brand);transform:translateY(-3px);box-shadow:0 8px 22px rgba(31,78,121,.12)}
 .card:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
-.tag{align-self:flex-start;font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:14px}
+.strip{height:96px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:34px}
+.card.klas .strip{background:var(--brand-soft)}
+.card.zelf .strip{background:var(--accent-soft)}
+.strip .tegel{width:58px;height:58px;border-radius:14px;background:var(--card);display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.08);transition:transform .2s}
+.card:hover .strip .tegel:nth-child(odd){transform:translateY(-4px) rotate(-4deg)}
+.card:hover .strip .tegel:nth-child(even){transform:translateY(-4px) rotate(4deg)}
+.body{display:flex;flex-direction:column;flex:1;padding:20px 24px 24px}
+.tag{align-self:flex-start;font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:12px}
 .card.klas .tag{background:var(--brand-soft);color:var(--brand)}
 .card.zelf .tag{background:var(--accent-soft);color:var(--accent)}
 .card h2{font-size:23px;margin:0 0 8px;line-height:1.25}
 .card p{margin:0 0 14px;color:var(--muted)}
-.card ul{margin:0 0 20px;padding-left:20px}
-.card li{margin:4px 0}
-.go{margin-top:auto;align-self:flex-start;font-weight:700;padding:10px 18px;border-radius:9px;color:var(--card)}
-.card.klas .go{background:var(--brand)}
-.card.zelf .go{background:var(--accent)}
-.info{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px}
-.info h3{margin:0 0 6px;font-size:17px;color:var(--brand)}
-.info ul{margin:0;padding-left:20px}
-.info li{margin:4px 0}
-@media (max-width:680px){ .grid{grid-template-columns:1fr} h1{font-size:29px} main{padding-top:32px} }
+.card ul{list-style:none;margin:0 0 20px;padding:0}
+.card li{display:flex;gap:10px;margin:7px 0}
+.card li b{flex:none;width:26px;text-align:center}
+.go{margin-top:auto;align-self:flex-start;font-weight:700;padding:10px 18px;border-radius:9px;color:#fff;transition:padding .15s}
+.card.klas .go{background:#1f4e79}
+.card.zelf .go{background:#c4541f}
+.card:hover .go{padding-right:24px}
+
+/* ---------- Info ---------- */
+.info{margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;gap:12px;font-size:14.5px;color:var(--muted)}
+.tip .ic{font-size:22px;line-height:1.2}
+.tip b{color:var(--ink)}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr;gap:22px}
+  h1{font-size:32px}
+  .grid,.info{grid-template-columns:1fr}
+  main{padding-top:28px}
+}
+@media (prefers-reduced-motion:reduce){ .cursor{animation:none} .card,.strip .tegel,.go{transition:none} }
 </style>
 </head>
 <body>
 <main>
-  <div class="kicker">4de middelbaar · Programmeren</div>
-  <h1>Python leren</h1>
-  <p class="lead">Kies hieronder waar je mee aan de slag gaat. Twijfel je? Vraag het aan je leerkracht.</p>
+  <section class="hero">
+    <div>
+      <div class="kicker"><span class="dot"></span>4de middelbaar · Programmeren</div>
+      <h1>Leer programmeren met <span class="py">Python</span></h1>
+      <p class="lead">Schrijf je eigen code, zie meteen wat ze doet en word stap voor stap beter. Fouten maken mag: daar leer je het meest van.</p>
+    </div>
+    <div class="term" aria-label="Een klein Python-programma en wat het toont">
+      <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>mijn_eerste_programma.py</span></div>
+      <pre id="code"></pre>
+      <div class="uit" id="uit"></div>
+    </div>
+  </section>
 
+  <p class="kies">Waar ga je mee aan de slag?</p>
   <div class="grid">
     <a class="card klas" href="oefeningen.html">
-      <span class="tag">In de klas</span>
-      <h2>Python-oefeningen</h2>
-      <p>De oefeningen die bij de lessen in de klas horen.</p>
-      <ul>
-        <li>Schrijf je code en krijg meteen feedback</li>
-        <li>Vraag hulp als je vastzit</li>
-        <li>Stuur je resultaat met één klik naar je leerkracht</li>
-      </ul>
-      <span class="go">Naar de oefeningen →</span>
+      <div class="strip" aria-hidden="true"><span class="tegel">✅</span><span class="tegel">🏗️</span><span class="tegel">🚆</span><span class="tegel">📦</span><span class="tegel">🚗</span></div>
+      <div class="body">
+        <span class="tag">In de klas</span>
+        <h2>Python-oefeningen</h2>
+        <p>De oefeningen die bij de lessen in de klas horen.</p>
+        <ul>
+          <li><b>⚡</b><span>Schrijf je code en krijg meteen feedback</span></li>
+          <li><b>🎮</b><span>Programmeerwerelden: bestuur een kraan, een trein, een robot en een auto</span></li>
+          <li><b>💡</b><span>Vastgelopen? Vraag hulp</span></li>
+          <li><b>📨</b><span>Stuur je resultaat met één klik naar je leerkracht</span></li>
+        </ul>
+        <span class="go">Naar de oefeningen →</span>
+      </div>
     </a>
     <a class="card zelf" href="cursus.html">
-      <span class="tag">Zelfstandig leren</span>
-      <h2>Cursus Python interactief</h2>
-      <p>Een volledige cursus om op je eigen tempo te volgen. Voor wie van thuis uit leert via Bednet, later instapt of extra wil oefenen.</p>
-      <ul>
-        <li>Uitleg, filmpjes en oefeningen stap voor stap</li>
-        <li>Probeer alles meteen uit in de browser</li>
-        <li>Je vooruitgang wordt bijgehouden</li>
-      </ul>
-      <span class="go">Naar de cursus →</span>
+      <div class="strip" aria-hidden="true"><span class="tegel">📘</span><span class="tegel">🎬</span><span class="tegel">🐍</span><span class="tegel">🏁</span></div>
+      <div class="body">
+        <span class="tag">Zelfstandig leren</span>
+        <h2>Cursus Python interactief</h2>
+        <p>Een volledige cursus om op je eigen tempo te volgen. Voor wie van thuis uit leert via Bednet, later instapt of extra wil oefenen.</p>
+        <ul>
+          <li><b>🎬</b><span>Uitleg, filmpjes en oefeningen stap voor stap</span></li>
+          <li><b>▶️</b><span>Probeer alles meteen uit in de browser</span></li>
+          <li><b>📈</b><span>Je vooruitgang wordt bijgehouden</span></li>
+        </ul>
+        <span class="go">Naar de cursus →</span>
+      </div>
     </a>
   </div>
 
   <div class="info">
-    <h3>Goed om te weten</h3>
-    <ul>
-      <li>Je hebt internet nodig. De eerste keer laden duurt even, want Python wordt dan opgestart.</li>
-      <li>Werk in Chrome of Edge. Op de Raspberry Pi gebruik je Chromium.</li>
-      <li>Je vooruitgang wordt bewaard op dit toestel en in deze browser. Werk dus liefst altijd op hetzelfde toestel.</li>
-    </ul>
+    <div class="tip"><span class="ic">🌐</span><span><b>Internet nodig.</b> De eerste keer laden duurt even: Python wordt dan opgestart.</span></div>
+    <div class="tip"><span class="ic">🧭</span><span><b>Chrome of Edge.</b> Op de Raspberry Pi gebruik je Chromium.</span></div>
+    <div class="tip"><span class="ic">💾</span><span><b>Zelfde toestel.</b> Je vooruitgang wordt bewaard op dit toestel, in deze browser.</span></div>
   </div>
 </main>
 <script>
 try{const th=localStorage.getItem("python-oefeningen-v1-theme")||localStorage.getItem("python-cursus-v1-theme"); if(th) document.documentElement.dataset.theme=th;}catch(e){}
+
+/* Klein typ-effect in het codevenster */
+(function(){
+  const regels=[
+    ['<span class="cm"># Mijn eerste programma</span>',''],
+    ['naam = <span class="kw">input</span>(<span class="st">"Hoe heet je? "</span>)',''],
+    ['<span class="kw">print</span>(<span class="st">"Welkom,"</span>, naam, <span class="st">"!"</span>)','']
+  ];
+  const vol=regels.map(r=>r[0]).join("\n");
+  const code=document.getElementById("code"), uit=document.getElementById("uit");
+  const eind=()=>{ code.innerHTML=vol; uit.innerHTML='Hoe heet je? <span style="color:#d6e2f0">jij</span><br>Welkom, jij !<span class="cursor"></span>'; };
+  let stil=false; try{ stil=matchMedia("(prefers-reduced-motion: reduce)").matches }catch(e){}
+  if(stil){ eind(); return }
+  // typ de zichtbare tekst, maar behoud de kleuren
+  const tmp=document.createElement("div"); tmp.innerHTML=vol; const tekst=tmp.textContent;
+  let i=0;
+  const kleur=n=>{ // geef de html voor de eerste n tekens
+    let teller=0, html="";
+    const loop=(node,uitk)=>{ for(const k of node.childNodes){ if(teller>=n) return;
+      if(k.nodeType===3){ const s=k.textContent.slice(0,n-teller); teller+=s.length; html+=s.replace(/&/g,"&amp;").replace(/</g,"&lt;") }
+      else { html+=`<span class="${k.className}">`; loop(k); html+="</span>" } } };
+    loop(tmp); return html };
+  const stap=()=>{ i++; code.innerHTML=kleur(i)+'<span class="cursor"></span>';
+    if(i<tekst.length) setTimeout(stap, tekst[i-1]==="\n"?260:38);
+    else setTimeout(()=>{ code.innerHTML=vol; uit.innerHTML='Hoe heet je? <span class="cursor"></span>';
+      setTimeout(()=>{ let t="jij", j=0; const typ=()=>{ j++; uit.innerHTML='Hoe heet je? <span style="color:#d6e2f0">'+t.slice(0,j)+'</span><span class="cursor"></span>'; if(j<t.length) setTimeout(typ,140); else setTimeout(eind,500) }; typ() },700) },400) };
+  setTimeout(stap,500);
+})();
 </script>
 </body>
 </html>
