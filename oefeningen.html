@@ -59,6 +59,8 @@ th{background:var(--brand-soft)}
 .out .errl{color:#ffb4a8}
 .ed{display:flex;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);overflow:hidden}
 .ed:focus-within{border-color:var(--brand)}
+.plakmelding{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9999;max-width:min(92vw,520px);background:var(--ink);color:var(--card);padding:10px 16px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.25);font-size:15px;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none}
+.plakmelding.toon{opacity:1}
 .gut{padding:10px 8px 10px 10px;text-align:right;color:var(--muted);user-select:none;min-width:2.6em;white-space:pre;overflow:hidden;font:14.5px/1.55 ui-monospace,Consolas,"DejaVu Sans Mono",monospace;border-right:1px solid var(--line)}
 .ed textarea{flex:1;border:0;border-radius:0;background:transparent;color:var(--ink);padding:10px;min-height:140px;resize:vertical;white-space:pre;overflow:auto;font:14.5px/1.55 ui-monospace,Consolas,"DejaVu Sans Mono",monospace;tab-size:4;outline:none}
 .stdin{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--brand-soft);display:none}
@@ -3080,8 +3082,20 @@ function editor(waarde,onChange){
     if(e.key==="Tab"&&!e.shiftKey){e.preventDefault();ins("    ")}
     else if(e.key==="Enter"){const s=ta.selectionStart, line=ta.value.slice(0,s).split("\n").pop(); let ind=(line.match(/^ */)||[""])[0]; if(/:\s*$/.test(line)) ind+="    "; e.preventDefault(); ins("\n"+ind)}
   });
+  /* plakken en slepen blokkeren: leerlingen typen de code zelf */
+  const geenPlak=e=>{e.preventDefault();plakMelding()};
+  ta.addEventListener("paste",geenPlak);
+  ta.addEventListener("drop",geenPlak);
+  ta.addEventListener("beforeinput",e=>{if(e.inputType==="insertFromPaste"||e.inputType==="insertFromDrop"||e.inputType==="insertFromPasteAsQuotation")geenPlak(e)});
   function ins(txt){const s=ta.selectionStart; ta.value=ta.value.slice(0,s)+txt+ta.value.slice(ta.selectionEnd); ta.selectionStart=ta.selectionEnd=s+txt.length; nums(); onChange(ta.value)}
   ed.ta=ta; ed.zet=(v)=>{ta.value=v;nums()}; return ed;
+}
+let plakTimer=null;
+function plakMelding(){
+  let m=document.querySelector(".plakmelding");
+  if(!m){m=$(`<div class="plakmelding" role="status"></div>`);document.body.appendChild(m)}
+  m.textContent="Plakken mag hier niet: typ de code zelf, zo leer je het best.";
+  m.classList.add("toon"); clearTimeout(plakTimer); plakTimer=setTimeout(()=>m.classList.remove("toon"),2600);
 }
 function invoerVak(waarde,onChange,getCode){
   const box=$(`<div class="stdin"><label style="font-size:14px"><b>Invoer</b> – wat typt de gebruiker in als je programma iets vraagt? Eén antwoord per regel. (Alleen voor ▶ Uitvoeren.)</label><textarea></textarea></div>`);
