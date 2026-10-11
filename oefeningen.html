@@ -88,6 +88,22 @@ select,input[type=text]{font:inherit;color:var(--ink);background:var(--card);bor
 .flow{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;margin:12px 0;text-align:center}
 .flow img{max-width:100%;height:auto}
 .wereld{margin:12px 0}
+.stage.blad{background:var(--card);padding:6px;outline:none}
+.stage.speel{box-shadow:0 0 0 3px var(--brand-soft)}
+.stage.speel.focus{box-shadow:0 0 0 3px var(--brand)}
+.video{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--brand-soft);border-radius:12px;padding:10px;margin:4px 0 14px}
+.vthumb{position:relative;flex:none;width:220px;max-width:100%;aspect-ratio:16/9;border:0;padding:0;border-radius:9px;overflow:hidden;cursor:pointer;background:#000}
+.vthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.vplay{position:absolute;inset:0;margin:auto;width:52px;height:38px;border-radius:10px;background:#d33a2c;color:#fff;font-size:18px;display:grid;place-items:center}
+.vthumb:hover .vplay{background:#b22a1e}
+.vframe{flex:1 1 100%;aspect-ratio:16/9;border-radius:9px;overflow:hidden;background:#000}
+.vframe iframe{width:100%;height:100%;border:0;display:block}
+.vinfo{flex:1;min-width:200px;display:flex;flex-direction:column;gap:2px;font-size:14.5px}
+.vinfo span{color:var(--muted)}
+.vinfo a{color:var(--brand);font-weight:600;font-size:14px}
+.kleintje{font-size:14px;color:var(--muted)}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:640px){ .tgrid{grid-template-columns:1fr} }
 .stage{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#cfe8f7;min-height:120px}
 .sits{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;font-size:14px}
 .sits span{font-weight:700;color:var(--muted)}
@@ -230,14 +246,14 @@ _W["n"] = 0
 
 def _tel():
     _W["n"] = _W["n"] + 1
-    if _W["n"] > 20000:
+    if _W["n"] > _SC.get("maxtel", 20000):
         _W["log"].append({"t": "fout", "msg": _LUSMSG})
         raise WereldFout(_LUSMSG)
 
 
 def _ev(**k):
     _tel()
-    if len(_W["log"]) > 2500:
+    if len(_W["log"]) > _SC.get("maxlog", 2500):
         _W["log"].append({"t": "fout", "msg": _LUSMSG})
         raise WereldFout(_LUSMSG)
     _W["log"].append(k)
@@ -651,6 +667,392 @@ _module("haven", kraan=_Kraan())
 _module("station", trein=_trein, wissel1=_w1, wissel2=_w2, sein=_Sein())
 _module("magazijn", robot=_Robot())
 _module("verkeer", auto=_Auto())
+
+
+# ---------------- Tekenen met turtle ----------------
+import math as _math
+
+_NL_KLEUR = {"rood": "red", "blauw": "blue", "groen": "green", "geel": "yellow", "zwart": "black", "wit": "white",
+             "oranje": "orange", "paars": "purple", "roze": "pink", "bruin": "brown", "grijs": "gray", "goud": "gold"}
+_TS = {"lijnen": [], "fills": [], "bg": "white", "kleuren": [], "mode": 1.0, "toetsen": {}, "luistert": False,
+       "nr": 0}
+_ST["lijnen"] = _TS["lijnen"]
+_ST["fills"] = _TS["fills"]
+_ST["teksten"] = []
+_ST["bg"] = "white"
+_ST["kleuren"] = _TS["kleuren"]
+_ST["dots"] = []
+
+
+def _r(v):
+    return round(v + 0.0, 2)
+
+
+def _kleur(args, wat):
+    if len(args) == 1 and isinstance(args[0], (tuple, list)):
+        args = tuple(args[0])
+    if len(args) == 1 and isinstance(args[0], str):
+        k = args[0].strip()
+        if k.lower() in _NL_KLEUR:
+            _fout("Gebruik Engelse kleurnamen: '" + _NL_KLEUR[k.lower()] + "' in plaats van '" + k + "'.")
+        if k == "":
+            _fout(wat + " kreeg een lege kleur.")
+        return k.lower().replace(" ", "")
+    if len(args) == 3:
+        for v in args:
+            if isinstance(v, bool) or not isinstance(v, (int, float)):
+                _fout(wat + " verwacht 3 getallen (rood, groen, blauw).")
+        if _TS["mode"] == 255:
+            if any(v < 0 or v > 255 for v in args):
+                _fout("Een kleurwaarde moet tussen 0 en 255 liggen.")
+            r, g, b = [int(round(v)) for v in args]
+        else:
+            if any(v < 0 or v > 1 for v in args):
+                _fout("Een kleurwaarde moet tussen 0 en 1 liggen. Wil je getallen tot 255 gebruiken? Zet dan eerst turtle.colormode(255).")
+            r, g, b = [int(round(v * 255)) for v in args]
+        return "rgb(" + str(r) + "," + str(g) + "," + str(b) + ")"
+    _fout(wat + " verwacht een kleur, bv. \"red\" of 3 getallen.")
+
+
+class _Scherm:
+    def bgcolor(self, *args):
+        if not args:
+            return _TS["bg"]
+        _TS["bg"] = _kleur(args, "bgcolor()")
+        _ST["bg"] = _TS["bg"]
+        _ev(t="bg", k=_TS["bg"])
+
+    def colormode(self, m=None):
+        if m is None:
+            return _TS["mode"]
+        if m not in (1, 1.0, 255):
+            _fout("colormode() verwacht 1.0 of 255.")
+        _TS["mode"] = 255 if m == 255 else 1.0
+
+    def listen(self, *a):
+        _TS["luistert"] = True
+
+    def onkey(self, functie, toets):
+        if functie is None:
+            _fout("Bij onkey() schrijf je de naam van de functie zonder haakjes, bv. scherm.onkey(ga_vooruit, \"Up\").")
+        if not callable(functie):
+            _fout("onkey() verwacht eerst de naam van een functie en dan de toets, bv. scherm.onkey(ga_vooruit, \"Up\").")
+        if not isinstance(toets, str):
+            _fout("De toets bij onkey() moet tekst zijn, bv. \"Up\".")
+        juist = {"up": "Up", "down": "Down", "left": "Left", "right": "Right", "space": "space"}
+        if toets.lower() in juist and toets != juist[toets.lower()]:
+            _fout("Schrijf de toets als \"" + juist[toets.lower()] + "\" in plaats van \"" + toets + "\": let op de hoofdletters.")
+        _TS["toetsen"][toets] = functie
+
+    onkeypress = onkey
+    onkeyrelease = onkey
+
+    def _niets(self, *a, **k):
+        return None
+
+    mainloop = done = exitonclick = tracer = update = setup = title = screensize = bye = onclick = onscreenclick = ontimer = _niets
+
+    def window_width(self):
+        return 640
+
+    def window_height(self):
+        return 480
+
+
+_scherm = _Scherm()
+
+
+class Turtle:
+    def __init__(self, *a, **k):
+        _TS["nr"] = _TS["nr"] + 1
+        self._id = _TS["nr"]
+        self._x = 0.0
+        self._y = 0.0
+        self._h = 0.0
+        self._pen = True
+        self._pk = "black"
+        self._fk = "black"
+        self._w = 1
+        self._zicht = True
+        self._vorm = "classic"
+        self._vul = None
+        _ev(t="nieuw", id=self._id)
+
+    # --- hulpfuncties
+    def _getal(self, n, wat):
+        if isinstance(n, bool) or not isinstance(n, (int, float)):
+            if isinstance(n, str):
+                _fout(wat + " verwacht een getal, maar je gaf tekst ('" + n + "'). Zet de tekst eerst om met int() of float().")
+            _fout(wat + " verwacht een getal.")
+        return n
+
+    def _naar(self, x, y):
+        _tel()
+        x1, y1 = self._x, self._y
+        self._x, self._y = x + 0.0, y + 0.0
+        if self._vul is not None:
+            self._vul.append([_r(x), _r(y)])
+        if self._pen and (abs(x - x1) > 1e-9 or abs(y - y1) > 1e-9):
+            lijn = [_r(x1), _r(y1), _r(x), _r(y), self._pk, self._w, self._id]
+            _TS["lijnen"].append(lijn)
+            _ev(t="l", a=lijn)
+        else:
+            _ev(t="p", id=self._id, x=_r(x), y=_r(y), h=_r(self._h))
+
+    def _draai(self, g):
+        self._h = (self._h + g) % 360
+        _ev(t="h", id=self._id, h=_r(self._h))
+
+    # --- bewegen
+    def forward(self, afstand):
+        d = self._getal(afstand, "forward()")
+        a = _math.radians(self._h)
+        self._naar(self._x + d * _math.cos(a), self._y + d * _math.sin(a))
+
+    fd = forward
+
+    def backward(self, afstand):
+        self.forward(-self._getal(afstand, "backward()"))
+
+    bk = back = backward
+
+    def left(self, hoek):
+        self._draai(self._getal(hoek, "left()"))
+
+    lt = left
+
+    def right(self, hoek):
+        self._draai(-self._getal(hoek, "right()"))
+
+    rt = right
+
+    def goto(self, x, y=None):
+        if y is None:
+            x, y = x
+        self._naar(self._getal(x, "goto()"), self._getal(y, "goto()"))
+
+    setpos = setposition = goto
+
+    def setx(self, x):
+        self._naar(self._getal(x, "setx()"), self._y)
+
+    def sety(self, y):
+        self._naar(self._x, self._getal(y, "sety()"))
+
+    def setheading(self, h):
+        self._h = self._getal(h, "setheading()") % 360
+        _ev(t="h", id=self._id, h=_r(self._h))
+
+    seth = setheading
+
+    def home(self):
+        self._naar(0, 0)
+        self.setheading(0)
+
+    def circle(self, straal, extent=None, steps=None):
+        r = self._getal(straal, "circle()")
+        if extent is None:
+            extent = 360
+        if steps is None:
+            frac = abs(extent) / 360
+            steps = 1 + int(min(11 + abs(r) / 6.0, 59.0) * frac)
+        w = 1.0 * extent / steps
+        w2 = 0.5 * w
+        l = 2.0 * r * _math.sin(_math.radians(w2))
+        if r < 0:
+            l, w, w2 = -l, -w, -w2
+        self._h = (self._h + w2) % 360
+        for i in range(steps):
+            a = _math.radians(self._h)
+            self._naar(self._x + l * _math.cos(a), self._y + l * _math.sin(a))
+            self._h = (self._h + w) % 360
+        self._h = (self._h - w2) % 360
+        _ev(t="h", id=self._id, h=_r(self._h))
+
+    def dot(self, grootte=None, *kleur):
+        g = grootte if grootte is not None else max(self._w + 4, self._w * 2)
+        k = _kleur(kleur, "dot()") if kleur else self._pk
+        d = [_r(self._x), _r(self._y), g, k]
+        _ST["dots"].append(d)
+        _ev(t="dot", a=d)
+
+    def write(self, tekst, move=False, align="left", font=None):
+        grootte = 8
+        if font and len(font) > 1 and isinstance(font[1], (int, float)):
+            grootte = font[1]
+        d = [_r(self._x), _r(self._y), str(tekst), self._pk, align, grootte]
+        _ST["teksten"].append(d)
+        _ev(t="txt", a=d)
+
+    # --- pen
+    def penup(self):
+        self._pen = False
+
+    pu = up = penup
+
+    def pendown(self):
+        self._pen = True
+
+    pd = down = pendown
+
+    def isdown(self):
+        return self._pen
+
+    def pensize(self, w=None):
+        if w is None:
+            return self._w
+        self._w = self._getal(w, "pensize()")
+
+    width = pensize
+
+    def pencolor(self, *args):
+        if not args:
+            return self._pk
+        self._pk = _kleur(args, "pencolor()")
+        if self._pk not in _TS["kleuren"]:
+            _TS["kleuren"].append(self._pk)
+
+    def fillcolor(self, *args):
+        if not args:
+            return self._fk
+        self._fk = _kleur(args, "fillcolor()")
+
+    def color(self, *args):
+        if not args:
+            return (self._pk, self._fk)
+        if len(args) == 2:
+            self.pencolor(args[0])
+            self.fillcolor(args[1])
+        else:
+            self.pencolor(*args)
+            self.fillcolor(*args)
+
+    def begin_fill(self):
+        self._vul = [[_r(self._x), _r(self._y)]]
+        self._vul_z = len(_TS["lijnen"])
+
+    def end_fill(self):
+        if self._vul is None:
+            _fout("end_fill() zonder begin_fill(): zet turtle.begin_fill() vóór de vorm die je wilt inkleuren.")
+        if len(self._vul) > 2:
+            f = {"pts": self._vul, "k": self._fk, "z": self._vul_z, "id": self._id}
+            _TS["fills"].append(f)
+            _ev(t="fill", a=f)
+        self._vul = None
+
+    def filling(self):
+        return self._vul is not None
+
+    # --- uitzicht en info
+    def speed(self, s=None):
+        return 0
+
+    def hideturtle(self):
+        self._zicht = False
+        _ev(t="zicht", id=self._id, v=False)
+
+    ht = hideturtle
+
+    def showturtle(self):
+        self._zicht = True
+        _ev(t="zicht", id=self._id, v=True)
+
+    st = showturtle
+
+    def isvisible(self):
+        return self._zicht
+
+    def shape(self, naam=None):
+        if naam is None:
+            return self._vorm
+        self._vorm = str(naam)
+        _ev(t="vorm", id=self._id, v=self._vorm)
+
+    def shapesize(self, *a, **k):
+        return None
+
+    turtlesize = shapesize
+
+    def position(self):
+        return (round(self._x, 2), round(self._y, 2))
+
+    pos = position
+
+    def xcor(self):
+        return round(self._x, 2)
+
+    def ycor(self):
+        return round(self._y, 2)
+
+    def heading(self):
+        return round(self._h, 2)
+
+    def distance(self, x, y=None):
+        if y is None:
+            x, y = x
+        return _math.hypot(x - self._x, y - self._y)
+
+    def clear(self):
+        _TS["lijnen"][:] = [l for l in _TS["lijnen"] if l[6] != self._id]
+        _TS["fills"][:] = [f for f in _TS["fills"] if f["id"] != self._id]
+        _ev(t="clear", id=self._id)
+
+    def reset(self):
+        self.clear()
+        self._x = self._y = self._h = 0.0
+        self._pen = True
+        self._pk = self._fk = "black"
+        self._w = 1
+        _ev(t="p", id=self._id, x=0, y=0, h=0)
+
+    def getscreen(self):
+        return _scherm
+
+
+_pen0 = None
+
+
+def _standaard():
+    global _pen0
+    if _pen0 is None:
+        _pen0 = Turtle()
+    return _pen0
+
+
+def _druk(toetsen):
+    for t in toetsen:
+        _toets(t)
+
+
+def _toets(t):
+    if not _TS["luistert"]:
+        _fout("Het scherm luistert niet naar de toetsen. Gebruik scherm.listen().")
+    f = _TS["toetsen"].get(t)
+    _ev(t="toets", k=t)
+    if f is not None:
+        f()
+
+
+def _turtle_module():
+    m = types.ModuleType("turtle")
+    m.Turtle = Turtle
+    m.Pen = Turtle
+    m.RawTurtle = Turtle
+    m.Screen = lambda *a: _scherm
+    m.TurtleScreen = _Scherm
+    m._druk = _druk
+    m._toets = _toets
+    for naam in ["bgcolor", "colormode", "listen", "onkey", "onkeypress", "onkeyrelease", "mainloop", "done",
+                 "exitonclick", "tracer", "update", "setup", "title", "screensize", "bye", "onclick",
+                 "onscreenclick", "ontimer", "window_width", "window_height"]:
+        setattr(m, naam, getattr(_scherm, naam))
+    for naam in dir(Turtle):
+        if not naam.startswith("_") and not hasattr(m, naam):
+            setattr(m, naam, (lambda n: lambda *a, **k: getattr(_standaard(), n)(*a, **k))(naam))
+    sys.modules["turtle"] = m
+
+
+_turtle_module()
 `;
 /* ================================================================
    PROGRAMMEERWERELDEN: kraan, trein, pakjesrobot en auto
@@ -833,6 +1235,17 @@ verkeer:{
 };
 
 let W_ANIM=0;
+/* tekenblad bestuurbaar maken met de pijltjestoetsen */
+function toetsenAan(stage,sc,log,out){
+  const MAP={ArrowUp:"Up",ArrowDown:"Down",ArrowLeft:"Left",ArrowRight:"Right"," ":"space",Spacebar:"space"};
+  stage.tabIndex=0; stage.classList.add("speel"); stage.focus({preventScroll:true});
+  let bezig=false, huidig=log;
+  stage.onkeydown=async e=>{ const k=MAP[e.key]; if(!k) return; e.preventDefault(); if(bezig) return; bezig=true;
+    const r=await runToets(k); bezig=false; if(!r) return;
+    if(r.err){ toonUit(out,{out:r.out,err:r.err}); stage.onkeydown=null; stage.classList.remove("speel"); return }
+    if(r.wereld){ huidig=r.wereld.log; W_ANIM++; stage.innerHTML=WERELDEN.tekenen.render(sc,{n:huidig.length,log:huidig}) } };
+  stage.onblur=()=>stage.classList.remove("focus"); stage.onfocus=()=>stage.classList.add("focus");
+}
 function speelWereld(stage,wid,sc,log,uitslag){
   const W=WERELDEN[wid]; const fr=W.frames(sc,log||[]); const id=++W_ANIM;
   if(uitslag) fr[fr.length-1]={...fr[fr.length-1],rand:uitslag};
@@ -1187,6 +1600,311 @@ wLevel({ id:"V3", groep:"🚗 Het Verkeer", titel:"Verkeer 3 - Genoeg brandstof"
     hulp:["Met 20 liter en 15 km per liter: hoe ver kom je? Wanneer moet je dus tanken?","<pre>bereik = brandstof * 15\nprint(...)\nif bereik &lt; afstand:\n    auto.tank()\nauto.rijd()</pre>Een if zonder else mag: de auto rijdt in beide gevallen.","Zo kan het:<pre>"+regNaam+"from verkeer import auto\n\nbrandstof = int(auto.lees_brandstof())\nafstand = int(auto.lees_afstand())\nbereik = brandstof * 15\nprint(\"Met deze brandstof kan de auto\", bereik, \"km ver rijden.\")\nif bereik &lt; afstand:\n    auto.tank()\nauto.rijd()</pre>"],
     ok:"Je auto komt altijd aan, zonder onnodig te tanken!" } }),
 ...V_LUS
+];
+
+/* ================================================================
+   DEEL 3: TEKENEN MET PYTHON (turtle)
+   ================================================================ */
+const T_KLEUREN={black:"#000000",white:"#ffffff",red:"#ff0000",green:"#008000",blue:"#0000ff",yellow:"#ffff00",orange:"#ffa500",purple:"#800080",pink:"#ffc0cb",brown:"#a52a2a",gray:"#808080",grey:"#808080",gold:"#ffd700",lightblue:"#add8e6",lightgreen:"#90ee90",lightyellow:"#ffffe0",darkgreen:"#006400",darkblue:"#00008b",navy:"#000080",cyan:"#00ffff",magenta:"#ff00ff",violet:"#ee82ee",skyblue:"#87ceeb",lime:"#00ff00",turquoise:"#40e0d0",silver:"#c0c0c0",beige:"#f5f5dc",tomato:"#ff6347",salmon:"#fa8072",crimson:"#dc143c",indigo:"#4b0082",maroon:"#800000",olive:"#808000",teal:"#008080",khaki:"#f0e68c",coral:"#ff7f50",chocolate:"#d2691e",orchid:"#da70d6",lavender:"#e6e6fa",darkred:"#8b0000",darkorange:"#ff8c00",hotpink:"#ff69b4",lightgray:"#d3d3d3",lightgrey:"#d3d3d3",darkgray:"#a9a9a9",forestgreen:"#228b22",royalblue:"#4169e1",steelblue:"#4682b4",sienna:"#a0522d",tan:"#d2b48c",peru:"#cd853f",goldenrod:"#daa520",seagreen:"#2e8b57",deepskyblue:"#00bfff",dodgerblue:"#1e90ff",firebrick:"#b22222",springgreen:"#00ff7f",yellowgreen:"#9acd32"};
+function tKleur(k){ if(k==null) return null; k=String(k).toLowerCase().replace(/\s+/g,"");
+  let m=k.match(/^rgb\((\d+),(\d+),(\d+)\)$/); if(m) return [+m[1],+m[2],+m[3]];
+  if(T_KLEUREN[k]) k=T_KLEUREN[k];
+  m=k.match(/^#([0-9a-f]{6})$/); if(m) return [0,2,4].map(i=>parseInt(m[1].slice(i,i+2),16));
+  m=k.match(/^#([0-9a-f]{3})$/); if(m) return [0,1,2].map(i=>parseInt(m[1][i]+m[1][i],16));
+  return null }
+function kleurGelijk(a,b){ const x=tKleur(a), y=tKleur(b); if(!x||!y) return String(a).toLowerCase()===String(b).toLowerCase(); return x.every((v,i)=>Math.abs(v-y[i])<=2) }
+function tCss(k){ const c=tKleur(k); return c?`rgb(${c.join(",")})`:k }
+const tDonker=k=>{ const c=tKleur(k); return c?(c[0]*.3+c[1]*.59+c[2]*.11)<110:false };
+
+/* ---- tekening vergelijken: lijnen samenvoegen tot maximale stukken ---- */
+function tSamen(lijnen,trans){
+  const T=trans||(p=>p); const groepen=[];
+  for(const l of lijnen){ let [x1,y1]=T([l[0],l[1]]), [x2,y2]=T([l[2],l[3]]);
+    if(Math.hypot(x2-x1,y2-y1)<0.5) continue;
+    let th=Math.atan2(y2-y1,x2-x1)*180/Math.PI; if(th<0) th+=180; if(th>=179.5) th-=180;
+    const r=th*Math.PI/180, cs=Math.cos(r), sn=Math.sin(r), c=-sn*x1+cs*y1;
+    let a=cs*x1+sn*y1, b=cs*x2+sn*y2; if(a>b) [a,b]=[b,a];
+    let g=groepen.find(g=>Math.abs(g.th-th)<=0.8&&Math.abs(g.c-c)<=1.2);
+    if(!g){ g={th,c,iv:[]}; groepen.push(g) } g.iv.push([a,b]) }
+  const uit=[];
+  for(const g of groepen){ g.iv.sort((p,q)=>p[0]-q[0]); let cur=null;
+    for(const iv of g.iv){ if(cur&&iv[0]<=cur[1]+0.8) cur[1]=Math.max(cur[1],iv[1]); else { if(cur) uit.push({th:g.th,c:g.c,a:cur[0],b:cur[1]}); cur=[...iv] } }
+    if(cur) uit.push({th:g.th,c:g.c,a:cur[0],b:cur[1]}) }
+  return uit }
+const tGelijkStuk=(p,q,tol)=>Math.abs(p.th-q.th)<=1&&Math.abs(p.c-q.c)<=tol&&Math.abs(p.a-q.a)<=tol&&Math.abs(p.b-q.b)<=tol;
+const T_TRANS={id:p=>p,my:p=>[p[0],-p[1]]};
+/* vergelijkt: geeft {ok, mist:[stukken uit ref], teveel:[stukken van leerling]} */
+function tVergelijk(student,ref,opt){ opt=opt||{}; let best=null;
+  const R=tSamen(ref);
+  for(const tr of (opt.sym||["id","my"])){ const S=tSamen(student,T_TRANS[tr]), tol=opt.tol||2;
+    const gebruikt=new Set(), mist=[];
+    for(const r of R){ const k=S.findIndex((s,i)=>!gebruikt.has(i)&&tGelijkStuk(r,s,tol)); if(k<0) mist.push(r); else gebruikt.add(k) }
+    const teveel=opt.extraMag?[]:S.filter((s,i)=>!gebruikt.has(i));
+    const res={ok:!mist.length&&!teveel.length,mist,teveel,tr};
+    if(res.ok) return res;
+    if(!best||res.mist.length+res.teveel.length<best.mist.length+best.teveel.length) best=res }
+  return best }
+const tPunt=(s,t)=>{ const r=s.th*Math.PI/180, cs=Math.cos(r), sn=Math.sin(r); return [Math.round(cs*t-sn*s.c),Math.round(sn*t+cs*s.c)] };
+const tStukTxt=s=>{ const p=tPunt(s,s.a), q=tPunt(s,s.b); return `een lijn van ${Math.round(s.b-s.a)} pixels van (${p[0]}, ${p[1]}) naar (${q[0]}, ${q[1]})` };
+
+/* standaard-doel voor een tekenopdracht */
+function tekenDoel(opt){ opt=opt||{};
+  return (sc,st,out,ref)=>{
+    const L=st.lijnen||[];
+    if(!L.length&&!(st.fills||[]).length) return "Je hebt nog niets getekend. Begin met import turtle en gebruik bv. turtle.forward(100).";
+    if(opt.voor){ const f=opt.voor(sc,st,out,ref); if(f) return f }
+    if(ref&&opt.vorm!==false){
+      const v=tVergelijk(L,ref.lijnen||[],opt);
+      if(!v.ok){
+        if(v.mist.length&&!v.teveel.length) return `Je tekening is nog niet volledig: er ${v.mist.length===1?"ontbreekt":"ontbreken"} nog ${v.mist.length} ${v.mist.length===1?"lijn":"lijnen"}, bv. ${tStukTxt(v.mist[0])}.`+(opt.tipMist||"");
+        if(!v.mist.length) return `Je tekening heeft ${v.teveel.length} ${v.teveel.length===1?"lijn":"lijnen"} te veel, bv. ${tStukTxt(v.teveel[0])}.`+(opt.tipTeveel||"");
+        return `Je tekening lijkt nog niet op de opdracht. Ik verwacht bv. ${tStukTxt(v.mist[0])}, maar jij tekende ${tStukTxt(v.teveel[0])}. Controleer je lengtes en hoeken.`+(opt.tipFout||"") } }
+    if(opt.na){ const f=opt.na(sc,st,out,ref); if(f) return f }
+    return null } }
+const heeftVulling=(st,kleur)=>(st.fills||[]).some(f=>!kleur||kleurGelijk(f.k,kleur));
+const lijnKleuren=st=>[...new Set((st.lijnen||[]).map(l=>JSON.stringify(tKleur(l[4])||l[4])))];
+
+/* ---- de wereld: tekenblad ---- */
+WERELDEN.tekenen={
+  frames(sc,log){ const fr=[{n:0}]; const teken=[];
+    log.forEach((e,i)=>{ if(["l","fill","dot","txt","bg","clear","toets"].includes(e.t)) teken.push(i) });
+    const stap=Math.max(1,Math.ceil(teken.length/90));
+    for(let k=stap-1;k<teken.length;k+=stap) fr.push({n:teken[k]+1});
+    fr.push({n:log.length}); return fr.map(f=>({...f,log})) },
+  staat(log,n){ const T={}, lijnen=[], fills=[], dots=[], txt=[]; let bg="white", fout=false, laatsteToets=null;
+    const tur=id=>T[id]||(T[id]={x:0,y:0,h:0,zicht:true,vorm:"classic",k:"black"});
+    for(let i=0;i<n;i++){ const e=log[i];
+      if(e.t==="nieuw") tur(e.id);
+      else if(e.t==="l"){ const a=e.a; lijnen.push(a); const t=tur(a[6]); t.x=a[2]; t.y=a[3]; t.k=a[4] }
+      else if(e.t==="p"){ const t=tur(e.id); t.x=e.x; t.y=e.y; t.h=e.h }
+      else if(e.t==="h"){ tur(e.id).h=e.h }
+      else if(e.t==="fill") fills.push(e.a);
+      else if(e.t==="dot") dots.push(e.a);
+      else if(e.t==="txt") txt.push(e.a);
+      else if(e.t==="bg") bg=e.k;
+      else if(e.t==="zicht") tur(e.id).zicht=e.v;
+      else if(e.t==="vorm") tur(e.id).vorm=e.v;
+      else if(e.t==="toets") laatsteToets=e.k;
+      else if(e.t==="clear"){ for(let j=lijnen.length-1;j>=0;j--) if(lijnen[j][6]===e.id) lijnen.splice(j,1); for(let j=fills.length-1;j>=0;j--) if(fills[j].id===e.id) fills.splice(j,1) }
+      else if(e.t==="fout") fout=true }
+    if(!Object.keys(T).length) tur(1);
+    return {T,lijnen,fills,dots,txt,bg,fout,laatsteToets} },
+  render(sc,f){ const log=f.log||[], z=this.staat(log,f.n==null?log.length:f.n);
+    const donker=tDonker(z.bg), raster=donker?"rgba(255,255,255,.10)":"rgba(31,78,121,.10)", as=donker?"rgba(255,255,255,.22)":"rgba(31,78,121,.22)";
+    let s=`<rect x="-320" y="-240" width="640" height="480" fill="${tCss(z.bg)}"/>`;
+    s+=`<g stroke="${raster}" stroke-width="1">`; for(let x=-300;x<=300;x+=50) if(x) s+=`<line x1="${x}" y1="-240" x2="${x}" y2="240"/>`; for(let y=-200;y<=200;y+=50) if(y) s+=`<line x1="-320" y1="${y}" x2="320" y2="${y}"/>`; s+=`</g>`;
+    s+=`<line x1="-320" y1="0" x2="320" y2="0" stroke="${as}"/><line x1="0" y1="-240" x2="0" y2="240" stroke="${as}"/>`;
+    s+=`<g font-size="10" fill="${as}">`+[-200,-100,100,200].map(v=>`<text x="${v+3}" y="12">${v}</text><text x="4" y="${-v+4}">${v}</text>`).join("")+`</g>`;
+    /* vullingen onder de lijnen die erna kwamen */
+    const fills=z.fills.slice().sort((a,b)=>a.z-b.z); let fi=0; let g="";
+    const vul=f=>`<polygon points="${f.pts.map(p=>p[0]+","+(-p[1])).join(" ")}" fill="${tCss(f.k)}"/>`;
+    z.lijnen.forEach((l,i)=>{ while(fi<fills.length&&fills[fi].z<=i){ g+=vul(fills[fi]); fi++ }
+      g+=`<line x1="${l[0]}" y1="${-l[1]}" x2="${l[2]}" y2="${-l[3]}" stroke="${tCss(l[4])}" stroke-width="${Math.max(.5,l[5])}" stroke-linecap="round"/>` });
+    while(fi<fills.length){ g+=vul(fills[fi]); fi++ }
+    for(const d of z.dots) g+=`<circle cx="${d[0]}" cy="${-d[1]}" r="${d[2]/2}" fill="${tCss(d[3])}"/>`;
+    for(const t of z.txt) g+=`<text x="${t[0]}" y="${-t[1]}" font-size="${Math.max(8,t[5])*1.33}" fill="${tCss(t[3])}" text-anchor="${t[4]==="center"?"middle":t[4]==="right"?"end":"start"}">${svgTxt(t[2])}</text>`;
+    s+=g;
+    for(const t of Object.values(z.T)){ if(!t.zicht) continue;
+      const kl=donker&&tDonker(t.k)?"#ffffff":tCss(t.k);
+      s+=`<g transform="translate(${t.x},${-t.y}) rotate(${-t.h})">`+(t.vorm==="turtle"
+        ?`<ellipse rx="9" ry="7" fill="#3fa45b" stroke="#1f6b35"/><circle cx="11" r="3.5" fill="#3fa45b" stroke="#1f6b35"/><circle cx="-5" cy="-7" r="2.5" fill="#3fa45b"/><circle cx="-5" cy="7" r="2.5" fill="#3fa45b"/><circle cx="5" cy="-7" r="2.5" fill="#3fa45b"/><circle cx="5" cy="7" r="2.5" fill="#3fa45b"/>`
+        :`<polygon points="10,0 -6,-6 -2,0 -6,6" fill="${kl}" stroke="${donker?"#000":"#fff"}" stroke-width=".8"/>`)+`</g>` }
+    const t1=z.T[1]||Object.values(z.T)[0];
+    let info=`x: ${Math.round(t1.x)} · y: ${Math.round(t1.y)} · richting: ${Math.round(t1.h)}°`;
+    if(z.laatsteToets) info+=` · toets: ${z.laatsteToets}`;
+    s+=`<g><rect x="-314" y="210" width="${info.length*6.3+18}" height="22" rx="6" fill="#fff" fill-opacity=".85" stroke="#1f4e79" stroke-opacity=".3"/><text x="-305" y="225" font-size="12" fill="#1d2433" font-family="ui-monospace,Consolas,monospace">${svgTxt(info)}</text></g>`;
+    if(f.rand) s+=`<rect x="-317" y="-237" width="634" height="474" rx="10" fill="none" stroke="${f.rand==="ok"?"#2a9d4b":"#d33a2c"}" stroke-width="6"/>`;
+    return `<svg viewBox="-320 -240 640 480" role="img" aria-label="Tekenblad van de turtle" style="width:min(100%,600px);height:auto;display:block;margin:0 auto;font-family:system-ui,sans-serif">${s}</svg>` }
+};
+
+/* ---- filmpjes ---- */
+function speelVideo(knop){ const id=knop.closest(".video").dataset.yt;
+  knop.outerHTML=`<div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="Filmpje" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>` }
+const VIDEO=(id,titel,tekst)=>`<div class="video" data-yt="${id}"><button type="button" class="vthumb" onclick="speelVideo(this)" aria-label="Speel het filmpje ${titel}"><img loading="lazy" src="https://i.ytimg.com/vi/${id}/mqdefault.jpg" alt=""><span class="vplay">▶</span></button><div class="vinfo"><b>🎬 Filmpje: ${titel}</b><span>${tekst||"Bekijk eerst het filmpje. Zit je vast? Kijk het gerust nog eens."}</span><a href="https://youtu.be/${id}" target="_blank" rel="noopener">Open op YouTube ↗</a></div></div>`;
+const V={lijn:"ixBnBoXnwvw",vierkant:"anwejD7H7f4",herhaling:"zkxbnV3YTQg",veelhoek:"qeI21jQT6vg",opmaak:"HVW-DtkCpU0",meerdere:"IfAeOnuRZn4",sterren:"b6JCxaKBYkg",spiraal:"hHvHyyZ3MMQ",kleuren:"lopU5hzW7R8",toetsen:"T_jAhOIPrws"};
+
+/* ---- bevelen ---- */
+const T_API={
+  fwd:["turtle.forward(100)","Gaat 100 pixels vooruit en tekent een lijn."],
+  bwd:["turtle.backward(50)","Gaat 50 pixels achteruit."],
+  lt:["turtle.left(90)","Draait 90 graden naar links."],
+  rt:["turtle.right(90)","Draait 90 graden naar rechts."],
+  pu:["turtle.penup() / turtle.pendown()","Pen omhoog (niet tekenen) of weer omlaag (wel tekenen)."],
+  goto:["turtle.goto(-100, 50)","Gaat naar het punt met x = -100 en y = 50. Het midden is (0, 0)."],
+  ps:["turtle.pensize(3)","Maakt de lijn 3 pixels dik."],
+  pc:["turtle.pencolor(\"red\")","Kiest de kleur van de lijn (Engelse kleurnamen)."],
+  fc:["turtle.fillcolor(\"yellow\")","Kiest de kleur om een vorm op te vullen."],
+  fill:["turtle.begin_fill() / turtle.end_fill()","Alles wat je tussen deze twee tekent, wordt opgevuld."],
+  bg:["turtle.Screen().bgcolor(\"black\")","Kiest de achtergrondkleur."],
+  cm:["turtle.colormode(255)","Daarna kun je kleuren maken met 3 getallen van 0 tot 255: <code>turtle.pencolor(255, 0, 0)</code>."],
+  sp:["turtle.speed(0)","Snelheid van de turtle (hier niet nodig: de app tekent altijd vlot)."],
+  ht:["turtle.hideturtle()","Verbergt de turtle (het pijltje)."],
+  circ:["turtle.circle(50)","Tekent een cirkel met straal 50."],
+  key:["scherm.onkey(functie, \"Up\")","Voert de functie uit als je op ↑ drukt. Ook: <code>\"Down\"</code>, <code>\"Left\"</code>, <code>\"Right\"</code>, <code>\"space\"</code>."],
+  listen:["scherm.listen()","Het scherm luistert naar de toetsen."],
+  clear:["turtle.clear()","Wist alles wat de turtle getekend heeft."]};
+const tApi=keys=>apiTabel(keys.map(k=>T_API[k]));
+const T_UITLEG=`<div class="box"><b>Zo werk je</b><br>Schrijf je code en klik op <b>▶ Uitvoeren</b>: de turtle tekent meteen. Het midden van het tekenblad is <code>(0, 0)</code>, de turtle kijkt eerst naar rechts. Bij <b>✓ Controleer</b> vergelijkt de computer jouw tekening met de opdracht.</div>`;
+const T_SC=o=>({maxlog:9000,maxtel:300000,...o});
+const tLevel=o=>({klaar:true,teken:true,stappen:[],...o,opdracht:o.opdracht+T_UITLEG});
+const tNaam="# {NAAM}\n";
+const tPre=c=>"Zo kan het:<pre>"+tNaam+c.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>";
+
+const TEKEN_OEFENINGEN=[
+tLevel({ id:"D1", groep:"🐢 Tekenen", titel:"Tekenen 1 - Een lijn",
+  opdracht:`${VIDEO(V.lijn,"Een lijn tekenen")}<p>Met de <b>turtle</b> kun je tekenen in Python. De turtle is een pen die over het scherm loopt. Teken een <b>lijn van 200 pixels</b> naar rechts.</p>${tApi(["fwd"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>Begin met <code>import turtle</code>: zo kun je de turtle gebruiken.</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[T_SC({naam:"lijn van 200"})],
+    ref:"import turtle\n\nturtle.forward(200)\n",
+    doel:tekenDoel({sym:["id"]}),
+    moet:[[/import\s+turtle/,"Begin met: import turtle"],[/forward\s*\(/,"Gebruik turtle.forward() om vooruit te gaan."]],
+    hulp:["Hoe heet het bevel om vooruit te gaan? Hoeveel pixels moet de turtle vooruit?","Schrijf onder <code>import turtle</code> het bevel <code>turtle.forward(...)</code> met het juiste getal.",tPre("import turtle\n\nturtle.forward(200)")],
+    ok:"Je eerste lijn staat op het scherm!" } }),
+tLevel({ id:"D2", groep:"🐢 Tekenen", titel:"Tekenen 2 - Een vierkant",
+  opdracht:`${VIDEO(V.vierkant,"Een vierkant tekenen")}<p>Teken een <b>vierkant</b> met zijden van <b>150 pixels</b>.</p>${tApi(["fwd","lt","rt"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>Een vierkant heeft 4 even lange zijden. Na elke zijde draait de turtle een hoek van 90 graden.</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[T_SC({naam:"vierkant van 150"})],
+    ref:"import turtle\n\nturtle.forward(150)\nturtle.left(90)\nturtle.forward(150)\nturtle.left(90)\nturtle.forward(150)\nturtle.left(90)\nturtle.forward(150)\nturtle.left(90)\n",
+    doel:tekenDoel({tipFout:" Een vierkant heeft hoeken van 90 graden."}),
+    moet:[[/import\s+turtle/,"Begin met: import turtle"],[/left\s*\(|right\s*\(/,"Laat de turtle draaien met turtle.left() of turtle.right()."]],
+    hulp:["Welke twee bevelen herhaal je telkens? Hoe vaak?","Vooruit 150, dan 90 graden draaien: <code>turtle.forward(150)</code> en <code>turtle.left(90)</code>. Doe dat 4 keer.",tPre("import turtle\n\nturtle.forward(150)\nturtle.left(90)\nturtle.forward(150)\nturtle.left(90)\nturtle.forward(150)\nturtle.left(90)\nturtle.forward(150)\nturtle.left(90)")],
+    ok:"Een perfect vierkant!" } }),
+tLevel({ id:"D3", groep:"🐢 Tekenen", titel:"Tekenen 3 - Herhalen met while", lus:true,
+  opdracht:`${VIDEO(V.herhaling,"Herhaling en variabelen")}<p>In het vorige level schreef je 4 keer hetzelfde. Dat kan korter met een <b>while-lus</b>. Vraag ook met <code>input()</code> hoe lang een zijde moet zijn en teken dan het vierkant.</p>${tApi(["fwd","lt"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>Gebruik een <b>teller</b> en een while-lus. Zet <code>turtle.forward()</code> maar <b>één keer</b> in je code. Kies je een situatie, dan wordt het vak <b>Invoer</b> ingevuld. Je mag daar ook zelf andere getallen proberen.</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[80,180].map(z=>T_SC({naam:`zijde ${z}`,invoer:[String(z)]})),
+    ref:"import turtle\n\nzijde = int(input(\"Hoe lang moet een zijde zijn? \"))\nteller = 0\nwhile teller < 4:\n    turtle.forward(zijde)\n    turtle.left(90)\n    teller = teller + 1\n",
+    doel:tekenDoel({}),
+    moet:[[/^\s*while\b/m,"Gebruik een while-lus om de zijden te herhalen."],[/input\s*\(/,"Vraag de lengte van een zijde met input()."]],
+    maxAantal:[[/forward\s*\(/g,1,"Zet turtle.forward() maar één keer in je code: de while-lus zorgt voor de herhaling."]],
+    hulp:["Hoe vaak moet de lus herhalen? Welke variabele houdt bij hoe vaak hij al herhaald heeft? En vergeet niet: input() geeft tekst.","<pre>zijde = int(input(\"Hoe lang moet een zijde zijn? \"))\nteller = 0\nwhile teller &lt; 4:\n    ...\n    teller = teller + 1</pre>",tPre("import turtle\n\nzijde = int(input(\"Hoe lang moet een zijde zijn? \"))\nteller = 0\nwhile teller < 4:\n    turtle.forward(zijde)\n    turtle.left(90)\n    teller = teller + 1")],
+    ok:"Korter én slimmer: je vierkant past zich aan!" } }),
+tLevel({ id:"D4", groep:"🐢 Tekenen", titel:"Tekenen 4 - Een veelhoek", lus:true,
+  opdracht:`${VIDEO(V.veelhoek,"Een veelhoek tekenen")}<p>Vraag <b>hoeveel hoeken</b> de veelhoek heeft en <b>hoe lang</b> een zijde is. Teken dan die veelhoek: een driehoek, een vijfhoek, een achthoek, ...</p>${tApi(["fwd","lt"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>De turtle draait in totaal <b>360 graden</b> rond. Hoeveel graden draait hij dan bij elke hoek? Vraag eerst het aantal hoeken en daarna de lengte van een zijde. Kies je een situatie, dan wordt het vak <b>Invoer</b> ingevuld. Je mag daar ook zelf andere getallen proberen.</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[[3,150],[5,110],[8,70]].map(([n,z])=>T_SC({naam:`${n} hoeken, zijde ${z}`,invoer:[String(n),String(z)]})),
+    ref:"import turtle\n\nhoeken = int(input(\"Hoeveel hoeken heeft de veelhoek? \"))\nzijde = int(input(\"Hoe lang is een zijde? \"))\nhoek = 360 / hoeken\nteller = 0\nwhile teller < hoeken:\n    turtle.forward(zijde)\n    turtle.left(hoek)\n    teller = teller + 1\n",
+    doel:tekenDoel({tipFout:" Bij elke hoek draait de turtle 360 gedeeld door het aantal hoeken."}),
+    moet:[[/^\s*while\b/m,"Gebruik een while-lus."],[/360/,"De turtle draait in totaal 360 graden: gebruik 360 in je berekening."]],
+    hulp:["Een vierkant: 360 / 4 = 90 graden. Een driehoek? En een veelhoek met <i>n</i> hoeken? Hoe vaak herhaalt je lus?","<pre>hoek = 360 / hoeken\nteller = 0\nwhile teller &lt; hoeken:\n    ...</pre>",tPre("import turtle\n\nhoeken = int(input(\"Hoeveel hoeken heeft de veelhoek? \"))\nzijde = int(input(\"Hoe lang is een zijde? \"))\nhoek = 360 / hoeken\nteller = 0\nwhile teller < hoeken:\n    turtle.forward(zijde)\n    turtle.left(hoek)\n    teller = teller + 1")],
+    ok:"Driehoek, vijfhoek of achthoek: je programma tekent ze allemaal!" } }),
+tLevel({ id:"D5", groep:"🐢 Tekenen", titel:"Tekenen 5 - Vorm opmaken", lus:true,
+  opdracht:`${VIDEO(V.opmaak,"Vorm opmaken")}<p>Teken een <b>zeshoek</b> met zijden van <b>100 pixels</b>. Maak hem mooi op:</p><ul><li>een <b>rode</b> rand van <b>5 pixels</b> dik;</li><li>opgevuld met <b>geel</b>;</li><li>de achtergrond mag je zelf kiezen.</li></ul>${tApi(["fwd","lt","ps","pc","fc","fill","bg"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>Zet de kleuren en de pendikte <b>vóór</b> je begint te tekenen. Zet <code>turtle.begin_fill()</code> vóór de zeshoek en <code>turtle.end_fill()</code> erna.</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[T_SC({naam:"gele zeshoek"})],
+    ref:"import turtle\n\nturtle.pensize(5)\nturtle.pencolor(\"red\")\nturtle.fillcolor(\"yellow\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 6:\n    turtle.forward(100)\n    turtle.left(60)\n    teller = teller + 1\nturtle.end_fill()\n",
+    doel:tekenDoel({tipFout:" Een zeshoek: de turtle draait 360 / 6 graden.",na:(sc,st)=>{
+      const L=st.lijnen;
+      if(!L.every(l=>kleurGelijk(l[4],"red"))) return "De vorm klopt, maar de rand is niet overal rood. Gebruik turtle.pencolor(\"red\") vóór je tekent.";
+      if(!L.every(l=>Math.abs(l[5]-5)<0.01)) return "De vorm klopt, maar de rand is niet 5 pixels dik. Gebruik turtle.pensize(5).";
+      if(!heeftVulling(st)) return "De zeshoek is nog niet opgevuld. Zet turtle.begin_fill() vóór de zeshoek en turtle.end_fill() erna.";
+      if(!heeftVulling(st,"yellow")) return "De zeshoek is opgevuld, maar niet met geel. Gebruik turtle.fillcolor(\"yellow\").";
+      return null }}),
+    moet:[[/^\s*while\b/m,"Gebruik een while-lus voor de 6 zijden."]],
+    hulp:["Welke bevelen bepalen de kleur van de rand, de dikte en de vulkleur? Waar in je code zet je begin_fill() en end_fill()?","<pre>turtle.pensize(5)\nturtle.pencolor(\"red\")\nturtle.fillcolor(\"yellow\")\nturtle.begin_fill()\n# hier de while-lus voor de zeshoek\nturtle.end_fill()</pre>",tPre("import turtle\n\nturtle.pensize(5)\nturtle.pencolor(\"red\")\nturtle.fillcolor(\"yellow\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 6:\n    turtle.forward(100)\n    turtle.left(60)\n    teller = teller + 1\nturtle.end_fill()")],
+    ok:"Een stralende gele zeshoek!" } }),
+tLevel({ id:"D6", groep:"🐢 Tekenen", titel:"Tekenen 6 - Meerdere figuren", lus:true,
+  opdracht:`${VIDEO(V.meerdere,"Meerdere figuren tekenen")}<p>Teken <b>drie vierkanten</b> van <b>60 pixels</b> naast elkaar. De linkerbenedenhoeken liggen op <code>(-200, 0)</code>, <code>(-50, 0)</code> en <code>(100, 0)</code>. Tussen de vierkanten mag <b>geen lijn</b> staan.</p>${tApi(["fwd","lt","pu","goto"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>Gebruik <code>turtle.penup()</code> en <code>turtle.goto()</code> om naar de volgende plek te gaan zonder te tekenen. Tip: de x-waarde wordt telkens 150 groter. Dat kan met een while-lus!</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[T_SC({naam:"drie vierkanten"})],
+    ref:"import turtle\n\nx = -200\nwhile x <= 100:\n    turtle.penup()\n    turtle.goto(x, 0)\n    turtle.pendown()\n    turtle.forward(60)\n    turtle.left(90)\n    turtle.forward(60)\n    turtle.left(90)\n    turtle.forward(60)\n    turtle.left(90)\n    turtle.forward(60)\n    turtle.left(90)\n    x = x + 150\n",
+    doel:tekenDoel({tipTeveel:" Gebruik turtle.penup() voor je naar het volgende vierkant gaat, en turtle.pendown() om weer te tekenen."}),
+    moet:[[/penup\s*\(|\.up\s*\(|\.pu\s*\(/,"Gebruik turtle.penup() om te verplaatsen zonder te tekenen."],[/goto\s*\(/,"Gebruik turtle.goto() om naar de juiste plek te gaan."]],
+    hulp:["Wat doet de turtle tussen twee vierkanten? Mag hij dan tekenen? Welke x-waarden heb je nodig?","<pre>x = -200\nwhile x &lt;= 100:\n    turtle.penup()\n    turtle.goto(x, 0)\n    turtle.pendown()\n    # teken hier een vierkant\n    x = x + 150</pre>",tPre("import turtle\n\nx = -200\nwhile x <= 100:\n    turtle.penup()\n    turtle.goto(x, 0)\n    turtle.pendown()\n    turtle.forward(60)\n    turtle.left(90)\n    turtle.forward(60)\n    turtle.left(90)\n    turtle.forward(60)\n    turtle.left(90)\n    turtle.forward(60)\n    turtle.left(90)\n    x = x + 150")],
+    ok:"Drie vierkanten, netjes op een rij!" } }),
+tLevel({ id:"D7", groep:"🐢 Tekenen", titel:"Tekenen 7 - Een huisje",
+  opdracht:`<p>Combineer alles wat je al kunt en teken een <b>huisje</b>:</p><ul><li>een <b>vierkant</b> van 120 pixels, met de linkerbenedenhoek in <code>(0, 0)</code>;</li><li>een <b>dak</b>: een driehoek met zijden van 120 pixels, bovenop het vierkant;</li><li>het vierkant en het dak zijn <b>opgevuld</b>, elk met een <b>andere kleur</b>.</li></ul><p>Wil je nog een deur, een raam of een zon tekenen? Dat mag gerust!</p><p class="kleintje">Bekijk de filmpjes <b>Vorm opmaken</b> en <b>Meerdere figuren tekenen</b> nog eens als je vastzit.</p>${tApi(["fwd","lt","pu","goto","fc","fill"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>De turtle begint in <code>(0, 0)</code> en kijkt naar rechts. Teken het vierkant met <code>left()</code>, zodat het naar boven gaat. Het dak begint in <code>(0, 120)</code>. Een driehoek met gelijke zijden heeft hoeken van 120 graden om te draaien.</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[T_SC({naam:"huisje"})],
+    ref:"import turtle\n\nturtle.fillcolor(\"lightyellow\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 4:\n    turtle.forward(120)\n    turtle.left(90)\n    teller = teller + 1\nturtle.end_fill()\nturtle.penup()\nturtle.goto(0, 120)\nturtle.pendown()\nturtle.fillcolor(\"red\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 3:\n    turtle.forward(120)\n    turtle.left(120)\n    teller = teller + 1\nturtle.end_fill()\n",
+    doel:tekenDoel({sym:["id"],extraMag:true,tipMist:" Begin in (0, 0) en teken met left(), zodat het huisje naar boven gaat.",na:(sc,st)=>{
+      const F=st.fills||[];
+      if(F.length<2) return "Het huisje staat er! Vul nu het vierkant én het dak op: gebruik begin_fill() en end_fill() rond elke vorm.";
+      const k=new Set(F.map(f=>JSON.stringify(tKleur(f.k)||f.k)));
+      if(k.size<2) return "Het vierkant en het dak hebben dezelfde kleur. Kies voor het dak een andere fillcolor().";
+      return null }}),
+    moet:[[/begin_fill\s*\(/,"Vul je vormen op met begin_fill() en end_fill()."]],
+    hulp:["Teken eerst het vierkant. Hoe kom je daarna in (0, 120) zonder een lijn te tekenen?","Vierkant: 4 keer <code>forward(120)</code> en <code>left(90)</code>. Dan <code>penup()</code>, <code>goto(0, 120)</code>, <code>pendown()</code>. Dak: 3 keer <code>forward(120)</code> en <code>left(120)</code>. Zet telkens een andere <code>fillcolor()</code> en <code>begin_fill()</code> / <code>end_fill()</code> rond elke vorm.",tPre("import turtle\n\nturtle.fillcolor(\"lightyellow\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 4:\n    turtle.forward(120)\n    turtle.left(90)\n    teller = teller + 1\nturtle.end_fill()\nturtle.penup()\nturtle.goto(0, 120)\nturtle.pendown()\nturtle.fillcolor(\"red\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 3:\n    turtle.forward(120)\n    turtle.left(120)\n    teller = teller + 1\nturtle.end_fill()")],
+    ok:"Wat een gezellig huisje!" } }),
+tLevel({ id:"D8", groep:"🐢 Tekenen", titel:"Tekenen 8 - Twee sterren", lus:true,
+  opdracht:`${VIDEO(V.sterren,"2 sterren tekenen")}<p>Teken <b>twee sterren</b> met 5 punten:</p><ul><li>een <b>gouden</b> ster (<code>"gold"</code>) met zijden van <b>100</b> pixels, die begint in <code>(-200, 0)</code>;</li><li>een <b>oranje</b> ster (<code>"orange"</code>) met zijden van <b>150</b> pixels, die begint in <code>(20, 0)</code>.</li></ul><p>Beide sterren zijn opgevuld met hun kleur.</p>${tApi(["fwd","rt","pu","goto","pc","fc","fill"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>Een ster teken je met 5 keer: vooruit en <b>144 graden</b> draaien. Probeer het eerst met één ster.</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[T_SC({naam:"twee sterren"})],
+    ref:"import turtle\n\nturtle.penup()\nturtle.goto(-200, 0)\nturtle.pendown()\nturtle.color(\"gold\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 5:\n    turtle.forward(100)\n    turtle.right(144)\n    teller = teller + 1\nturtle.end_fill()\nturtle.penup()\nturtle.goto(20, 0)\nturtle.pendown()\nturtle.color(\"orange\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 5:\n    turtle.forward(150)\n    turtle.right(144)\n    teller = teller + 1\nturtle.end_fill()\n",
+    doel:tekenDoel({tipFout:" Een ster: 5 keer vooruit en 144 graden draaien.",tipTeveel:" Gebruik penup() om naar de tweede ster te gaan.",na:(sc,st)=>{
+      if(!heeftVulling(st,"gold")) return "De sterren staan er! Vul nu de eerste ster op met \"gold\" (fillcolor of color, met begin_fill() en end_fill()).";
+      if(!heeftVulling(st,"orange")) return "De gouden ster is klaar. Vul nu de tweede ster op met \"orange\".";
+      return null }}),
+    moet:[[/^\s*while\b/m,"Gebruik een while-lus voor de 5 punten van een ster."],[/144/,"Bij een ster draait de turtle telkens 144 graden."]],
+    hulp:["Hoe teken je één ster? Wat moet je doen voor de tweede ster begint?","<pre>turtle.color(\"gold\")\nturtle.begin_fill()\nteller = 0\nwhile teller &lt; 5:\n    turtle.forward(100)\n    turtle.right(144)\n    teller = teller + 1\nturtle.end_fill()</pre><code>turtle.color()</code> zet de penkleur én de vulkleur tegelijk.",tPre("import turtle\n\nturtle.penup()\nturtle.goto(-200, 0)\nturtle.pendown()\nturtle.color(\"gold\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 5:\n    turtle.forward(100)\n    turtle.right(144)\n    teller = teller + 1\nturtle.end_fill()\nturtle.penup()\nturtle.goto(20, 0)\nturtle.pendown()\nturtle.color(\"orange\")\nturtle.begin_fill()\nteller = 0\nwhile teller < 5:\n    turtle.forward(150)\n    turtle.right(144)\n    teller = teller + 1\nturtle.end_fill()")],
+    ok:"Twee schitterende sterren!" } }),
+tLevel({ id:"D9", groep:"🐢 Tekenen", titel:"Tekenen 9 - Een spiraal", lus:true,
+  opdracht:`${VIDEO(V.spiraal,"Spiraal tekenen")}<p>Teken een <b>spiraal</b>. De eerste lijn is <b>5 pixels</b> lang, en elke volgende lijn is <b>5 pixels langer</b>. Na elke lijn draait de turtle naar links. Stop als de lijn langer dan <b>200 pixels</b> zou worden.</p><p>Vraag de <b>hoek</b> met <code>input()</code>: met 90 graden krijg je een vierkante spiraal, met 120 graden een driehoekige.</p>${tApi(["fwd","lt"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>Gebruik een variabele <code>lengte</code> die in de lus telkens groter wordt. Kies je een situatie, dan wordt het vak <b>Invoer</b> ingevuld. Je mag daar ook zelf andere getallen proberen.</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[90,120].map(h=>T_SC({naam:`hoek ${h}`,invoer:[String(h)]})),
+    ref:"import turtle\n\nhoek = int(input(\"Welke hoek draait de turtle? \"))\nlengte = 5\nwhile lengte <= 200:\n    turtle.forward(lengte)\n    turtle.left(hoek)\n    lengte = lengte + 5\n",
+    doel:tekenDoel({tipFout:" Begin met een lijn van 5 pixels en maak elke lijn 5 pixels langer.",tipMist:" Teken je ook de lijn van precies 200 pixels? Kijk naar je voorwaarde: < of <= ?",tipTeveel:" Stop je wel op tijd? De langste lijn is 200 pixels."}),
+    moet:[[/^\s*while\b/m,"Gebruik een while-lus."],[/input\s*\(/,"Vraag de hoek met input()."]],
+    hulp:["Welke variabele verandert in de lus? Met hoeveel? Wanneer stopt de lus?","<pre>lengte = 5\nwhile lengte &lt;= 200:\n    turtle.forward(lengte)\n    turtle.left(hoek)\n    lengte = lengte + 5</pre>",tPre("import turtle\n\nhoek = int(input(\"Welke hoek draait de turtle? \"))\nlengte = 5\nwhile lengte <= 200:\n    turtle.forward(lengte)\n    turtle.left(hoek)\n    lengte = lengte + 5")],
+    ok:"Hypnotiserend! Je spiraal draait perfect." } }),
+tLevel({ id:"D10", groep:"🐢 Tekenen", titel:"Tekenen 10 - Kleuren veranderen", lus:true,
+  opdracht:`${VIDEO(V.kleuren,"Kleuren veranderen")}<p>Maak een <b>kleurrijke spiraal</b> op een <b>zwarte</b> achtergrond, zoals in het filmpje:</p><ul><li>herhaal <b>100 keer</b>;</li><li>kies telkens een <b>willekeurige kleur</b> met 3 getallen tussen 0 en 255;</li><li>ga <code>lengte</code> pixels vooruit en draai <b>59 graden</b> naar links;</li><li>de lengte begint bij <b>1</b> en wordt telkens <b>1</b> groter.</li></ul>${tApi(["cm","bg","pc","fwd","lt","ps"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen",
+    html:`<p>Gebruik <code>import random</code> en <code>random.randint(0, 255)</code>. Vergeet <code>turtle.colormode(255)</code> niet!</p>`,
+    starter:"import turtle\nimport random\n\n",
+    scenarios:[T_SC({naam:"kleurrijke spiraal"})],
+    ref:"import turtle\nimport random\n\nturtle.colormode(255)\nturtle.Screen().bgcolor(\"black\")\nteller = 0\nlengte = 1\nwhile teller < 100:\n    r = random.randint(0, 255)\n    g = random.randint(0, 255)\n    b = random.randint(0, 255)\n    turtle.pencolor(r, g, b)\n    turtle.forward(lengte)\n    turtle.left(59)\n    lengte = lengte + 1\n    teller = teller + 1\n",
+    doel:tekenDoel({tipFout:" Draai telkens 59 graden en maak de lengte telkens 1 groter.",tipMist:" Herhaal je wel 100 keer?",tipTeveel:" Herhaal je wel precies 100 keer?",na:(sc,st)=>{
+      if(!kleurGelijk(st.bg,"black")) return "De spiraal klopt, maar de achtergrond is niet zwart. Gebruik turtle.Screen().bgcolor(\"black\").";
+      if(lijnKleuren(st).length<30) return "De spiraal klopt, maar ze is niet kleurrijk genoeg. Kies in de lus telkens een nieuwe willekeurige kleur.";
+      return null }}),
+    moet:[[/import\s+random/,"Gebruik import random om willekeurige kleuren te maken."],[/randint\s*\(/,"Maak willekeurige getallen met random.randint(0, 255)."],[/^\s*while\b/m,"Gebruik een while-lus."]],
+    hulp:["Welke regels moeten <b>in</b> de lus staan, zodat elke lijn een andere kleur krijgt? Welke regels staan ervoor?","<pre>turtle.colormode(255)\nturtle.Screen().bgcolor(\"black\")\nteller = 0\nlengte = 1\nwhile teller &lt; 100:\n    r = random.randint(0, 255)\n    ...\n    turtle.pencolor(r, g, b)\n    ...</pre>",tPre("import turtle\nimport random\n\nturtle.colormode(255)\nturtle.Screen().bgcolor(\"black\")\nteller = 0\nlengte = 1\nwhile teller < 100:\n    r = random.randint(0, 255)\n    g = random.randint(0, 255)\n    b = random.randint(0, 255)\n    turtle.pencolor(r, g, b)\n    turtle.forward(lengte)\n    turtle.left(59)\n    lengte = lengte + 1\n    teller = teller + 1")],
+    ok:"Een regenboog van lijnen: prachtig!" } }),
+tLevel({ id:"D11", groep:"🐢 Tekenen", titel:"Tekenen 11 - Pijltjestoetsen",
+  opdracht:`${VIDEO(V.toetsen,"Pijltjestoetsen")}<p>Bestuur de turtle met de <b>pijltjestoetsen</b>, zoals in het filmpje:</p><ul><li><b>↑</b> 20 pixels vooruit, <b>↓</b> 20 pixels achteruit;</li><li><b>←</b> 15 graden naar links, <b>→</b> 15 graden naar rechts;</li><li><b>spatiebalk</b> (<code>"space"</code>): het scherm wissen.</li></ul><p>Hiervoor maak je je eigen <b>functies</b> met <code>def</code>.</p>${tApi(["listen","key","fwd","bwd","lt","rt","clear"])}`,
+  hoofd:{ titel:"Teken met de turtle", wereld:"tekenen", toetsen:true,
+    html:`<p>Klik op <b>▶ Uitvoeren</b>, klik daarna op het tekenblad en gebruik je pijltjestoetsen. Bij <b>✓ Controleer</b> drukt de computer zelf een reeks toetsen in.</p><div class="box"><b>Een functie maken</b><br>Met <code>def</code> geef je een stukje code een naam. Het wordt pas uitgevoerd als de functie wordt opgeroepen, bv. als je op een toets drukt.<pre>def ga_vooruit():\n    turtle.forward(20)</pre></div>`,
+    starter:"import turtle\n\nscherm = turtle.Screen()\n\n",
+    scenarios:[["Up","Up","Left","Up","Right","Right","Up","Down"],["Left","Left","Up","space","Right","Up","Up"]].map((t,i)=>T_SC({naam:`toetsen ${i+1}: ${t.map(k=>({Up:"↑",Down:"↓",Left:"←",Right:"→",space:"spatie"}[k])).join(" ")}`,toetsen:t})),
+    ref:"import turtle\n\nscherm = turtle.Screen()\n\n\ndef ga_vooruit():\n    turtle.forward(20)\n\n\ndef ga_achteruit():\n    turtle.backward(20)\n\n\ndef draai_links():\n    turtle.left(15)\n\n\ndef draai_rechts():\n    turtle.right(15)\n\n\ndef wis_scherm():\n    turtle.clear()\n\n\nscherm.listen()\nscherm.onkey(ga_vooruit, \"Up\")\nscherm.onkey(ga_achteruit, \"Down\")\nscherm.onkey(draai_links, \"Left\")\nscherm.onkey(draai_rechts, \"Right\")\nscherm.onkey(wis_scherm, \"space\")\n",
+    doel:tekenDoel({sym:["id"],tipMist:" Werken al je toetsen? Let op de hoofdletters: \"Up\", \"Down\", \"Left\", \"Right\" en \"space\".",tipFout:" Kijk of elke functie het juiste doet: 20 pixels en 15 graden.",tipTeveel:" Wist de spatiebalk het scherm met turtle.clear()?"}),
+    moet:[[/^\s*def\s+\w+\s*\(\s*\)\s*:/m,"Maak je eigen functies met def, bv. def ga_vooruit():"],[/listen\s*\(/,"Laat het scherm luisteren met scherm.listen()."],[/onkey(press)?\s*\(/,"Koppel de toetsen aan je functies met scherm.onkey()."]],
+    hulp:["Welke 5 functies heb je nodig? En welke 2 stappen komen na de functies?","<pre>def ga_vooruit():\n    turtle.forward(20)\n\n\nscherm.listen()\nscherm.onkey(ga_vooruit, \"Up\")</pre>Let op: bij <code>onkey</code> schrijf je de naam van de functie <b>zonder</b> haakjes.",tPre("import turtle\n\nscherm = turtle.Screen()\n\n\ndef ga_vooruit():\n    turtle.forward(20)\n\n\ndef ga_achteruit():\n    turtle.backward(20)\n\n\ndef draai_links():\n    turtle.left(15)\n\n\ndef draai_rechts():\n    turtle.right(15)\n\n\ndef wis_scherm():\n    turtle.clear()\n\n\nscherm.listen()\nscherm.onkey(ga_vooruit, \"Up\")\nscherm.onkey(ga_achteruit, \"Down\")\nscherm.onkey(draai_links, \"Left\")\nscherm.onkey(draai_rechts, \"Right\")\nscherm.onkey(wis_scherm, \"space\")")],
+    ok:"Je hebt een tekenspel gemaakt! Probeer het eens uit met ▶ Uitvoeren." } }),
+tLevel({ id:"D12", groep:"🐢 Tekenen", titel:"Tekenen 12 - Mijn kunstwerk", lus:true,
+  opdracht:`<p>Tijd voor je <b>eigen kunstwerk</b>! Teken wat je wilt: een robot, een bloem, een landschap, een patroon, ... Je tekening moet wel:</p><ul><li>een <b>while-lus</b> gebruiken;</li><li>minstens <b>3 verschillende kleuren</b> lijnen hebben;</li><li>minstens <b>1 opgevulde vorm</b> hebben;</li><li>uit minstens <b>20 lijnen</b> bestaan.</li></ul><p class="kleintje">Idee: draai een vierkant 36 keer telkens 10 graden en je krijgt een bloem. Gebruik <code>turtle.circle(50)</code> voor een cirkel.</p>${tApi(["fwd","lt","pu","goto","ps","pc","fc","fill","bg","circ","ht"])}`,
+  hoofd:{ titel:"Jouw kunstwerk", wereld:"tekenen",
+    html:`<p>Laat je fantasie de vrije loop. Bewaar je mooiste tekening: je leerkracht ziet je code.</p>`,
+    starter:"import turtle\n\n",
+    scenarios:[T_SC({naam:"kunstwerk"})],
+    doel:tekenDoel({vorm:false,na:(sc,st)=>{
+      const n=tSamen(st.lijnen||[]).length, k=lijnKleuren(st).length;
+      if(n<20) return `Je tekening heeft nu ${n} ${n===1?"lijn":"lijnen"}. Maak er minstens 20.`;
+      if(k<3) return `Je gebruikt nu ${k} ${k===1?"kleur":"kleuren"} voor je lijnen. Gebruik er minstens 3 met pencolor().`;
+      if(!heeftVulling(st)) return "Vul minstens één vorm op met begin_fill() en end_fill().";
+      return null }}),
+    moet:[[/^\s*while\b/m,"Gebruik minstens één while-lus in je kunstwerk."]],
+    hulp:["Begin klein: teken één vorm met een while-lus. Voeg daarna kleuren en een opgevulde vorm toe.","Een bloem van vierkanten:<pre>teller = 0\nwhile teller &lt; 36:\n    # teken hier een vierkant\n    turtle.left(10)\n    teller = teller + 1</pre>",tPre("import turtle\n\nturtle.Screen().bgcolor(\"lightblue\")\nturtle.color(\"orange\")\nturtle.begin_fill()\nturtle.circle(40)\nturtle.end_fill()\nteller = 0\nwhile teller < 36:\n    if teller % 2 == 0:\n        turtle.pencolor(\"red\")\n    else:\n        turtle.pencolor(\"purple\")\n    zijde = 0\n    while zijde < 4:\n        turtle.forward(120)\n        turtle.left(90)\n        zijde = zijde + 1\n    turtle.left(10)\n    teller = teller + 1\nturtle.pencolor(\"green\")\nturtle.right(90)\nturtle.forward(200)")],
+    ok:"Wat een kunstwerk! Je bent een echte programmeur-kunstenaar." } })
 ];
 
 /* Titels van de hoofdstukken (klasoefeningen) en info over de werelden */
@@ -2061,6 +2779,7 @@ Veel plezier met de film!</pre>`,
 }
 ];
 OEFENINGEN.push(...WERELD_OEFENINGEN);
+OEFENINGEN.push(...TEKEN_OEFENINGEN);
 
 /* ---------------- Python in een worker ---------------- */
 let worker=null, pyReady=null;
@@ -2072,8 +2791,8 @@ function startWorker(){
     py.setStdout({write:b=>{ if(out.length>60000){ teveel=true; throw new Error("teveel") } out+=dec.decode(b,{stream:true});return b.length}});
     py.setStderr({write:b=>{out+=dec.decode(b,{stream:true});return b.length}});
     py.setStdin({stdin:()=>{if(!q.length)return undefined; const v=q.shift(); if(echo) out+=v+"\\n"; else out+="\\n\\u0007"; return v;}});
-    const wj=()=>{ if(!e.data.wsrc) return null; try{ return py.runPython("_wereld_json()") }catch(x){ return null } };
-    try{ py.runPython("for _k in [k for k in list(globals()) if not k.startswith('_')]: del globals()[_k]");
+    const wj=()=>{ if(!e.data.wsrc&&!e.data.behoud) return null; try{ return py.runPython("_wereld_json()") }catch(x){ return null } };
+    try{ if(!e.data.behoud) py.runPython("for _k in [k for k in list(globals()) if not k.startswith('_')]: del globals()[_k]");
       if(e.data.wsrc){ py.globals.set("_WSRC",e.data.wsrc); py.globals.set("_WSC",e.data.wsc); py.runPython("exec(compile(_WSRC, '<wereld>', 'exec'), globals())"); }
       await py.runPythonAsync(e.data.code); postMessage({type:"done",out,err:null,wereld:wj()}); }
     catch(err){ postMessage({type:"done",out:teveel?out.slice(0,3000)+"\\n…":out,err:teveel?"OneindigeLus: Je programma bleef maar uitvoer tonen en werd gestopt.":String(err.message||err),wereld:wj()}); }
@@ -2228,6 +2947,22 @@ function runPython(code,inputs,echo,wereld){
   }));
 }
 
+/* Een toets doorgeven aan een programma dat al gelopen heeft (turtle met onkey) */
+function runToets(toets){
+  if(!worker||!pyReady) return Promise.resolve(null);
+  return pyReady.then(()=>new Promise(res=>{
+    const t=setTimeout(()=>{worker.terminate();worker=null;res({out:"",err:{line:null,text:"Je functie bleef te lang lopen en werd gestopt.",type:"Tijd"},wereld:null})},8000);
+    worker.onmessage=e=>{if(e.data.type==="done"){clearTimeout(t); let w=null; try{w=e.data.wereld?JSON.parse(e.data.wereld):null}catch(x){} res({out:e.data.out,err:friendlyError(e.data.err),wereld:w})}};
+    worker.postMessage({code:"_toets("+JSON.stringify(toets)+")\n",inputs:[],echo:true,behoud:true});
+  }));
+}
+/* Referentietekening: de voorbeeldoplossing in dezelfde situatie */
+const REF_CACHE=new Map();
+function metToetsen(code,sc){ return sc.toetsen?code.replace(/\s*$/,"")+"\n\n_druk("+JSON.stringify(sc.toetsen)+")\n":code }
+async function refStaat(deel,sc){ if(!deel.ref) return null; const k=deel.ref+"|"+JSON.stringify(sc);
+  if(!REF_CACHE.has(k)){ const r=await runPython(metToetsen(deel.ref,sc),sc.invoer||[],true,{sc}); REF_CACHE.set(k,r.wereld?r.wereld.staat:null) }
+  return REF_CACHE.get(k) }
+
 /* ---------------- Nakijken ---------------- */
 function getallenIn(txt){ return (txt.match(/-?\d+(?:[.,]\d+)?/g)||[]).map(s=>parseFloat(s.replace(",","."))) }
 function bevat(out,verwacht,tol){ const g=getallenIn(out); return verwacht.every(v=>g.some(x=>Math.abs(x-v)<=tol)) }
@@ -2236,14 +2971,18 @@ function fmt(n){ return String(n).replace(".",",") }
 async function nakijkenWereld(code,deel){
   const stijl=KLASAFSPRAKEN?klasafspraken(code,S.naam):[];
   for(const [re,msg] of (deel.moet||[])) if(!re.test(code)) return {ok:false,msg};
+  const zonderCommentaar=code.split("\n").map(l=>l.replace(/#.*$/,"")).join("\n");
+  for(const [re,max,msg] of (deel.maxAantal||[])) if((zonderCommentaar.match(re)||[]).length>max) return {ok:false,msg};
+  const nRegels=code.split("\n").length;
   let laatste=null;
   for(let i=0;i<deel.scenarios.length;i++){ const sc=deel.scenarios[i];
-    const r=await runPython(code,[],true,{sc});
+    const r=await runPython(metToetsen(code,sc),sc.invoer||[],true,{sc});
+    if(r.err&&r.err.line>nRegels) r.err.line=null;
     const w=r.wereld||{log:[],staat:{}}, wat=`In situatie ${i+1} (${sc.naam})`, toon={out:r.out,err:r.err};
     const anim={i,sc,log:w.log,uitslag:"fout"};
     if(r.err&&r.err.type!=="WereldFout") return {ok:false,toon,anim,msg:`${wat} geeft je programma een foutmelding${r.err.line?" op regel "+r.err.line:""}. `+(r.err.uitleg||"Lees ze rustig en verbeter je code.")};
     if(r.err) return {ok:false,toon,anim,msg:`${wat} ging het mis${r.err.line?" op regel "+r.err.line:""}: ${r.err.text}`+(sc.tip?" "+sc.tip:"")};
-    const f=deel.doel(sc,w.staat||{},r.out||"");
+    const f=deel.doel(sc,w.staat||{},r.out||"",await refStaat(deel,sc));
     if(f) return {ok:false,toon,anim,msg:`${wat}: ${f}`+(sc.tip?" "+sc.tip:"")};
     laatste={i,sc,log:w.log,uitslag:"ok"};
   }
@@ -2388,7 +3127,7 @@ function codeBlok({waarde,onCode,invoer,onInvoer,controleer,uitvoeren}){
   if(controleer) act.querySelector(".chk").onclick=async()=>{ if(!ed.ta.value.trim()) return; bezig(true);
     try{ await controleer(ed.ta.value,out) } catch(e){ toonLaadFout(out,e) }
     bezig(false) };
-  wrap.ed=ed; wrap.act=act; wrap.out=out;
+  wrap.ed=ed; wrap.act=act; wrap.out=out; wrap.iv=iv;
   wrap.vergrendel=()=>{ed.ta.readOnly=true; const c=act.querySelector(".chk"); if(c){c.dataset.lock="1";c.disabled=true}};
   return wrap;
 }
@@ -2425,13 +3164,14 @@ function renderStart(m){
       if(geenKlas) c.querySelector("#klas").classList.add("mist"); if(geenNaam) c.querySelector("#naam").classList.add("mist");
       c.scrollIntoView({behavior:"smooth"}); setTimeout(()=>{const el=c.querySelector(geenKlas?"#klas":"#naam"); if(el) el.focus()},350); return}
     S.naam=S.naam.trim(); go(o.id) };
-  const klasOef=OEFENINGEN.filter(o=>!o.groep), wereldOef=OEFENINGEN.filter(o=>o.groep);
+  const klasOef=OEFENINGEN.filter(o=>!o.groep), wereldOef=OEFENINGEN.filter(o=>o.groep&&!o.teken), tekenOef=OEFENINGEN.filter(o=>o.teken);
   const telKlaar=l=>l.filter(o=>status(o)==="verstuurd").length, telOpen=l=>l.filter(o=>o.klaar).length;
   if(!S.tab) S.tab="klas"; if(!S.dicht) S.dicht={};
 
   const kaart=$(`<div class="card"><div class="tabs" role="tablist">
       <button type="button" data-tab="klas">📘 Klasoefeningen <span class="tel">${telKlaar(klasOef)}/${telOpen(klasOef)}</span></button>
       <button type="button" data-tab="werelden">🎮 Programmeerwerelden <span class="tel">${telKlaar(wereldOef)}/${telOpen(wereldOef)}</span></button>
+      <button type="button" data-tab="tekenen">🐢 Tekenen <span class="tel">${telKlaar(tekenOef)}/${telOpen(tekenOef)}</span></button>
     </div><div class="tabinhoud"></div></div>`);
   m.appendChild(kaart);
   const inhoud=kaart.querySelector(".tabinhoud");
@@ -2461,8 +3201,16 @@ function renderStart(m){
         b.onclick=()=>open(o); lv.appendChild(b) });
       grid.appendChild(t) });
   }
+  function tekenTekenen(){
+    inhoud.innerHTML=`<p class="w-intro">Teken vormen, sterren en spiralen met de <b>turtle</b>. Bij elke oefening hoort een filmpje 🎬 dat je zo vaak kunt bekijken als je wilt.</p>`+voortgang(tekenOef,"Tekenoefeningen");
+    const t=$(`<div class="wtegel" style="--wk:#2a9d4b"><div class="w-kop"><span class="w-icoon">🐢</span><div><div class="w-naam">Tekenen met Python</div><div class="w-sub">Van een lijn tot je eigen kunstwerk</div></div><span class="tel">${telKlaar(tekenOef)}/${tekenOef.length}</span></div><div class="w-levels tgrid"></div></div>`);
+    const lv=t.querySelector(".w-levels");
+    tekenOef.forEach((o,i)=>{ const s=status(o), naam=o.titel.replace(/^.*? - /,"");
+      const b=$(`<button type="button" class="lvl ${s}"><span class="lvl-nr">${s==="verstuurd"?"✔":i+1}</span><span class="lvl-t">${esc(naam)}</span>${/class="video"/.test(o.opdracht)?'<span title="Met filmpje">🎬</span>':""}${s==="verstuurd"?`<span class="lvl-c">${fmt(S.oef[o.id].verstuurd.cijfer)}</span>`:s==="klaar"?'<span class="lvl-c mid">versturen</span>':s==="bezig"?'<span class="lvl-c mid">bezig</span>':""}</button>`);
+      b.onclick=()=>open(o); lv.appendChild(b) });
+    inhoud.appendChild(t) }
   const tabs=[...kaart.querySelectorAll(".tabs button")];
-  const kies=tab=>{ S.tab=tab; save(); tabs.forEach(b=>b.classList.toggle("aan",b.dataset.tab===tab)); tab==="werelden"?tekenWerelden():tekenKlas() };
+  const kies=tab=>{ S.tab=tab; save(); tabs.forEach(b=>b.classList.toggle("aan",b.dataset.tab===tab)); tab==="werelden"?tekenWerelden():tab==="tekenen"?tekenTekenen():tekenKlas() };
   tabs.forEach(b=>b.onclick=()=>kies(b.dataset.tab));
   kies(S.tab);
 
@@ -2501,20 +3249,24 @@ function renderOef(m,oef){
   function bouwDeel(d,ps,titel){
     const hc=$(`<div class="card step ${ps.ok?"done":""}"><h3>${esc(titel)}</h3>${d.html}</div>`);
     /* programmeerwereld: speelveld met situaties */
-    let stage=null, kiesSit=null;
+    let stage=null, kiesSit=null, blok=null;
+    const zetInvoer=sc=>{ if(!blok||!sc.invoer) return; const v=sc.invoer.join("\n"); ps.invoer=v; blok.iv.querySelector("textarea").value=v; save() };
     if(d.wereld){
-      const wv=$(`<div class="wereld"><div class="sits"><span>Situatie:</span></div><div class="stage"></div></div>`); hc.appendChild(wv);
+      const wv=$(`<div class="wereld"><div class="sits"><span>Situatie:</span></div><div class="stage ${d.wereld==="tekenen"?"blad":""}"></div></div>`); hc.appendChild(wv);
       stage=wv.querySelector(".stage"); const sits=wv.querySelector(".sits");
       if(ps.sit==null||ps.sit>=d.scenarios.length) ps.sit=0;
-      kiesSit=(i,teken)=>{ ps.sit=i; save(); sits.querySelectorAll("button").forEach((b,k)=>b.classList.toggle("aan",k===i)); if(teken!==false) toonWereld(stage,d.wereld,d.scenarios[i]) };
+      kiesSit=(i,teken)=>{ ps.sit=i; save(); sits.querySelectorAll("button").forEach((b,k)=>b.classList.toggle("aan",k===i)); zetInvoer(d.scenarios[i]); if(teken!==false) toonWereld(stage,d.wereld,d.scenarios[i]) };
       d.scenarios.forEach((sc,i)=>{ const b=$(`<button type="button">${i+1}. ${esc(sc.naam)}</button>`); b.onclick=()=>kiesSit(i); sits.appendChild(b) });
       kiesSit(ps.sit);
     }
-    const blok=codeBlok({waarde:ps.code??d.starter, onCode:v=>{ps.code=v;save()}, invoer:ps.invoer??d.invoer, onInvoer:v=>{ps.invoer=v;save()},
-      uitvoeren:d.wereld?async(code,out)=>{ const sc=d.scenarios[ps.sit]; const r=await runPython(code,[],true,{sc}); const w=r.wereld||{log:[],staat:{}};
+    blok=codeBlok({waarde:ps.code??d.starter, onCode:v=>{ps.code=v;save()}, invoer:ps.invoer??d.invoer, onInvoer:v=>{ps.invoer=v;save()},
+      uitvoeren:d.wereld?async(code,out)=>{ let sc=d.scenarios[ps.sit]; if(sc.invoer) sc={...sc,invoer:blok.iv.regels()}; const r=await runPython(code,sc.invoer||[],true,{sc}); const w=r.wereld||{log:[],staat:{}};
+        if(d.toetsen){ toonUit(out,{out:r.out+(r.err?"":(r.out?"\n":"")+"⌨️ Klik op het tekenblad en gebruik je pijltjestoetsen (en de spatiebalk)."),err:r.err});
+          speelWereld(stage,d.wereld,sc,w.log,null); if(!r.err) toetsenAan(stage,sc,w.log,out); return }
         let uitslag="fout", doelMsg=null;
-        if(!r.err){ doelMsg=d.doel(sc,w.staat||{},r.out||""); uitslag=doelMsg?"fout":"ok" }
-        toonUit(out,{out:r.out+(doelMsg?(r.out?"\n":"")+"🎯 "+doelMsg:(r.err?"":(r.out?"\n":"")+"🎯 Gelukt in deze situatie! Probeer ook de andere situaties.")),err:r.err});
+        if(!r.err){ doelMsg=d.doel(sc,w.staat||{},r.out||"",await refStaat(d,sc)); uitslag=doelMsg?"fout":"ok" }
+        const meer=d.scenarios.length>1?" Probeer ook de andere situaties.":"";
+        toonUit(out,{out:r.out+(doelMsg?(r.out?"\n":"")+"🎯 "+doelMsg:(r.err?"":(r.out?"\n":"")+(d.wereld==="tekenen"?"🎯 Je tekening klopt!":"🎯 Gelukt in deze situatie!")+meer)),err:r.err});
         speelWereld(stage,d.wereld,sc,w.log,uitslag) }:null,
       controleer:async(code,out)=>{
         const r=await nakijken(code,d,d.invoerNamen);
@@ -2531,6 +3283,7 @@ function renderOef(m,oef){
         else { toonFb(hfb,r); hfb.insertAdjacentHTML("beforeend",r.stijlFout?(eerste||`<div class="ex" style="margin-top:6px;font-size:14px">Verbeter de overtredingen hierboven. Opnieuw controleren kost geen pogingen meer.</div>`):pogingInfo()); tekenAf() }
       }});
     hc.appendChild(blok);
+    if(d.wereld&&ps.invoer==null) zetInvoer(d.scenarios[ps.sit]);
     const hfb=$(`<div class="fb"></div>`); hc.appendChild(hfb);
     const pogTxt=()=>` <span style="color:var(--muted)">(${ps.controles} ${ps.controles===1?"poging":"pogingen"})</span>`;
     if(ps.ok){ blok.vergrendel(); toonFb(hfb,{ok:true,msg:d.ok},pogTxt()) }
