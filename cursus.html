@@ -110,6 +110,27 @@ textarea.code{min-height:110px;background:var(--code-bg)}
 .pill.ok{background:var(--ok-soft);color:var(--ok)}
 .pill.bad{background:var(--bad-soft);color:var(--bad)}
 .pill.mid{background:var(--warn-soft);color:var(--accent)}
+.rep-sum{display:flex;gap:28px;flex-wrap:wrap;margin:6px 0 10px}
+.rep-sum>div{display:flex;flex-direction:column}
+.rep-sub{font-size:14px;color:var(--muted)}
+.rep-bar{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.rep-bar>div{height:100%;background:var(--ok);border-radius:999px}
+.rep-tip{font-size:14px;color:var(--muted);margin:10px 0 0}
+.rep-list{display:flex;flex-direction:column;gap:6px}
+.rep-ch{border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.rep-ch>summary{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;list-style:none;flex-wrap:wrap}
+.rep-ch>summary::-webkit-details-marker{display:none}
+.rep-ch>summary::before{content:"▸";color:var(--muted);transition:transform .15s}
+.rep-ch[open]>summary::before{transform:rotate(90deg)}
+.rep-t{flex:1;min-width:180px;font-weight:600}
+.rep-ch.nieuw .rep-t{color:var(--muted);font-weight:500}
+.rep-pt{font-weight:700;font-size:14px;min-width:54px;text-align:right}
+.rep-mini{width:70px;height:6px;border-radius:999px;background:var(--line);overflow:hidden;display:inline-block}
+.rep-mini>span{display:block;height:100%;background:var(--ok)}
+.pill.rep-nieuw{background:var(--line);color:var(--muted)}
+.rep-body{padding:2px 14px 10px;background:var(--card);border-top:1px solid var(--line);border-radius:0 0 10px 10px}
+.rep-rest{margin-top:6px}
+.rep-rest>summary{cursor:pointer;color:var(--brand);font-weight:600;font-size:14.5px;padding:4px 0}
 .ed{display:flex;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);overflow:hidden}
 .ed:focus-within{border-color:var(--brand)}
 .gut{padding:10px 8px 10px 10px;text-align:right;color:var(--muted);user-select:none;min-width:2.6em;white-space:pre;overflow:hidden;font:14.5px/1.55 ui-monospace,Consolas,"DejaVu Sans Mono",monospace;border-right:1px solid var(--line)}
@@ -1891,25 +1912,40 @@ function reportText(ids){ids=ids||CHAPTERS.map(c=>c.id); const d=new Date(); let
   return t}
 
 function renderReport(m){
-  const c=$(`<div class="card"><div class="kicker">Overzicht</div><h2>Mijn resultaat</h2><p>${S.name?("Leerling: <b>"+esc(S.name)+"</b>"):"<i>Vul je naam in op de startpagina.</i>"}</p></div>`); m.appendChild(c);
-  CHAPTERS.forEach(ch=>{const s=chapterStats(ch); const pct=s.mx?Math.round(100*s.sc/s.mx):0;
-    const card=$(`<div class="card"><h3>${esc(ch.title)}</h3><div style="display:flex;gap:20px;align-items:baseline;flex-wrap:wrap"><span class="score">${fmt(s.sc)}/${fmt(s.mx)}</span><span>${pct}% van de punten • ${s.done} van ${s.total} onderdelen afgewerkt</span></div></div>`);
-    s.lines.forEach(l=>{ if(l.open!==undefined){card.appendChild($(`<div class="rep-line"><span>V${l.n}</span><span style="margin-left:0;white-space:normal;color:var(--ink)">${esc(l.q)}<br><i style="color:var(--muted)">${esc(l.open||"nog niet ingevuld")}</i></span></div>`))}
-      else card.appendChild($(`<div class="rep-line"><span>V${l.n}</span><span style="margin-left:0;white-space:normal;color:var(--ink)">${esc(l.q)}</span><span><span class="pill ${l.ok?"ok":l.part?"mid":l.status.includes("afgevinkt")?"mid":"bad"}">${esc(l.status)}</span></span></div>`))});
-    m.appendChild(card)});
+  const stats=CHAPTERS.map(ch=>({ch,s:chapterStats(ch)}));
+  const totSc=stats.reduce((x,o)=>x+o.s.sc,0), totMx=stats.reduce((x,o)=>x+o.s.mx,0);
+  const fase=s=>s.done===0?"nieuw":s.done>=s.total?"klaar":"bezig";
+  const nKlaar=stats.filter(o=>fase(o.s)==="klaar").length, nBezig=stats.filter(o=>fase(o.s)==="bezig").length;
+  const pctTot=totMx?Math.round(100*totSc/totMx):0;
+  const c=$(`<div class="card"><div class="kicker">Overzicht</div><h2>Mijn resultaat</h2><p>${S.name?("Leerling: <b>"+esc(S.name)+"</b>"):"<i>Vul je naam in op de startpagina.</i>"}</p>
+    <div class="rep-sum"><div><span class="score">${fmt(totSc)}/${fmt(totMx)}</span><span class="rep-sub">punten (alle lessen samen)</span></div><div><span class="score">${nKlaar}</span><span class="rep-sub">van ${CHAPTERS.length} lessen klaar</span></div><div><span class="score">${nBezig}</span><span class="rep-sub">${nBezig===1?"les":"lessen"} bezig</span></div></div>
+    <div class="rep-bar"><div style="width:${pctTot}%"></div></div>
+    <p class="rep-tip">Klik op een les hieronder om je antwoorden per vraag te zien.</p></div>`); m.appendChild(c);
+  const lijst=$(`<div class="card"><h3>Per les</h3><div class="rep-list"></div></div>`); const rl=lijst.querySelector(".rep-list");
+  stats.forEach(({ch,s})=>{ const pct=s.mx?Math.round(100*s.sc/s.mx):0, f=fase(s);
+    const chip=f==="klaar"?'<span class="pill ok">✔ klaar</span>':f==="bezig"?`<span class="pill mid">bezig · ${s.done}/${s.total}</span>`:'<span class="pill rep-nieuw">nog niet gestart</span>';
+    const d=$(`<details class="rep-ch ${f}"><summary><span class="rep-t">${esc(ch.title)}</span><span class="rep-pt">${fmt(s.sc)}/${fmt(s.mx)}</span><span class="rep-mini"><span style="width:${pct}%"></span></span>${chip}</summary><div class="rep-body"><p class="rep-sub" style="margin:0 0 6px">${pct}% van de punten • ${s.done} van ${s.total} onderdelen afgewerkt</p></div></details>`);
+    const body=d.querySelector(".rep-body");
+    s.lines.forEach(l=>{ if(l.open!==undefined){body.appendChild($(`<div class="rep-line"><span>V${l.n}</span><span style="margin-left:0;white-space:normal;color:var(--ink)">${esc(l.q)}<br><i style="color:var(--muted)">${esc(l.open||"nog niet ingevuld")}</i></span></div>`))}
+      else body.appendChild($(`<div class="rep-line"><span>V${l.n}</span><span style="margin-left:0;white-space:normal;color:var(--ink)">${esc(l.q)}</span><span><span class="pill ${l.ok?"ok":l.part?"mid":l.status.includes("afgevinkt")?"mid":"bad"}">${esc(l.status)}</span></span></div>`))});
+    rl.appendChild(d) });
   const send=$(`<div class="card" id="sendcard"><h3>Stuur je resultaat naar je leerkracht</h3>
-   <p><b>Welke lessen wil je doorsturen?</b> Vink de lessen aan die je sinds de vorige keer gemaakt hebt.</p><div id="chlist"></div>
+   <p><b>Welke lessen wil je doorsturen?</b> De lessen waaraan je sinds de vorige keer gewerkt hebt, zijn al aangevinkt.</p><div id="chlist"></div>
    <div class="actions" style="margin-top:12px"><button class="btn" id="outlook">✉ Mail via Outlook (schoolaccount)</button><button class="btn secondary" id="copy">Kopieer resultaat</button><button class="btn secondary" id="dl">Download als bestand</button></div>
    <p style="font-size:14px;color:var(--muted);margin-top:8px">Outlook opent in een nieuw tabblad met een kant-en-klare mail aan je leerkracht. Controleer of je aangemeld bent met je schoolaccount en klik op <b>Verzenden</b>. Lukt dat niet? Kopieer dan je resultaat en plak het in een bericht via Smartschool. <a href="#" id="mailto">Ander mailprogramma gebruiken</a></p>
    <div class="fb" id="sendfb"></div>
    <details style="margin-top:14px"><summary>Opnieuw beginnen</summary><p style="font-size:14px">Hiermee wis je al je antwoorden op deze computer. Doe dit alleen als je leerkracht dat vraagt.</p><button class="btn secondary" id="reset">Alles wissen</button></details></div>`);
-  m.appendChild(send);
+  m.appendChild(send); m.appendChild(lijst);
   S.sent=S.sent||{};
   const list=send.querySelector("#chlist");
+  const rest=$(`<details class="rep-rest"><summary>Andere lessen tonen</summary><div></div></details>`), restBox=rest.querySelector("div"); let nRest=0;
   CHAPTERS.forEach(ch=>{const st=chapterStats(ch); const sig=chapterSig(ch); const prev=S.sent[ch.id];
     const active=allItems(ch).some(it=>{const x=S.answers[it.id]; return x&&((x.attempts||0)>0||x.ran||(typeof x.value==="string"&&x.value.trim()&&it.type!=="code"&&it.type!=="play")||(Array.isArray(x.value)&&x.value.length)||(it.type==="tf"||it.type==="match")&&x.value&&Object.keys(x.value).length)}); const changed=!prev||prev.sig!==sig;
     const row=$(`<label class="check"><input type="checkbox" value="${ch.id}"><span><b>${esc(ch.title)}</b><br><span style="font-size:14px;color:var(--muted)">${st.sc}/${st.mx} punten • ${st.done} van ${st.total} onderdelen afgewerkt${prev?` • al doorgestuurd op ${esc(prev.at)}${changed?" (sindsdien verder gewerkt)":""}`:""}</span></span></label>`);
-    const cb=row.querySelector("input"); cb.checked=active&&changed; list.appendChild(row)});
+    const cb=row.querySelector("input"); cb.checked=active&&changed;
+    if(active||prev) list.appendChild(row); else { restBox.appendChild(row); nRest++ } });
+  if(!list.children.length) list.appendChild($(`<p class="rep-sub" style="margin:0 0 6px">Je bent nog met geen enkele les begonnen.</p>`));
+  if(nRest){ rest.querySelector("summary").textContent=`Andere lessen tonen (${nRest} nog niet begonnen)`; list.appendChild(rest) }
   const sel=()=>[...list.querySelectorAll("input:checked")].map(i=>i.value);
   const sf=send.querySelector("#sendfb");
   const need=()=>{const ids=sel(); if(!ids.length){sf.className="fb info";sf.textContent="Vink eerst minstens één les aan.";return null} return ids};
