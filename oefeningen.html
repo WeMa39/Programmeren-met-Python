@@ -1919,6 +1919,23 @@ const WERELD_INFO={
 /* ---------------- Illustraties bij de oefeningen (eigen tekeningen) ---------------- */
 const B=(inhoud,bg,label)=>`<div class="beeld"><svg viewBox="0 0 600 190" role="img" aria-label="${label}" style="font-family:system-ui,sans-serif"><rect width="600" height="190" fill="${bg}"/>${inhoud}</svg></div>`;
 const BEELD={
+vragenlijst:B(`
+  <g transform="translate(60,16)">
+    <rect width="170" height="160" rx="10" fill="#c98b4a"/>
+    <rect x="12" y="16" width="146" height="134" rx="4" fill="#fff"/>
+    <rect x="55" y="4" width="60" height="20" rx="5" fill="#8a8f98"/>
+    ${[["Favoriete kleur?",48],["Straatnaam?",86],["Hobby?",124]].map(([q,y])=>`<text x="24" y="${y}" font-size="12.5" fill="#1d2433" font-weight="700">${q}</text><line x1="24" y1="${y+12}" x2="146" y2="${y+12}" stroke="#c9d1dc" stroke-dasharray="4 3"/>`).join("")}
+  </g>
+  ${[["blauw",40,"#3b6fd6"],["Kerkstraat",88,"#3fa45b"],["lezen",136,"#d08a2c"]].map(([a,y,k],i)=>`<g transform="translate(270,${y})"><text x="0" y="4" font-size="20" fill="#9aa1ab">→</text><rect x="34" y="-16" width="${a.length*9+30}" height="30" rx="15" fill="${k}"/><text x="${34+(a.length*9+30)/2}" y="4" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">${a}</text></g>`).join("")}
+  ${[["favoriete_kleur",40],["straatnaam",88],["hobby",136]].map(([v,y])=>`<g transform="translate(470,${y})"><rect x="-6" y="-16" width="128" height="30" rx="6" fill="#fff" stroke="#1f4e79" stroke-width="2"/><text x="58" y="4" text-anchor="middle" font-size="12" font-family="ui-monospace,monospace" fill="#1f4e79">${v}</text></g>`).join("")}`,"#f3f7fb","Een klembord met drie vragen; elk antwoord gaat in een eigen variabele"),
+winkelwagen:B(`
+  ${[["🍎","5 × €1.50",70],["🍞","1 × €2",190],["🥛","2 × €2.25",310]].map(([e,t,x])=>`<g transform="translate(${x},34)"><rect x="-48" y="-14" width="96" height="96" rx="12" fill="#fff" stroke="#c9d1dc" stroke-width="2"/><text y="38" text-anchor="middle" font-size="40">${e}</text><text y="70" text-anchor="middle" font-size="14" font-weight="700" fill="#1d2433">${t}</text></g>`).join("")}
+  <g transform="translate(420,40)">
+    <path d="M-10 0 h20 l18 70 h112 l16 -50 h-138" fill="none" stroke="#1f4e79" stroke-width="5" stroke-linejoin="round"/>
+    <text x="36" y="36" font-size="22">🍎</text><text x="70" y="36" font-size="22">🍞</text><text x="104" y="36" font-size="22">🥛</text>
+    <circle cx="36" cy="88" r="9" fill="#1f4e79"/><circle cx="118" cy="88" r="9" fill="#1f4e79"/>
+  </g>
+  <text x="300" y="170" text-anchor="middle" font-size="15" font-weight="800" fill="#1f4e79">prijs × aantal per product, dan alles optellen = totaal</text>`,"#f4f8ef","Appels, brood en melk met hun prijs en aantal, en een winkelkar"),
 kassabon:B(`
   <g transform="translate(70,22)">
     <path d="M0 0 h150 v146 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 l-12.5 -8 l-12.5 8 z" fill="#fff" stroke="#c9d1dc" stroke-width="2"/>
@@ -2125,8 +2142,123 @@ kleinste:B(`
 const LUS_START="teller = 0\nwhile teller <= 10:\n    print(teller)\n    teller = teller + 1\nprint(\"Klaar!\")";
 const OEFENINGEN = [
 { id:"3.1", titel:"3.1 De Magische Rekenmachine", klaar:false },
-{ id:"4.1", titel:"4.1 De Korte Vragenlijst", klaar:false },
-{ id:"4.2", titel:"4.2 De Slimme Winkelwagen", klaar:false },
+{ id:"4.1", titel:"4.1 De Korte Vragenlijst", klaar:true,
+  opdracht:`${BEELD.vragenlijst}<p>Schrijf een Python-programma dat de gebruiker een paar <b>vragen</b> stelt. Sla de antwoorden op in <b>variabelen</b> en gebruik die daarna om een overzicht te printen van de ingevulde antwoorden.</p>${ZO_WERK_JE}`,
+  stappen:[
+    { titel:"Stap 1 – Tekst of variabele?", type:"probeer",
+      html:`<p>Het programma hieronder vraagt je favoriete kleur en slaat het antwoord op in de variabele <code>favoriete_kleur</code>. Daarna staan er twee bijna dezelfde <code>print()</code>-regels. In het vak <b>Invoer</b> staat al wat de gebruiker intypt: <code>blauw</code>.</p><p>Klik op <b>▶ Uitvoeren</b> en vergelijk de twee laatste regels van de uitvoer.</p>`,
+      starter:'favoriete_kleur = input("Wat is je favoriete kleur? ")\nprint("Jouw favoriete kleur is", "favoriete_kleur", ".")\nprint("Jouw favoriete kleur is", favoriete_kleur, ".")',
+      invoer:"blauw",
+      vraag:{ q:"Welke print()-regel toont het antwoord dat de gebruiker intypte?", opties:[
+        "De eerste: daar staat favoriete_kleur tussen aanhalingstekens",
+        "De tweede: daar staat favoriete_kleur zonder aanhalingstekens",
+        "Allebei: ze tonen hetzelfde"], juist:1,
+        uitleg:"Juist: tussen aanhalingstekens is favoriete_kleur gewoon tekst, en Python toont die letterlijk. Zonder aanhalingstekens is het de naam van een variabele, en Python toont wat erin zit: blauw." } }
+  ],
+  hoofd:{ titel:"Stap 2 – Schrijf de vragenlijst",
+    html:`<ol>
+    <li>Vraag met <code>input("Wat is je favoriete kleur? ")</code> naar de favoriete kleur en sla het antwoord op in <code>favoriete_kleur</code>.</li>
+    <li>Vraag met <code>input("Wat is de naam van de straat waar je woont? ")</code> naar de straat en sla het antwoord op in <code>straatnaam</code>.</li>
+    <li>Vraag met <code>input("Wat is je favoriete hobby? ")</code> naar de hobby en sla het antwoord op in <code>hobby</code>.</li>
+    <li>Toon met <code>print()</code> alle antwoorden. Combineer telkens tekst met de variabele, zodat duidelijk is wat elk antwoord betekent. Bijvoorbeeld: <code>print("Jouw favoriete kleur is", favoriete_kleur, ".")</code></li></ol>
+    <p>Voorbeeld van de uitvoer als de gebruiker <code>blauw</code>, <code>Kerkstraat</code> en <code>lezen</code> intypt:</p><pre>Wat is je favoriete kleur? blauw
+Wat is de naam van de straat waar je woont? Kerkstraat
+Wat is je favoriete hobby? lezen
+-------------------------
+Jouw favoriete kleur is blauw .
+Jouw straatnaam is Kerkstraat .
+Jouw favoriete hobby is lezen .
+-------------------------</pre>
+    <div class="box warm"><b>Hoe wordt dit nagekeken?</b><br>Bij <b>✓ Controleer</b> voert de computer je programma drie keer uit, telkens met andere antwoorden (bv. <code>groen</code>, <code>Dorpsstraat</code> en <code>voetbal</code>). Je programma moet dus echt tonen wat de gebruiker intypt. Daarna kijkt de computer of je code de <b>klasafspraken</b> volgt: zet daarom na een variabele op het einde nog een leesteken, zoals <code>"."</code>.</div>`,
+    starter:'',
+    invoer:"blauw\nKerkstraat\nlezen",
+    invoerNamen:["kleur","straat","hobby"],
+    tests:[
+      {invoer:["blauw","Kerkstraat","lezen"], aantalInvoer:3, woorden:[["blauw"],["kerkstraat"],["lezen"]], tip:"Toon na de vragen een overzicht met alle drie de antwoorden."},
+      {invoer:["groen","Dorpsstraat","voetbal"], aantalInvoer:3, woorden:[["groen"],["dorpsstraat"],["voetbal"]], tip:"Toon je de variabelen, en niet de antwoorden uit het voorbeeld? Zet de naam van een variabele niet tussen aanhalingstekens."},
+      {invoer:["paars","Stationsstraat","gamen"], aantalInvoer:3, woorden:[["paars"],["stationsstraat"],["gamen"]], tip:"Toon je de variabelen, en niet de antwoorden uit het voorbeeld? Zet de naam van een variabele niet tussen aanhalingstekens."}
+    ],
+    moet:[
+      [/(?:\binput\s*\([\s\S]*?){3}/, "Je programma moet drie keer input() gebruiken: voor de kleur, de straat en de hobby."],
+      [/\bfavoriete_kleur\s*=\s*input\s*\(/, "Sla het antwoord op de eerste vraag op in een variabele met de naam favoriete_kleur."],
+      [/\bstraatnaam\s*=\s*input\s*\(/, "Sla het antwoord op de tweede vraag op in een variabele met de naam straatnaam."],
+      [/\bhobby\s*=\s*input\s*\(/, "Sla het antwoord op de derde vraag op in een variabele met de naam hobby."],
+      [/\bprint\s*\(/, "Gebruik print() om de antwoorden te tonen."]
+    ],
+    fouten:[
+      [/can only concatenate str/, "Je plakt tekst aan elkaar met +. Gebruik in print() liever komma's: print(\"Jouw favoriete kleur is\", favoriete_kleur, \".\")."]
+    ],
+    hulp:[
+      "Je hebt twee soorten opdrachten nodig: drie keer <code>input()</code> om te vragen, en een paar keer <code>print()</code> om te tonen. Kijk ook terug naar stap 1: hoe toon je wat er <i>in</i> een variabele zit?",
+      "Een vraag stellen en het antwoord bewaren doe je zo: <code>favoriete_kleur = input(\"Wat is je favoriete kleur? \")</code>. Tonen doe je zo: <code>print(\"Jouw favoriete kleur is\", favoriete_kleur, \".\")</code>. Doe hetzelfde voor <code>straatnaam</code> en <code>hobby</code>.",
+      "Zo kan het:<pre># {NAAM}\nfavoriete_kleur = input(\"Wat is je favoriete kleur? \")\nstraatnaam = input(\"Wat is de naam van de straat waar je woont? \")\nhobby = input(\"Wat is je favoriete hobby? \")\n\n# Toon een overzicht van de antwoorden\nprint(\"-------------------------\")\nprint(\"Jouw favoriete kleur is\", favoriete_kleur, \".\")\nprint(\"Jouw straatnaam is\", straatnaam, \".\")\nprint(\"Jouw favoriete hobby is\", hobby, \".\")\nprint(\"-------------------------\")</pre>"
+    ],
+    ok:"Je vragenlijst toont netjes alle antwoorden die de gebruiker intypt!" },
+  extra:{ titel:"Extra uitdaging (optioneel, +1 punt)",
+    html:`<p>Gebruik <b>één enkele</b> <code>print()</code> om alle antwoorden in <b>één zin</b> te tonen. Bijvoorbeeld:</p><pre>print("Jouw favoriete kleur is", favoriete_kleur, ", je woont in de", straatnaam, "en je hobby is", hobby, ".")</pre><p>Je mag je overzicht van hierboven laten staan.</p>`,
+    tests:[ {invoer:["blauw","Kerkstraat","lezen"], woorden:[["blauw"],["kerkstraat"],["lezen"]]}, {invoer:["groen","Dorpsstraat","voetbal"], woorden:[["groen"],["dorpsstraat"],["voetbal"]]} ],
+    moet:[[/^[^\n#]*\bprint\s*\((?=[^\n]*\bfavoriete_kleur\b)(?=[^\n]*\bstraatnaam\b)(?=[^\n]*\bhobby\b)/m, "Zet favoriete_kleur, straatnaam en hobby samen in één print() op één regel."]],
+    ok:"Mooi! Je toont alle antwoorden in één zin." }
+},
+{ id:"4.2", titel:"4.2 De Slimme Winkelwagen", klaar:true,
+  opdracht:`${BEELD.winkelwagen}<p>Schrijf een Python-programma dat de <b>totale kosten</b> van een boodschappenlijst berekent. Je gebruikt verschillende soorten gegevens (<b>integers</b> en <b>floats</b>) en combineert ze correct.</p>${ZO_WERK_JE}`,
+  stappen:[
+    { titel:"Stap 1 – Gehele getallen en kommagetallen", type:"probeer",
+      html:`<p>Een brood kost 2 euro, een appel 1.50 euro. Met <code>type()</code> vraag je aan Python welk soort gegevens in een variabele zit: <code>int</code> is een <b>geheel getal</b>, <code>float</code> is een <b>kommagetal</b>.</p><p>Klik op <b>▶ Uitvoeren</b> en bekijk wat Python toont.</p>`,
+      starter:'prijs_brood = 2\nprijs_appel = 1.50\nprint(type(prijs_brood))\nprint(type(prijs_appel))\nprint(prijs_appel * 5)\nprint(type(prijs_appel * 5))',
+      invoer:"",
+      vraag:{ q:"Wat krijg je als je een float (1.50) vermenigvuldigt met een int (5)?", opties:[
+        "Een int: 7",
+        "Een float: 7.5",
+        "Een foutmelding, want je mag die twee niet combineren"], juist:1,
+        uitleg:"Juist: een int en een float kun je gewoon met elkaar vermenigvuldigen. Het resultaat is een float, want het kan cijfers na de komma hebben: 1.50 * 5 = 7.5." } }
+  ],
+  hoofd:{ titel:"Stap 2 – Schrijf de slimme winkelwagen",
+    html:`<ol>
+    <li>Maak deze variabelen aan:<ul><li><code>prijs_appel = 1.50</code> (een float)</li><li><code>prijs_brood = 2</code> (een integer)</li><li><code>prijs_melk = 2.25</code> (een float)</li><li><code>aantal_appels = 5</code>, <code>aantal_broden = 1</code> en <code>aantal_melk = 2</code></li></ul></li>
+    <li>Bereken de totale prijs per product en sla die op in nieuwe variabelen:<ul><li><code>totaal_appels = prijs_appel * aantal_appels</code></li><li><code>totaal_brood = prijs_brood * aantal_broden</code></li><li><code>totaal_melk = prijs_melk * aantal_melk</code></li></ul></li>
+    <li>Tel de drie totalen op in een variabele <code>totaal</code>.</li>
+    <li>Toon met <code>print()</code> een overzichtelijke bon. Combineer de variabelen met duidelijke tekst en toon ook het eindtotaal.</li></ol>
+    <p>Voorbeeld van de uitvoer:</p><pre>Boodschappenlijst:
+Appels: 5 stuks voor 7.5 euro.
+Brood: 1 stuks voor 2 euro.
+Melk: 2 stuks voor 4.5 euro.
+-------------------------
+Totaal te betalen: 14.0 euro.
+-------------------------</pre>
+    <div class="box warm"><b>Hoe wordt dit nagekeken?</b><br>Bij <b>✓ Controleer</b> kijkt de computer of je de variabelen met de juiste namen aanmaakt, of je de totalen <b>berekent</b> met die variabelen (dus niet zelf uitrekent en intypt) en of alle bedragen op je bon staan. Daarna kijkt hij of je code de <b>klasafspraken</b> volgt. Ook een titel zoals <code>"Boodschappenlijst:"</code> eindigt dus met een leesteken.</div>`,
+    starter:'',
+    invoer:"",
+    tests:[
+      {invoer:[], naam:"je programma", getallen:[7.5,2,4.5,14], woorden:[["appel"],["brood"],["melk"],["totaal"]], tip:"Toon voor elk product het aantal en de totale prijs, en daarna het eindtotaal."}
+    ],
+    moet:[
+      [/\bprijs_appel\s*=\s*1\.50?\b/, "Maak de variabele prijs_appel aan met de waarde 1.50."],
+      [/\bprijs_brood\s*=\s*2\b(?!\.)/, "Maak de variabele prijs_brood aan met de waarde 2 (een integer)."],
+      [/\bprijs_melk\s*=\s*2\.25\b/, "Maak de variabele prijs_melk aan met de waarde 2.25."],
+      [/\baantal_appels\s*=\s*5\b/, "Maak de variabele aantal_appels aan met de waarde 5."],
+      [/\baantal_broden\s*=\s*1\b/, "Maak de variabele aantal_broden aan met de waarde 1."],
+      [/\baantal_melk\s*=\s*2\b/, "Maak de variabele aantal_melk aan met de waarde 2."],
+      [/\btotaal_appels\s*=\s*(?:prijs_appel\s*\*\s*aantal_appels|aantal_appels\s*\*\s*prijs_appel)\b/, "Bereken totaal_appels met de variabelen: totaal_appels = prijs_appel * aantal_appels"],
+      [/\btotaal_brood\s*=\s*(?:prijs_brood\s*\*\s*aantal_broden|aantal_broden\s*\*\s*prijs_brood)\b/, "Bereken totaal_brood met de variabelen: totaal_brood = prijs_brood * aantal_broden"],
+      [/\btotaal_melk\s*=\s*(?:prijs_melk\s*\*\s*aantal_melk|aantal_melk\s*\*\s*prijs_melk)\b/, "Bereken totaal_melk met de variabelen: totaal_melk = prijs_melk * aantal_melk"],
+      [/^[ \t]*totaal\s*=(?=[^\n]*\btotaal_appels\b)(?=[^\n]*\btotaal_brood\b)(?=[^\n]*\btotaal_melk\b)[^\n]*\+/m, "Tel de drie totalen op in een variabele totaal: totaal = totaal_appels + totaal_brood + totaal_melk"]
+    ],
+    fouten:[
+      [/can only concatenate str/, "Je plakt tekst en een getal aan elkaar met +. Gebruik in print() komma's: print(\"Totaal te betalen:\", totaal, \"euro.\")."]
+    ],
+    hulp:[
+      "Werk in drie blokken: eerst de zes variabelen met prijzen en aantallen, dan de berekeningen, en pas op het einde de <code>print()</code>-regels. Een kommagetal schrijf je in Python met een <b>punt</b>: <code>1.50</code>.",
+      "De berekeningen staan letterlijk in de opdracht, bv. <code>totaal_appels = prijs_appel * aantal_appels</code>. Het eindtotaal is <code>totaal = totaal_appels + totaal_brood + totaal_melk</code>. Tonen doe je zo: <code>print(\"Appels:\", aantal_appels, \"stuks voor\", totaal_appels, \"euro.\")</code>",
+      "Zo kan het:<pre># {NAAM}\nprijs_appel = 1.50\nprijs_brood = 2\nprijs_melk = 2.25\naantal_appels = 5\naantal_broden = 1\naantal_melk = 2\n\n# Bereken de totale prijs per product\ntotaal_appels = prijs_appel * aantal_appels\ntotaal_brood = prijs_brood * aantal_broden\ntotaal_melk = prijs_melk * aantal_melk\ntotaal = totaal_appels + totaal_brood + totaal_melk\n\n# Toon de bon\nprint(\"Boodschappenlijst:\")\nprint(\"Appels:\", aantal_appels, \"stuks voor\", totaal_appels, \"euro.\")\nprint(\"Brood:\", aantal_broden, \"stuks voor\", totaal_brood, \"euro.\")\nprint(\"Melk:\", aantal_melk, \"stuks voor\", totaal_melk, \"euro.\")\nprint(\"-------------------------\")\nprint(\"Totaal te betalen:\", totaal, \"euro.\")\nprint(\"-------------------------\")</pre>"
+    ],
+    ok:"Je winkelwagen rekent alles correct uit!" },
+  extra:{ titel:"Extra uitdaging (optioneel, +1 punt)",
+    html:`<p>Voeg <b>21% btw</b> toe aan het totaalbedrag en toon ook dit bedrag op je bon. Toon:</p><ul><li>het <b>btw-bedrag</b> (21% van het totaal),</li><li>het totaal <b>inclusief</b> btw.</li></ul><p>Tip: 21% van een bedrag bereken je met <code>bedrag * 0.21</code>. Je mag afronden met <code>round(getal, 2)</code>. Bijvoorbeeld: <code>print("Het btw-bedrag is", btw, "euro.")</code></p>`,
+    tests:[ {invoer:[], naam:"je programma", getallen:[14,2.94,16.94]} ],
+    moet:[[/0?\.21|1\.21|21\s*\/\s*100/, "Bereken de btw met 21%: bijvoorbeeld totaal * 0.21."]],
+    ok:"Prima! Je bon toont nu ook de btw." }
+},
 { id:"4.3", titel:"4.3 De Kassabon", klaar:true,
   opdracht:`${BEELD.kassabon}<p>Schrijf een Python-programma dat de gebruiker vraagt naar de <b>prijs</b> van een product en het <b>aantal</b> gekochte stuks. Het programma berekent de totale prijs en toont die netjes op het scherm.</p>
   <div class="box"><b>Zo werk je</b><br>Volg de stappen hieronder. Met <b>▶ Uitvoeren</b> probeer je je code uit, zo vaak je wilt. Met <b>✓ Controleer</b> laat je ze nakijken. Lukt het niet? Vraag dan <b>💡 hulp</b>. Hulp en veel pogingen kosten een beetje punten, maar je komt altijd tot een correct programma.</div>`,
