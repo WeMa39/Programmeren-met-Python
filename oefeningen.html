@@ -2218,19 +2218,19 @@ Jouw favoriete hobby is lezen .
     <li>Maak deze variabelen aan:<ul><li><code>prijs_appel = 1.50</code> (een float)</li><li><code>prijs_brood = 2</code> (een integer)</li><li><code>prijs_melk = 2.25</code> (een float)</li><li><code>aantal_appels = 5</code>, <code>aantal_broden = 1</code> en <code>aantal_melk = 2</code></li></ul></li>
     <li>Bereken de totale prijs per product en sla die op in nieuwe variabelen:<ul><li><code>totaal_appels = prijs_appel * aantal_appels</code></li><li><code>totaal_brood = prijs_brood * aantal_broden</code></li><li><code>totaal_melk = prijs_melk * aantal_melk</code></li></ul></li>
     <li>Tel de drie totalen op in een variabele <code>totaal</code>.</li>
-    <li>Toon met <code>print()</code> een overzichtelijke bon. Combineer de variabelen met duidelijke tekst en toon ook het eindtotaal.</li></ol>
+    <li>Toon met <code>print()</code> een overzichtelijke bon. Toon per product het <b>aantal</b> en de <b>totale prijs van dat product</b> (<code>totaal_appels</code>, <code>totaal_brood</code> en <code>totaal_melk</code>, dus niet de prijs per stuk). Toon op het einde het <b>eindtotaal</b>.</li></ol>
     <p>Voorbeeld van de uitvoer:</p><pre>Boodschappenlijst:
-Appels: 5 stuks voor 7.5 euro.
-Brood: 1 stuks voor 2 euro.
-Melk: 2 stuks voor 4.5 euro.
+Appels: 5 stuks, samen 7.5 euro.
+Brood: 1 stuks, samen 2 euro.
+Melk: 2 stuks, samen 4.5 euro.
 -------------------------
 Totaal te betalen: 14.0 euro.
 -------------------------</pre>
-    <div class="box warm"><b>Hoe wordt dit nagekeken?</b><br>Bij <b>✓ Controleer</b> kijkt de computer of je de variabelen met de juiste namen aanmaakt, of je de totalen <b>berekent</b> met die variabelen (dus niet zelf uitrekent en intypt) en of alle bedragen op je bon staan. Daarna kijkt hij of je code de <b>klasafspraken</b> volgt. Ook een titel zoals <code>"Boodschappenlijst:"</code> eindigt dus met een leesteken.</div>`,
+    <div class="box warm"><b>Hoe wordt dit nagekeken?</b><br>Bij <b>✓ Controleer</b> kijkt de computer of je de variabelen met de juiste namen aanmaakt, of je de totalen <b>berekent</b> met die variabelen (dus niet zelf uitrekent en intypt) en of de totale prijs per product (7.5, 2 en 4.5 euro) en het eindtotaal (14 euro) op je bon staan. Daarna kijkt hij of je code de <b>klasafspraken</b> volgt. Ook een titel zoals <code>"Boodschappenlijst:"</code> eindigt dus met een leesteken.</div>`,
     starter:'',
     invoer:"",
     tests:[
-      {invoer:[], naam:"je programma", getallen:[7.5,2,4.5,14], woorden:[["appel"],["brood"],["melk"],["totaal"]], tip:"Toon voor elk product het aantal en de totale prijs, en daarna het eindtotaal."}
+      {invoer:[], naam:"je programma", getallen:[7.5,2,4.5,14], woorden:[["appel"],["brood"],["melk"],["totaal"]], tip:"Toon per product de totale prijs van dat product (totaal_appels, totaal_brood, totaal_melk), niet de prijs per stuk: 5 appels kosten samen 7.5 euro, 2 flessen melk 4.5 euro."}
     ],
     moet:[
       [/\bprijs_appel\s*=\s*1\.50?\b/, "Maak de variabele prijs_appel aan met de waarde 1.50."],
@@ -2249,8 +2249,8 @@ Totaal te betalen: 14.0 euro.
     ],
     hulp:[
       "Werk in drie blokken: eerst de zes variabelen met prijzen en aantallen, dan de berekeningen, en pas op het einde de <code>print()</code>-regels. Een kommagetal schrijf je in Python met een <b>punt</b>: <code>1.50</code>.",
-      "De berekeningen staan letterlijk in de opdracht, bv. <code>totaal_appels = prijs_appel * aantal_appels</code>. Het eindtotaal is <code>totaal = totaal_appels + totaal_brood + totaal_melk</code>. Tonen doe je zo: <code>print(\"Appels:\", aantal_appels, \"stuks voor\", totaal_appels, \"euro.\")</code>",
-      "Zo kan het:<pre># {NAAM}\nprijs_appel = 1.50\nprijs_brood = 2\nprijs_melk = 2.25\naantal_appels = 5\naantal_broden = 1\naantal_melk = 2\n\n# Bereken de totale prijs per product\ntotaal_appels = prijs_appel * aantal_appels\ntotaal_brood = prijs_brood * aantal_broden\ntotaal_melk = prijs_melk * aantal_melk\ntotaal = totaal_appels + totaal_brood + totaal_melk\n\n# Toon de bon\nprint(\"Boodschappenlijst:\")\nprint(\"Appels:\", aantal_appels, \"stuks voor\", totaal_appels, \"euro.\")\nprint(\"Brood:\", aantal_broden, \"stuks voor\", totaal_brood, \"euro.\")\nprint(\"Melk:\", aantal_melk, \"stuks voor\", totaal_melk, \"euro.\")\nprint(\"-------------------------\")\nprint(\"Totaal te betalen:\", totaal, \"euro.\")\nprint(\"-------------------------\")</pre>"
+      "De berekeningen staan letterlijk in de opdracht, bv. <code>totaal_appels = prijs_appel * aantal_appels</code>. Het eindtotaal is <code>totaal = totaal_appels + totaal_brood + totaal_melk</code>. Tonen doe je zo: <code>print(\"Appels:\", aantal_appels, \"stuks, samen\", totaal_appels, \"euro.\")</code>",
+      "Zo kan het:<pre># {NAAM}\nprijs_appel = 1.50\nprijs_brood = 2\nprijs_melk = 2.25\naantal_appels = 5\naantal_broden = 1\naantal_melk = 2\n\n# Bereken de totale prijs per product\ntotaal_appels = prijs_appel * aantal_appels\ntotaal_brood = prijs_brood * aantal_broden\ntotaal_melk = prijs_melk * aantal_melk\ntotaal = totaal_appels + totaal_brood + totaal_melk\n\n# Toon de bon\nprint(\"Boodschappenlijst:\")\nprint(\"Appels:\", aantal_appels, \"stuks, samen\", totaal_appels, \"euro.\")\nprint(\"Brood:\", aantal_broden, \"stuks, samen\", totaal_brood, \"euro.\")\nprint(\"Melk:\", aantal_melk, \"stuks, samen\", totaal_melk, \"euro.\")\nprint(\"-------------------------\")\nprint(\"Totaal te betalen:\", totaal, \"euro.\")\nprint(\"-------------------------\")</pre>"
     ],
     ok:"Je winkelwagen rekent alles correct uit!" },
   extra:{ titel:"Extra uitdaging (optioneel, +1 punt)",
