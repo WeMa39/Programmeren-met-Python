@@ -165,6 +165,31 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .afspr .ok{background:var(--ok-soft);color:var(--ok)}
 .afspr .nok{background:var(--bad-soft);color:var(--bad);text-decoration:line-through}
 @media (max-width:560px){ h2{font-size:21px} .card{padding:14px} }
+/* Stroomdiagrammen */
+.flowblok{margin-top:12px}
+.fl-teken{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;overflow-x:auto}
+.fl-zij{display:flex;flex-direction:column;gap:14px}
+.fl-uitleg{font-size:14px;color:var(--muted);margin-bottom:8px}
+.fl-lijst{display:flex;flex-direction:column;gap:6px}
+.fl-knoop{border:1px solid var(--line);border-radius:8px;padding:6px;background:var(--card)}
+.fl-knoop.ruit{border-color:#e3a49c}
+.fl-rij{display:flex;gap:6px;align-items:center}
+.fl-rij select,.fl-vak select{flex:1 1 0;width:0;min-width:0;font:inherit;font-size:14px;padding:6px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+.fl-vorm{font-weight:700;color:var(--brand);white-space:nowrap}
+.fl-k{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;width:30px;height:30px;cursor:pointer;font:inherit}
+.fl-k:disabled{opacity:.35;cursor:default}
+.fl-takken{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.fl-tak{min-width:0;border-left:3px solid var(--line);padding-left:6px}
+.fl-tk{font-size:12px;font-weight:700;margin-bottom:4px}
+.fl-tk.ja{color:var(--ok)} .fl-tk.nee{color:var(--bad)}
+.fl-add{display:flex;gap:6px;flex-wrap:wrap}
+.fl-add .btn{padding:5px 10px;font-size:13px}
+.fl-vak{display:flex;gap:10px;align-items:center;margin:8px 0}
+.fl-vraag{margin:14px 0}
+.fl-st{display:none;margin-top:8px}
+.fl-legende{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0}
+.fl-lg{display:flex;gap:8px;align-items:center;font-size:14px}
+.fl-lg span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -1915,7 +1940,8 @@ const WERELD_INFO={
   "🏗️ De Havenkraan":{icoon:"🏗️",naam:"De Havenkraan",sub:"Containers naar het juiste schip",kleur:"#2f6fae"},
   "🚆 Het Station":{icoon:"🚆",naam:"Het Station",sub:"Zet de wissels voor elke trein",kleur:"#c0392b"},
   "📦 Het Magazijn":{icoon:"📦",naam:"Het Magazijn",sub:"Sorteer de pakjes met een robot",kleur:"#b9762f"},
-  "🚗 Het Verkeer":{icoon:"🚗",naam:"Het Verkeer",sub:"Een zelfrijdende auto veilig op weg",kleur:"#2a9d4b"}};
+  "🚗 Het Verkeer":{icoon:"🚗",naam:"Het Verkeer",sub:"Een zelfrijdende auto veilig op weg",kleur:"#2a9d4b"},
+  "🧭 Stroomdiagrammen":{icoon:"🧭",naam:"Stroomdiagrammen",sub:"Een algoritme lezen en zelf opstellen",kleur:"#6b4fa0"}};
 /* ---------------- Illustraties bij de oefeningen (eigen tekeningen) ---------------- */
 const B=(inhoud,bg,label)=>`<div class="beeld"><svg viewBox="0 0 600 190" role="img" aria-label="${label}" style="font-family:system-ui,sans-serif"><rect width="600" height="190" fill="${bg}"/>${inhoud}</svg></div>`;
 const BEELD={
@@ -2912,7 +2938,237 @@ Veel plezier met de film!</pre>`,
     ok:"Je programma vindt altijd het kleinste getal!" }
 }
 ];
+/* ---------------- Stroomdiagrammen: tekenen, vervolledigen en zelf opstellen ---------------- */
+/* Een stroomdiagram is een lijst knopen: {t:"actie",tekst,code} of {t:"keuze",tekst,code,ja:[…],nee:[…]}.
+   Een knoop met vak:"A" is een leeg vak dat de leerling invult. */
+const FL={bw:240,bh:52,dw:350,dh:110,gap:30,ow:120,oh:40};
+let FL_ID=0;
+const flLeeg=()=>({l:0,r:0,h:0});
+function flMaat(lijst){ let l=0,r=0,h=0; lijst.forEach((n,i)=>{ const m=flKnoopMaat(n); l=Math.max(l,m.l); r=Math.max(r,m.r); h+=m.h+(i?FL.gap:0) }); return {l,r,h} }
+function flKnoopMaat(n){ if(n.t!=="keuze") return {l:FL.bw/2,r:FL.bw/2,h:FL.bh};
+  const a=n.ja.length?flMaat(n.ja):flLeeg(), b=n.nee.length?flMaat(n.nee):flLeeg();
+  const offL=Math.max(FL.dw/2,a.r+18), offR=Math.max(FL.dw/2,b.l+18);
+  return {l:Math.max(FL.dw/2,offL+a.l), r:Math.max(FL.dw/2,offR+b.r), h:FL.dh+FL.gap+Math.max(a.h,b.h)+FL.gap, offL, offR, a, b} }
+function flSvg(lijst){
+  const id="fl"+(++FL_ID), m=flMaat(lijst), W=Math.max(m.l,FL.ow/2)+Math.max(m.r,FL.ow/2)+40, cx=Math.max(m.l,FL.ow/2)+20;
+  const o=[], pijl=(x1,y1,x2,y2)=>o.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#1d2433" stroke-width="2" marker-end="url(#${id})"/>`),
+    lijn=pts=>o.push(`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#1d2433" stroke-width="2"/>`);
+  const tekst=(n,x,y,max)=>{ if(n.vak&&!n.tekst) return `<text x="${x}" y="${y+5}" text-anchor="middle" font-size="14" font-weight="700" fill="#7a8494">Vak ${esc(n.vak)}</text>`;
+    if(!n.tekst) return `<text x="${x}" y="${y+5}" text-anchor="middle" font-size="13" fill="#7a8494">— kies —</text>`;
+    const v=n.vak?`<text x="${x-max/2+6}" y="${y-12}" font-size="10" font-weight="700" fill="#6b4fa0">${esc(n.vak)}</text>`:"";
+    return v+`<text x="${x}" y="${y-3}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d2433">${esc(n.tekst)}</text>`+(n.code?`<text x="${x}" y="${y+15}" text-anchor="middle" font-size="11.5" font-family="ui-monospace,Consolas,monospace" fill="#1d2433">${esc(n.code)}</text>`:"") };
+  const leeg=n=>n.vak&&!n.tekst, rand=n=>leeg(n)?`stroke="#6b4fa0" stroke-width="2" stroke-dasharray="6 4"`:`stroke="#1d2433" stroke-width="2"`;
+  function knoop(n,x,y){
+    if(n.t!=="keuze"){ o.push(`<rect x="${x-FL.bw/2}" y="${y}" width="${FL.bw}" height="${FL.bh}" fill="${leeg(n)?"#f4f0fb":"#eaf1f9"}" ${rand(n)}/>`+tekst(n,x,y+FL.bh/2,FL.bw)); return y+FL.bh }
+    const mt=flKnoopMaat(n), ym=y+FL.dh/2, xl=x-mt.offL, xr=x+mt.offR, y2=y+FL.dh+FL.gap, yM=y2+Math.max(mt.a.h,mt.b.h)+FL.gap;
+    o.push(`<polygon points="${x},${y} ${x+FL.dw/2},${ym} ${x},${y+FL.dh} ${x-FL.dw/2},${ym}" fill="${leeg(n)?"#f4f0fb":"#fde8e6"}" ${rand(n)}/>`+tekst(n,x,ym,FL.dw*0.6));
+    o.push(`<text x="${x-FL.dw/2-6}" y="${ym-8}" text-anchor="end" font-size="12" font-weight="700" fill="#1e7a46">True</text><text x="${x+FL.dw/2+6}" y="${ym-8}" font-size="12" font-weight="700" fill="#b3261e">False</text>`);
+    [[n.ja,xl,x-FL.dw/2],[n.nee,xr,x+FL.dw/2]].forEach(([tak,bx,hoek])=>{
+      if(!tak.length){ lijn([[hoek,ym],[bx,ym],[bx,yM],[x,yM]]); return }
+      lijn([[hoek,ym],[bx,ym],[bx,y2-2]]); pijl(bx,y2-14,bx,y2);
+      const eind=reeks(tak,bx,y2); lijn([[bx,eind],[bx,yM],[x,yM]]) });
+    return yM }
+  function reeks(l,x,y){ l.forEach((n,i)=>{ if(i){ pijl(x,y,x,y+FL.gap); y+=FL.gap } y=knoop(n,x,y) }); return y }
+  let y=10; o.push(`<rect x="${cx-FL.ow/2}" y="${y}" width="${FL.ow}" height="${FL.oh}" rx="20" fill="#e6f4ec" stroke="#1d2433" stroke-width="2"/><text x="${cx}" y="${y+25}" text-anchor="middle" font-size="14" font-weight="700" fill="#1d2433">Start</text>`);
+  y+=FL.oh; pijl(cx,y,cx,y+FL.gap); y+=FL.gap; y=reeks(lijst,cx,y); pijl(cx,y,cx,y+FL.gap); y+=FL.gap;
+  o.push(`<rect x="${cx-FL.ow/2}" y="${y}" width="${FL.ow}" height="${FL.oh}" rx="20" fill="#fde8e6" stroke="#1d2433" stroke-width="2"/><text x="${cx}" y="${y+25}" text-anchor="middle" font-size="14" font-weight="700" fill="#1d2433">Stop</text>`);
+  const H=y+FL.oh+10;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Stroomdiagram" style="width:100%;max-width:${W}px;height:auto;display:block;margin:0 auto;font-family:system-ui,sans-serif"><defs><marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#1d2433"/></marker></defs><rect width="${W}" height="${H}" fill="#fff"/>${o.join("")}</svg>` }
+
+/* Van wat de leerling koos naar een volledig stroomdiagram */
+function flBoom(d,m){
+  if(d.flow==="vervolledig"){ const V=m.vak||{};
+    const zet=l=>l.map(n=>{ let k={...n}; if(n.vak){ const lijst=n.t==="keuze"?d.vragen:d.acties, i=V[n.vak]; k={...k,...(i!=null&&lijst[i]?lijst[i]:{tekst:"",code:""})} }
+      if(n.t==="keuze") k={...k,ja:zet(n.ja),nee:zet(n.nee)}; return k });
+    return zet(d.boom) }
+  const zet=l=>(l||[]).map(n=>{ const p=(n.t==="keuze"?d.vragen:d.acties)[n.k]||{tekst:"",code:""};
+    return n.t==="keuze"?{t:"keuze",tekst:p.tekst,code:p.code,ja:zet(n.ja),nee:zet(n.nee),open:n.k==null}:{t:"actie",tekst:p.tekst,code:p.code,open:n.k==null} });
+  return zet(m.stappen) }
+/* Van stroomdiagram naar Python (een ruit die alleen in een False-tak staat, wordt elif) */
+function flCode(boom,kop){
+  const r=[]; const blok=(l,ins)=>{ if(!l.length){ r.push(ins+"pass"); return } l.forEach(n=>keuze(n,ins,"if")) };
+  function keuze(n,ins,woord){ if(n.t!=="keuze"){ r.push(ins+n.code); return }
+    r.push(`${ins}${woord} ${n.code}:`); blok(n.ja,ins+"    ");
+    if(n.nee.length===1&&n.nee[0].t==="keuze") keuze(n.nee[0],ins,"elif");
+    else if(n.nee.length){ r.push(ins+"else:"); blok(n.nee,ins+"    ") } }
+  boom.forEach(n=>keuze(n,"","if"));
+  return "# "+(S.naam||"Naam")+"\n"+(kop?kop+"\n\n":"")+r.join("\n")+"\n" }
+const flTel=(l,t)=>l.reduce((s,n)=>s+(n.t===t?1:0)+(n.t==="keuze"?flTel(n.ja,t)+flTel(n.nee,t):0),0);
+const flOpen=l=>l.some(n=>(n.vak&&!n.tekst)||n.open||(n.t==="keuze"&&(flOpen(n.ja)||flOpen(n.nee))));
+function flModel(json){ try{ return JSON.parse(json||"{}")||{} }catch(e){ return {} } }
+/* Wat moet er nog gebeuren voor je kunt controleren? (kost geen poging) */
+function flValideer(d,m){
+  if(d.flow==="lezen") return (m.antw||[]).filter(x=>x!=null).length<d.vragen.length?"Beantwoord eerst alle vragen.":null;
+  const b=flBoom(d,m);
+  if(d.flow==="vervolledig") return flOpen(b)?"Vul eerst alle vakken in.":null;
+  if(!b.length) return "Je stroomdiagram is nog leeg. Voeg vakken toe met de knoppen.";
+  if(flOpen(b)) return "Kies in elk vak wat de "+(d.wie||"machine")+" moet doen.";
+  return null }
+
+async function nakijkenFlow(json,d){
+  const m=flModel(json);
+  if(d.flow==="lezen"){ const A=m.antw||[], fout=d.vragen.map((v,i)=>A[i]===v.juist?0:i+1).filter(x=>x);
+    if(fout.length) return {ok:false,msg:`${fout.length===1?"Vraag "+fout[0]+" klopt":"Vragen "+fout.join(", ")+" kloppen"} nog niet. Volg de pijlen nog eens met je vinger, van Start tot Stop.`};
+    return {ok:true,msg:d.ok} }
+  const boom=flBoom(d,m);
+  if(d.minKeuzes&&flTel(boom,"keuze")<d.minKeuzes) return {ok:false,msg:d.keuzeTip||`Je stroomdiagram heeft minstens ${d.minKeuzes} ${d.minKeuzes===1?"ruit":"ruiten"} nodig.`};
+  const code=flCode(boom,d.kop); let laatste=null;
+  for(let i=0;i<d.scenarios.length;i++){ const sc=d.scenarios[i];
+    const r=await runPython(code,sc.invoer||[],true,{sc}); const w=r.wereld||{log:[],staat:{}}, wat=`In situatie ${i+1} (${sc.naam})`;
+    const anim={i,sc,log:w.log,uitslag:"fout"};
+    if(r.err) return {ok:false,anim,msg:`${wat} loopt het mis: ${r.err.type==="WereldFout"?r.err.text:"het stroomdiagram kan zo niet uitgevoerd worden."}`};
+    const f=d.doel(sc,w.staat||{},r.out||"",null);
+    if(f) return {ok:false,anim,msg:`${wat}: ${f}`+(sc.tip?" "+sc.tip:"")};
+    laatste={i,sc,log:w.log,uitslag:"ok"} }
+  return {ok:true,anim:laatste,msg:d.ok} }
+
+/* Het invulblok onder een stroomdiagram-opdracht. Zelfde aanpak als codeBlok: geeft een element met vergrendel(). */
+function flowBlok(d,{waarde,onCode,controleer,uitvoeren}){
+  let m=flModel(waarde), slot=false;
+  const wrap=$(`<div class="flowblok"></div>`);
+  const tek=$(`<div class="fl-teken"></div>`), werk=$(`<div class="fl-werk"></div>`);
+  const out=$(`<div class="out" style="display:none"></div>`), st=$(`<div class="fl-st"></div>`);
+  const act=$(`<div class="actions">${uitvoeren?'<button class="btn secondary run">▶ Uitvoeren</button>':""}<button class="btn chk">✓ Controleer</button></div>`);
+  const bewaar=()=>{ onCode(JSON.stringify(m)); teken() };
+  const teken=()=>{ tek.innerHTML=flSvg(d.flow==="lezen"?d.boom:flBoom(d,m)) };
+  const melding=t=>{ st.className="fb info fl-st"; st.textContent=t; st.style.display=t?"block":"none" };
+  const opties=(lijst,gekozen)=>`<option value="">— kies —</option>`+lijst.map((p,i)=>`<option value="${i}" ${gekozen===i?"selected":""}>${esc(p.tekst)}</option>`).join("");
+
+  function bouwLezen(){ werk.innerHTML=""; m.antw=m.antw||[];
+    d.vragen.forEach((v,i)=>{ const q=$(`<div class="fl-vraag"><b>${i+1}. ${esc(v.q)}</b></div>`);
+      v.opties.forEach((t,j)=>{ const o=$(`<label class="opt"><input type="radio" name="flv${FL_ID}_${i}" value="${j}" ${m.antw[i]===j?"checked":""}><span>${esc(t)}</span></label>`);
+        o.querySelector("input").onchange=()=>{ m.antw[i]=j; bewaar(); melding("") }; q.appendChild(o) });
+      werk.appendChild(q) }) }
+  function vakken(l,acc){ l.forEach(n=>{ if(n.vak) acc.push(n); if(n.t==="keuze"){ vakken(n.ja,acc); vakken(n.nee,acc) } }); return acc }
+  function bouwVervolledig(){ werk.innerHTML=""; m.vak=m.vak||{};
+    vakken(d.boom,[]).sort((a,b)=>a.vak.localeCompare(b.vak)).forEach(n=>{ const ruit=n.t==="keuze";
+      const r=$(`<label class="fl-vak"><span class="fl-vorm">${ruit?"◇":"▭"} Vak ${esc(n.vak)}</span><select>${opties(ruit?d.vragen:d.acties,m.vak[n.vak])}</select></label>`);
+      r.querySelector("select").onchange=e=>{ m.vak[n.vak]=e.target.value===""?null:+e.target.value; bewaar(); melding("") };
+      werk.appendChild(r) }) }
+  function bouwOpstellen(){ werk.innerHTML=""; m.stappen=m.stappen||[];
+    werk.appendChild($(`<div class="fl-uitleg">Bouw je stroomdiagram van boven naar onder. Start en Stop staan er al. Een <b>ruit</b> krijgt een True-tak en een False-tak.</div>`));
+    werk.appendChild(lijstEl(m.stappen,0)) }
+  function lijstEl(l,diepte){ const box=$(`<div class="fl-lijst"></div>`);
+    l.forEach((n,i)=>{ const ruit=n.t==="keuze";
+      const rij=$(`<div class="fl-knoop ${ruit?"ruit":""}"><div class="fl-rij"><span class="fl-vorm" title="${ruit?"Ruit: een vraag":"Rechthoek: een actie"}">${ruit?"◇":"▭"}</span><select>${opties(ruit?d.vragen:d.acties,n.k)}</select><button type="button" class="fl-k" title="Hoger">↑</button><button type="button" class="fl-k" title="Lager">↓</button><button type="button" class="fl-k" title="Weg">✕</button></div></div>`);
+      const [op,neer,weg]=rij.querySelectorAll(".fl-k");
+      rij.querySelector("select").onchange=e=>{ n.k=e.target.value===""?null:+e.target.value; bewaar(); melding("") };
+      op.disabled=i===0; neer.disabled=i===l.length-1;
+      op.onclick=()=>{ [l[i-1],l[i]]=[l[i],l[i-1]]; bewaar(); bouw() };
+      neer.onclick=()=>{ [l[i+1],l[i]]=[l[i],l[i+1]]; bewaar(); bouw() };
+      weg.onclick=()=>{ l.splice(i,1); bewaar(); bouw() };
+      if(ruit){ const t=$(`<div class="fl-takken"><div class="fl-tak"><div class="fl-tk ja">True</div></div><div class="fl-tak"><div class="fl-tk nee">False</div></div></div>`);
+        const [tj,tn]=t.querySelectorAll(".fl-tak"); tj.appendChild(lijstEl(n.ja,diepte+1)); tn.appendChild(lijstEl(n.nee,diepte+1)); rij.appendChild(t) }
+      box.appendChild(rij) });
+    const knop=$(`<div class="fl-add"><button type="button" class="btn secondary">+ ▭ Actie</button>${diepte<2?'<button type="button" class="btn secondary">+ ◇ Keuze</button>':""}</div>`);
+    const [ka,kk]=knop.querySelectorAll("button");
+    ka.onclick=()=>{ l.push({t:"actie",k:null}); bewaar(); bouw() };
+    if(kk) kk.onclick=()=>{ l.push({t:"keuze",k:null,ja:[],nee:[]}); bewaar(); bouw() };
+    box.appendChild(knop); return box }
+  function bouw(){ (d.flow==="lezen"?bouwLezen:d.flow==="vervolledig"?bouwVervolledig:bouwOpstellen)(); if(slot) vergrendel() }
+  function vergrendel(){ slot=true; wrap.querySelectorAll("input,select,.fl-k,.fl-add button,.chk").forEach(x=>x.disabled=true); act.querySelector(".chk").style.display="none" }
+
+  wrap.append(...(d.flow==="opstellen"?[$(`<div class="fl-zij"></div>`)]:[]));
+  if(d.flow==="opstellen"){ const z=wrap.firstChild; z.append(werk,tek) } else wrap.append(tek,werk);
+  wrap.append(act,st,out); melding("");
+  const bezig=b=>act.querySelectorAll("button").forEach(x=>{ if(!slot||!x.classList.contains("chk")) x.disabled=b });
+  if(uitvoeren) act.querySelector(".run").onclick=async()=>{ const v=flValideer(d,m); if(v){ melding(v); return } melding(""); bezig(true);
+    try{ await uitvoeren(flCode(flBoom(d,m),d.kop),out) } catch(e){ toonLaadFout(out,e) } bezig(false) };
+  act.querySelector(".chk").onclick=async()=>{ const v=flValideer(d,m); if(v){ melding(v); return } melding(""); bezig(true);
+    try{ await controleer(JSON.stringify(m),out) } catch(e){ toonLaadFout(out,e) } bezig(false) };
+  teken(); bouw();
+  wrap.vergrendel=vergrendel; wrap.iv=null;
+  return wrap }
+
+/* ---------------- Oefeningen met stroomdiagrammen ---------------- */
+const lvlH=id=>WERELD_OEFENINGEN.find(o=>o.id===id).hoofd;
+const FL_VORMEN=`<div class="fl-legende">${flSvgVorm("ovaal","Start / Stop","Begin en einde")}${flSvgVorm("rect","Actie","Een bevel, bv. kraan.pak()")}${flSvgVorm("ruit","Keuze","Een vraag: True of False")}</div>`;
+function flSvgVorm(v,t,u){ const s=v==="ovaal"?`<rect x="10" y="12" width="100" height="36" rx="18" fill="#e6f4ec" stroke="#1d2433" stroke-width="2"/>`:v==="rect"?`<rect x="10" y="10" width="100" height="40" fill="#eaf1f9" stroke="#1d2433" stroke-width="2"/>`:`<polygon points="60,4 112,30 60,56 8,30" fill="#fde8e6" stroke="#1d2433" stroke-width="2"/>`;
+  return `<div class="fl-lg"><svg viewBox="0 0 120 60" width="120" height="60" aria-hidden="true">${s}</svg><div><b>${t}</b><br><span>${u}</span></div></div>` }
+const FL_HAVEN3=[{t:"actie",tekst:"Pak de container",code:"kraan.pak()"},
+  {t:"keuze",tekst:'Is de kleur "rood"?',code:'kraan.lees_kleur() == "rood"',ja:[{t:"actie",tekst:"2 vakken naar rechts",code:"kraan.rechts(2)"}],nee:[{t:"actie",tekst:"6 vakken naar rechts",code:"kraan.rechts(6)"}]},
+  {t:"actie",tekst:"Zet de container neer",code:"kraan.zet()"}];
+const FL_UITLEG=`<div class="box"><b>Zo werk je</b><br>Met <b>✓ Controleer</b> laat je je stroomdiagram nakijken. Bij een oefening met een kraan of een trein probeert de computer je stroomdiagram uit in alle situaties, net alsof het een programma is. Met <b>▶ Uitvoeren</b> zie je gratis wat er gebeurt in de situatie die je kiest. Lukt het niet? Vraag dan <b>💡 hulp</b>.</div>`;
+const FL_ST_ACTIES=[{tekst:"Wissel 1 naar boven",code:"wissel1.boven()"},{tekst:"Wissel 1 naar onder",code:"wissel1.onder()"},{tekst:"De trein vertrekt",code:"trein.rijd()"}];
+const FL_ST_VRAGEN=[{tekst:'Is de bestemming "Gent"?',code:'trein.lees_bestemming() == "Gent"'},{tekst:'Is de bestemming "Brugge"?',code:'trein.lees_bestemming() == "Brugge"'},{tekst:'Is de bestemming "Oostende"?',code:'trein.lees_bestemming() == "Oostende"'}];
+const H_ZWAAR=[[12,3,"de boot"],[27,7,"het vrachtschip"],[20,3,"de boot"],[21,7,"het vrachtschip"]].map(([g,d,n])=>hSc({naam:`${g} ton`,kleur:"geel",label:g+" t",gewicht:g,max:40,schepen:[3,7],namen:H_SCHEPEN5,doel:d,doelNaam:n,paneel:`📟 Gewicht: ${g} ton`,tip:g===20?"Precies 20 ton is niet méér dan 20 ton: die container gaat naar de boot.":""}));
+const FL_HZ_ACTIES=[{tekst:"Pak de container",code:"kraan.pak()"},{tekst:"Zet de container neer",code:"kraan.zet()"},{tekst:"3 vakken naar rechts",code:"kraan.rechts(3)"},{tekst:"7 vakken naar rechts",code:"kraan.rechts(7)"},{tekst:"2 vakken naar links",code:"kraan.links(2)"}];
+const FL_HZ_VRAGEN=[{tekst:"Weegt de container meer dan 20 ton?",code:"int(kraan.lees_gewicht()) > 20"},{tekst:"Weegt de container 20 ton of meer?",code:"int(kraan.lees_gewicht()) >= 20"},{tekst:'Is de kleur "rood"?',code:'kraan.lees_kleur() == "rood"'}];
+const FL_H4_ACTIES=[{tekst:"Pak de container",code:"kraan.pak()"},{tekst:"Zet de container neer",code:"kraan.zet()"},{tekst:"2 vakken naar rechts",code:"kraan.rechts(2)"},{tekst:"4 vakken naar rechts",code:"kraan.rechts(4)"},{tekst:"6 vakken naar rechts",code:"kraan.rechts(6)"}];
+const FL_H4_VRAGEN=[{tekst:'Is de kleur "rood"?',code:'kraan.lees_kleur() == "rood"'},{tekst:'Is de kleur "blauw"?',code:'kraan.lees_kleur() == "blauw"'},{tekst:'Is de kleur "groen"?',code:'kraan.lees_kleur() == "groen"'}];
+const G_FLOW="🧭 Stroomdiagrammen";
+const FLOW_OEFENINGEN=[
+{ id:"F1", groep:G_FLOW, titel:"Stroomdiagram 1 - Lezen", klaar:true, geenCode:true, stappen:[],
+  opdracht:`<p>Een <b>stroomdiagram</b> toont een <b>algoritme</b>: de stappen die de computer zet, in de juiste volgorde. Je leest het van <b>Start</b> naar <b>Stop</b> door de pijlen te volgen. Dit stroomdiagram ken je al: het is het programma van <b>Haven 3</b>.</p>${FL_VORMEN}${FL_UITLEG}`,
+  hoofd:{ titel:"Lees het stroomdiagram", flow:"lezen", boom:FL_HAVEN3,
+    html:`<p>Volg de pijlen met je vinger en beantwoord de vragen.</p>`,
+    vragen:[
+      {q:"Een rode container: op welk vak zet de kraan hem neer?", opties:["Vak 2 (schip A)","Vak 6 (schip B)","Hij blijft op de kade staan"], juist:0},
+      {q:"Een gele container: op welk vak zet de kraan hem neer?", opties:["Vak 2 (schip A)","Vak 6 (schip B)","Nergens: geel staat niet in het stroomdiagram"], juist:1},
+      {q:"Welke vakken voert de kraan altijd uit, welke kleur de container ook heeft?", opties:["Pak de container en Zet de container neer","Pak de container en 2 vakken naar rechts","Alleen Zet de container neer"], juist:0},
+      {q:"Bij één container: hoeveel van de twee vakken ‘vakken naar rechts’ worden uitgevoerd?", opties:["Geen","Precies één","Allebei"], juist:1},
+      {q:"Welke vorm stelt een vraag waarop het antwoord True of False is?", opties:["De ovaal","De rechthoek","De ruit"], juist:2},
+      {q:"Welke regel Python hoort bij de ruit?", opties:['if kraan.lees_kleur() == "rood":',"kraan.rechts(2)","else:"], juist:0}
+    ],
+    hulp:["Begin bij Start en volg de pijlen. Bij de ruit kies je één pijl: True als het antwoord ja is, False als het nee is.","Een container die niet rood is, volgt altijd de False-pijl, welke kleur hij ook heeft. Na de keuze komen de twee pijlen weer samen: wat daarna komt, gebeurt altijd."],
+    ok:"Je leest het stroomdiagram als een echte programmeur!" } },
+{ id:"F2", groep:G_FLOW, titel:"Stroomdiagram 2 - Vervolledigen", klaar:true, stappen:[],
+  opdracht:`<p>Treinen naar <b>Gent</b> rijden over het <b>bovenste</b> spoor, treinen naar <b>Brugge</b> over het <b>onderste</b>. Eerst maak je het stroomdiagram af, daarna zet je het om naar Python.</p>${FL_UITLEG}${API_STATION}`,
+  hoofd:{ delen:[
+    { titel:"Vervolledig het stroomdiagram", flow:"vervolledig", wereld:"station", kop:"from station import trein, wissel1", wie:"trein",
+      html:`<p>Kies voor elk leeg vak wat erin hoort. Het stroomdiagram hierboven verandert mee.</p>`,
+      boom:[{t:"keuze",vak:"A",ja:[{t:"actie",vak:"B"}],nee:[{t:"actie",vak:"C"}]},{t:"actie",vak:"D"}],
+      acties:FL_ST_ACTIES, vragen:FL_ST_VRAGEN,
+      scenarios:lvlH("T1").scenarios, doel:stationDoel,
+      hulp:["Wat moet er gebeuren vóór de trein vertrekt? De vraag in de ruit gaat over de bestemming.","Vak A: Is de bestemming \"Gent\"? Bij True moet de trein naar boven, bij False naar onder. De trein vertrekt pas helemaal op het einde."],
+      ok:"Je stroomdiagram stuurt elke trein naar de juiste stad!" },
+    { titel:"Van stroomdiagram naar code", wereld:"station",
+      html:`<p>Zet je stroomdiagram van deel 1 om naar Python. Elke vorm wordt een regel: de ruit wordt <code>if ...:</code>, de False-kant wordt <code>else:</code>. Begin met <code>from station import trein, wissel1</code>.</p>`,
+      starter:"from station import trein, wissel1\n\n",
+      scenarios:lvlH("T1").scenarios, doel:stationDoel,
+      moet:[[/lees_bestemming\s*\(/,"Lees de bestemming met trein.lees_bestemming()."],[/^\s*if\b/m,"Gebruik een if voor de ruit."],[/^\s*else\b/m,"Gebruik een else voor de False-kant van de ruit."]],
+      hulp:["Kijk naar je stroomdiagram: welke vorm wordt een if, en welke vakken springen in?","<pre>if trein.lees_bestemming() == \"Gent\":\n    wissel1.boven()\nelse:\n    wissel1.onder()\ntrein.rijd()</pre>Vergeet de import en je naam niet."],
+      ok:"Je code doet precies wat je stroomdiagram zegt!" } ] } },
+{ id:"F3", groep:G_FLOW, titel:"Stroomdiagram 3 - Zelf opstellen", klaar:true, stappen:[],
+  opdracht:`<p>De kraan kiest nu op <b>gewicht</b>. Containers van <b>meer dan 20 ton</b> gaan naar het <b>vrachtschip</b> op vak 7. Alle andere containers gaan naar de <b>boot</b> op vak 3. Stel eerst zelf het stroomdiagram op, en schrijf daarna het programma.</p>${FL_UITLEG}${API_HAVEN}`,
+  hoofd:{ delen:[
+    { titel:"Stel het stroomdiagram op", flow:"opstellen", wereld:"haven", kop:"from haven import kraan", wie:"kraan", minKeuzes:1,
+      keuzeTip:"De kraan moet kiezen tussen twee schepen. Daarvoor heb je een ruit nodig.",
+      html:`<p>Voeg vakken toe en kies wat erin komt. Let op: er staan ook vakken tussen die je niet nodig hebt.</p>`,
+      acties:FL_HZ_ACTIES, vragen:FL_HZ_VRAGEN,
+      scenarios:H_ZWAAR, doel:havenDoel,
+      hulp:["Wat doet de kraan altijd, wat het gewicht ook is? Die vakken staan buiten de ruit. Alleen het aantal vakken naar rechts hangt af van het gewicht.","Volgorde: Pak de container → ruit ‘Weegt de container meer dan 20 ton?’ → True: 7 vakken naar rechts, False: 3 vakken naar rechts → Zet de container neer."],
+      ok:"Je algoritme brengt elke container naar het juiste schip!" },
+    { titel:"Van stroomdiagram naar code", wereld:"haven",
+      html:`<p>Zet je stroomdiagram om naar Python. Het gewicht is <b>tekst</b>: zet het om met <code>int()</code> voor je het vergelijkt.</p>`,
+      starter:"from haven import kraan\n\n",
+      scenarios:H_ZWAAR, doel:havenDoel,
+      moet:[[/lees_gewicht\s*\(/,"Lees het gewicht met kraan.lees_gewicht()."],[/int\s*\(/,"Zet het gewicht om naar een getal met int()."],[/^\s*if\b/m,"Gebruik een if voor de ruit."],[/^\s*else\b/m,"Gebruik een else voor de False-kant."]],
+      fouten:[[/not supported between instances of 'str'/,"Je vergelijkt tekst met een getal. Zet het gewicht eerst om met int()."]],
+      hulp:["Elke vorm uit je stroomdiagram wordt een regel code. De ruit wordt een if met een vergelijking.","<pre>gewicht = int(kraan.lees_gewicht())\nkraan.pak()\nif gewicht &gt; 20:\n    kraan.rechts(7)\nelse:\n    kraan.rechts(3)\nkraan.zet()</pre>"],
+      ok:"Je programma volgt je stroomdiagram perfect!" } ] } },
+{ id:"F4", groep:G_FLOW, titel:"Stroomdiagram 4 - Van code naar stroomdiagram", klaar:true, geenCode:true, stappen:[],
+  opdracht:`<p>Nu werk je omgekeerd. Hieronder staat het programma van <b>Haven 4</b>: rood gaat naar schip A (vak 2), blauw naar schip B (vak 4) en groen naar schip C (vak 6). Maak het stroomdiagram dat bij deze code hoort.</p>
+  <pre>kraan.pak()
+if kraan.lees_kleur() == "rood":
+    kraan.rechts(2)
+elif kraan.lees_kleur() == "blauw":
+    kraan.rechts(4)
+else:
+    kraan.rechts(6)
+kraan.zet()</pre>
+  <p><code>elif</code> betekent <i>anders als</i>. In een stroomdiagram is dat een <b>tweede ruit</b> aan de False-kant van de eerste.</p>${FL_UITLEG}`,
+  hoofd:{ titel:"Teken het stroomdiagram", flow:"opstellen", wereld:"haven", kop:"from haven import kraan", wie:"kraan", minKeuzes:2,
+    keuzeTip:"Er zijn drie schepen, dus de kraan moet twee vragen stellen. Je hebt twee ruiten nodig.",
+    html:`<p>Een ruit kun je ook ín de False-tak van een andere ruit zetten.</p>`,
+    acties:FL_H4_ACTIES, vragen:FL_H4_VRAGEN,
+    scenarios:lvlH("H4").scenarios, doel:havenDoel,
+    hulp:["Begin met de vakken die altijd gebeuren: Pak de container (bovenaan) en Zet de container neer (onderaan). Daartussen komt de eerste ruit.","Eerste ruit: Is de kleur \"rood\"? True: 2 vakken naar rechts. In de False-tak zet je een tweede ruit: Is de kleur \"blauw\"? True: 4 vakken, False: 6 vakken naar rechts."],
+    ok:"Je hebt elif getekend: een tweede ruit aan de False-kant van de eerste!" } }
+];
+
 OEFENINGEN.push(...WERELD_OEFENINGEN);
+OEFENINGEN.push(...FLOW_OEFENINGEN);
 OEFENINGEN.push(...TEKEN_OEFENINGEN);
 
 /* ---------------- Python in een worker ---------------- */
@@ -3124,6 +3380,7 @@ async function nakijkenWereld(code,deel){
   return {ok:true,anim:laatste,msg:deel.ok||"Juist!"};
 }
 async function nakijken(code,deel,namen){
+  if(deel.flow) return nakijkenFlow(code,deel);
   if(deel.wereld) return nakijkenWereld(code,deel);
   const stijl=KLASAFSPRAKEN?klasafspraken(code,S.naam):[];
   for(const [re,msg] of (deel.moet||[])) if(!re.test(code)) return {ok:false,msg};
@@ -3365,7 +3622,7 @@ function renderStart(m){
 
 function renderOef(m,oef){
   const a=O(oef.id);
-  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Alle oefeningen</button></div><div class="kicker">Oefening</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${KLASAFSPRAKEN?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
+  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Alle oefeningen</button></div><div class="kicker">Oefening</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${KLASAFSPRAKEN&&!oef.geenCode?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
   m.querySelector("#terug").onclick=()=>go("start");
 
   /* stappen (probeer + vraag) */
@@ -3405,7 +3662,7 @@ function renderOef(m,oef){
       d.scenarios.forEach((sc,i)=>{ const b=$(`<button type="button">${i+1}. ${esc(sc.naam)}</button>`); b.onclick=()=>kiesSit(i); sits.appendChild(b) });
       kiesSit(ps.sit);
     }
-    blok=codeBlok({waarde:ps.code??d.starter, onCode:v=>{ps.code=v;save()}, invoer:ps.invoer??d.invoer, onInvoer:v=>{ps.invoer=v;save()},
+    blok=(d.flow?flowBlok.bind(null,d):codeBlok)({waarde:ps.code??d.starter, onCode:v=>{ps.code=v;save()}, invoer:ps.invoer??d.invoer, onInvoer:v=>{ps.invoer=v;save()},
       uitvoeren:d.wereld?async(code,out)=>{ let sc=d.scenarios[ps.sit]; if(sc.invoer) sc={...sc,invoer:blok.iv.regels()}; const r=await runPython(code,sc.invoer||[],true,{sc}); const w=r.wereld||{log:[],staat:{}};
         if(d.toetsen){ toonUit(out,{out:r.out+(r.err?"":(r.out?"\n":"")+"⌨️ Klik op het tekenblad en gebruik je pijltjestoetsen (en de spatiebalk)."),err:r.err});
           speelWereld(stage,d.wereld,sc,w.log,null); if(!r.err) toetsenAan(stage,sc,w.log,out); return }
