@@ -240,6 +240,11 @@ const CIJFER = {
       false = de afspraken worden niet nagekeken. */
 const KLASAFSPRAKEN = true;
 
+/* 5. Geheime sleutel voor de controlecode. Gebruik exact hetzelfde getal
+      als in je Excel-resultatenbestand (blad Uitleg, cel A24).
+      Verander je het, doe het dan op beide plaatsen. */
+const SLEUTEL = 182028;
+
 const APP_ID = "python-oefeningen-v1";
 /* ================================================================ */
 
@@ -3445,9 +3450,14 @@ function berekenCijfer(a){
   const cijfer=Math.min(C.maximum, basis+bonus);
   return {cijfer:Math.round(cijfer*100)/100, aftrekPog, aftrekHulp, aftrekAfspr, bonus, basis};
 }
-function controleCode(leerling,oefening,cijfer,pogingen,hulp){
-  const n=Math.round(cijfer*100)*37 + pogingen*11 + hulp*23 + leerling.length*7 + oefening.length*5 + 59;
-  return n%97;
+/* Controlecode: verandert als iets van de gegevens in het Form wordt aangepast.
+   Excel rekent dezelfde code na (blad Verwerking, kolommen M en N). */
+function controleCode(leerling,klas,oefening,cijfer,pogingen,hulp,afspraken){
+  const zt=x=>String(x).replace(/ +/g," ").replace(/^ | $/g,"");   // zoals TRIM() in Excel
+  const t=[SLEUTEL,zt(leerling),zt(klas),zt(oefening),Math.round(cijfer*100),pogingen,hulp,afspraken].join("|");
+  let som=0;
+  for(let i=1;i<=t.length;i++){ const k=i+SLEUTEL; som+=t.charCodeAt(i-1)*(1+(k*k+SLEUTEL)%999979) }
+  return 1000000+som%999983;
 }
 
 /* ---------------- Opslag ---------------- */
@@ -3764,14 +3774,14 @@ function verstuur(oef,a,c){
   const pog=a.controles, hulp=a.hulp, cijferTxt=fmt(c.cijfer);
   const code=(a.extraOk?a.extraOplossing:a.oplossing)||"";
   const waarden={ LEERLING:S.naam, KLAS:S.klas, OEFENING:oef.titel, CIJFER:cijferTxt, POGINGEN:pog, HULP:hulp, AFSPRAKEN:a.afspraken||0,
-    CONTROLE:controleCode(S.naam,oef.titel,c.cijfer,pog,hulp), CODE:code.length>1500?code.slice(0,1500)+"\n…(ingekort)":code };
+    CONTROLE:controleCode(S.naam,S.klas,oef.titel,c.cijfer,pog,hulp,a.afspraken||0), CODE:code.length>1500?code.slice(0,1500)+"\n…(ingekort)":code };
   const overzicht=`<table style="margin-top:8px;font-size:14px">${[["Leerling",S.naam],["Klas",S.klas],["Oefening",oef.titel],["Cijfer",cijferTxt],["Pogingen",pog],["Hulp",hulp],["Overtredingen klasafspraken",a.afspraken||0],["Controlecode",waarden.CONTROLE]].map(([k,v])=>`<tr><th style="width:130px">${k}</th><td>${esc(v)}</td></tr>`).join("")}</table>`;
   if(!FORM_URL){ f.className="fb info"; f.innerHTML="<b>Testmodus:</b> je leerkracht heeft nog geen Form gekoppeld. Dit zou er verstuurd worden:"+overzicht; return }
   const l=formLink(waarden);
   if(!l||!l.gevonden){ f.className="fb bad"; f.textContent="De link naar het Form is niet goed ingesteld. Verwittig je leerkracht."; return }
   window.open(l.url,"_blank","noopener");
   a.verstuurd={cijfer:c.cijfer,op:new Date().toLocaleString("nl-BE",{dateStyle:"short",timeStyle:"short"})}; save();
-  f.className="fb ok"; f.innerHTML="✔ Het Form opent in een nieuw tabblad. <b>Controleer of deze gegevens erin staan</b> en klik dan op <b>Verzenden</b>:"+overzicht;
+  f.className="fb ok"; f.innerHTML="✔ Het Form opent in een nieuw tabblad. <b>Controleer of deze gegevens erin staan</b> en klik dan op <b>Verzenden</b>. Pas niets aan: de controlecode hoort bij precies deze gegevens. Wie iets wijzigt, krijgt een ongeldige inzending die niet meetelt."+overzicht;
 }
 
 /* ---------------- Thema ---------------- */
