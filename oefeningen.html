@@ -217,6 +217,22 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .vl-uitleg{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--brand-soft);font-size:15px}
 .vl-knoppen{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
 .vl-knoppen .tel{color:var(--muted);font-size:14px}
+.hoofdtabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
+.hoofdtabs button{font:inherit;font-weight:800;font-size:18px;padding:12px 14px;border-radius:var(--radius);border:2px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.hoofdtabs button span{font-size:13px;font-weight:600;color:var(--muted)}
+.hoofdtabs button.aan{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
+.th-lessen{display:flex;flex-direction:column;gap:10px}
+.th-les{display:flex;gap:12px;align-items:center;text-align:left;font:inherit;padding:12px 14px;border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:12px;background:var(--card);color:var(--ink);cursor:pointer}
+.th-les>span:nth-child(2){flex:1;display:flex;flex-direction:column}
+.th-dozen{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}
+.th-dozen>div{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.th-regel{margin:10px 0;display:inline-flex;flex-direction:column;gap:4px}
+.th-regel code{font-size:20px;padding:6px 12px}
+.th-regel div{display:flex;gap:14px;font-size:13px;flex-wrap:wrap}
+.th-regel .n{color:#1f6fd1} .th-regel .is{color:var(--accent)} .th-regel .w{color:var(--ok)}
+.th-quiz{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.th-kop{margin:22px 4px 10px}
+.th-kop h3{margin:0}
 .volg-hint{font-size:13.5px;color:var(--muted)}
 </style>
 </head>
@@ -1334,15 +1350,6 @@ function havenDoel(sc,st,out){
   if(st.geplaatst==null) return "De container hangt nog aan de kraan. Zet hem neer met kraan.zet().";
   if(st.geplaatst!==sc.doel) return `De container staat op het schip op vak ${st.geplaatst}, maar hij moest naar ${sc.doelNaam} op vak ${sc.doel}.`;
   return null }
-function havenTerugDoel(sc,st,out){
-  const f=havenDoel(sc,st,out); if(f) return f;
-  if(st.pos!==0) return `De container staat op het schip, maar de kraan staat nog op vak ${st.pos}. Rijd terug naar de kade (vak 0) met kraan.links(...).`;
-  if(!bevat(out,[sc.afstand],0.01)) return `De kraan werkt, maar ik vind de afstand (${sc.afstand}) niet in je uitvoer. Toon ze met print(): de variabele zonder aanhalingstekens.`;
-  return null }
-function havenSchipBDoel(sc,st,out){
-  const f=havenDoel(sc,st,out); if(f) return f;
-  if(!bevat(out,[sc.doel],0.01)) return `De container staat op schip B, maar ik vind de afstand tot schip B (${sc.doel}) niet in je uitvoer. Toon je tweede variabele met print().`;
-  return null }
 function stationDoel(sc,st,out){
   if(!st.vertrokken) return "De trein is niet vertrokken. Vergeet trein.rijd() niet.";
   if(st.spoor!==sc.doel) return `De trein reed naar spoor ${st.spoor} (${sc.sporen[st.spoor]}), maar moest naar spoor ${sc.doel} (${sc.sporen[sc.doel]}).`;
@@ -1547,28 +1554,6 @@ wLevel({ id:"H2", groep:"🏗️ De Havenkraan", titel:"Haven 2 - Lees de afstan
     moet:[[/lees_afstand\s*\(/, "Lees de afstand met kraan.lees_afstand(): het schip ligt telkens ergens anders."]],
     hulp:["Een vast getal in kraan.rechts() werkt maar in één situatie. Hoe gebruik je de afstand die de kraan leest?","kraan.lees_afstand() geeft tekst, zoals bij input(). Zet ze om met int() en bewaar ze in een variabele: <code>afstand = int(kraan.lees_afstand())</code>.","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nafstand = int(kraan.lees_afstand())\nkraan.pak()\nkraan.rechts(afstand)\nkraan.zet()</pre>"],
     ok:"Je kraan vindt het schip, waar het ook ligt!" } }),
-wLevel({ id:"H2b", groep:"🏗️ De Havenkraan", titel:"Haven 2b - Heen en terug",
-  opdracht:`<p>Na elke lading moet de kraan terug naar de <b>kade (vak 0)</b>, want daar staat de volgende container. Het schip ligt telkens op een andere afstand.</p><p>Lees de afstand daarom <b>één keer</b> en bewaar ze in een <b>variabele</b>. Die variabele gebruik je daarna <b>drie keer</b>: om te tonen hoe ver het schip ligt, om naar het schip te rijden en om terug te rijden. Twijfel je wat een variabele is? Open dan hieronder de uitleg 📦.</p>${API_HAVEN}`,
-  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
-    html:`<p>Toon eerst met <code>print()</code> hoe ver het schip ligt, bv. <i>Het schip ligt op 5 vakken.</i> Breng daarna de container naar het schip en rijd terug naar vak 0.</p>`,
-    starter:"from haven import kraan\n\n",
-    scenarios:[4,6,3,7].map((a,i)=>hSc({naam:`schip op ${a} vakken`,schepen:[a],namen:{[a]:"Schip"},doel:a,doelNaam:"het schip",afstand:a,kleur:["blauw","groen","rood","geel"][i],paneel:`📟 Afstand tot het schip: ${a}`})),
-    doel:havenTerugDoel,
-    moet:[[/^\s*[A-Za-z_]\w*\s*=.*lees_afstand\s*\(/m, "Bewaar de afstand in een variabele: afstand = int(kraan.lees_afstand())"]],
-    maxAantal:[[/lees_afstand\s*\(/g,1,"Je leest de afstand meer dan één keer. Lees ze één keer, bewaar ze in een variabele en gebruik daarna die variabele."]],
-    hulp:["Hoeveel vakken moet de kraan terug naar links? Is dat hetzelfde getal als naar rechts? Waar heb je dat getal bewaard?","<pre>afstand = int(kraan.lees_afstand())\nprint(\"Het schip ligt op\", afstand, \"vakken.\")</pre>Gebruik daarna <code>afstand</code> (zonder aanhalingstekens) in <code>kraan.rechts()</code> én in <code>kraan.links()</code>.","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nafstand = int(kraan.lees_afstand())\nprint(\"Het schip ligt op\", afstand, \"vakken.\")\nkraan.pak()\nkraan.rechts(afstand)\nkraan.zet()\nkraan.links(afstand)</pre>"],
-    ok:"De container staat op het schip en de kraan is terug op de kade. Eén variabele, drie keer gebruikt!" } }),
-wLevel({ id:"H2c", groep:"🏗️ De Havenkraan", titel:"Haven 2c - Het tweede schip",
-  opdracht:`<p>Er liggen nu <b>twee schepen</b> achter elkaar. De kraan meet alleen de afstand tot <b>schip A</b>. <b>Schip B</b> ligt altijd <b>2 vakken verder</b> dan schip A. De container moet naar <b>schip B</b>.</p><p>Maak daarom een <b>tweede variabele</b> voor de afstand tot schip B en reken ze uit met je eerste variabele.</p>${API_HAVEN}`,
-  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
-    html:`<p>Toon met <code>print()</code> hoe ver schip B ligt, bv. <i>Schip B ligt op 6 vakken.</i> Breng daarna de container naar schip B.</p>`,
-    starter:"from haven import kraan\n\n",
-    scenarios:[2,4,1,5].map((a,i)=>hSc({naam:`schip A op ${a} vakken`,schepen:[a,a+2],namen:{[a]:"Schip A",[a+2]:"Schip B"},doel:a+2,doelNaam:"schip B",afstand:a,kleur:["rood","blauw","groen","geel"][i],paneel:`📟 Afstand tot schip A: ${a}`})),
-    doel:havenSchipBDoel,
-    moet:[[/lees_afstand\s*\(/, "Lees de afstand tot schip A met kraan.lees_afstand()."],[/^\s*[A-Za-z_]\w*\s*=\s*(?:[A-Za-z_]\w*\s*\+\s*\d|\d+\s*\+\s*[A-Za-z_])/m, "Maak een tweede variabele en reken ze uit met je eerste variabele, bv. afstand_b = afstand + 2"]],
-    maxAantal:[[/lees_afstand\s*\(/g,1,"Je leest de afstand meer dan één keer. Lees ze één keer en bewaar ze in een variabele."]],
-    hulp:["Als schip A op 3 vakken ligt, waar ligt schip B dan? En als schip A op 5 vakken ligt? Welke berekening maak je telkens?","<pre>afstand = int(kraan.lees_afstand())\nafstand_b = afstand + 2</pre>Nu zit in <code>afstand_b</code> de afstand tot schip B. Gebruik die variabele in <code>print()</code> en in <code>kraan.rechts()</code>.","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nafstand = int(kraan.lees_afstand())\nafstand_b = afstand + 2\nprint(\"Schip B ligt op\", afstand_b, \"vakken.\")\nkraan.pak()\nkraan.rechts(afstand_b)\nkraan.zet()</pre>"],
-    ok:"Juist gerekend: de container staat op schip B!" } }),
 wLevel({ id:"H3", groep:"🏗️ De Havenkraan", titel:"Haven 3 - Rood of niet",
   opdracht:`<p>Er liggen twee schepen. <b>Rode</b> containers gaan naar <b>schip A</b> op vak 2. Alle <b>andere</b> containers gaan naar <b>schip B</b> op vak 6.</p>${API_HAVEN}`,
   hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
@@ -3622,7 +3607,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest("[data-vl-stap],
   let stap=+root.dataset.stap||0, A=+root.dataset.a||5;
   if(b.dataset.vlA){ A=+b.dataset.vlA; stap=0 } else stap=Math.max(0,Math.min(VAR_STAPPEN.length-1,stap+ +b.dataset.vlStap));
   root.dataset.stap=stap; root.dataset.a=A; root.innerHTML=varlesHTML(stap,A) });
-const VAR_TIPS=`<h4 style="margin:16px 0 4px;color:var(--brand)">Zo gebruik je een variabele goed</h4><ol class="afspr">
+const VAR_TIPS=`<ol class="afspr">
 <li><b>Een variabele is een doos met een naam.</b> Links van <code>=</code> staat de naam, rechts wat erin moet. <code>=</code> betekent <i>bewaar in</i>, niet <i>is gelijk aan</i>.<br><span class="ok">afstand = 5</span><span class="nok">5 = afstand</span></li>
 <li><b>Kies een naam die zegt wat erin zit.</b> Kleine letters, geen spaties: gebruik <code>_</code>.<br><span class="ok">afstand_b = afstand + 2</span><span class="nok">x = a + 2</span><span class="nok">afstand b = 7</span></li>
 <li><b>Eerst maken, dan gebruiken.</b> Python leest van boven naar onder. Gebruik je de naam vóór de regel met <code>=</code>, dan krijg je een <code>NameError</code>.</li>
@@ -3631,9 +3616,117 @@ const VAR_TIPS=`<h4 style="margin:16px 0 4px;color:var(--brand)">Zo gebruik je e
 <li><b>Eén keer lezen, vaak gebruiken.</b> Bewaar wat je leest of berekent in een variabele en gebruik die variabele daarna zo vaak als je wilt.<br><span class="ok">kraan.rechts(afstand)<br>kraan.links(afstand)</span></li>
 <li><b>Rekenen met variabelen mag.</b> Een nieuwe waarde vervangt de oude.<br><span class="ok">totaal = prijs * aantal</span><span class="ok">teller = teller + 1</span></li>
 </ol>`;
-const varUitleg=()=>`<p style="margin:10px 0 0">Een <b>variabele</b> is een doos met een naam waarin Python iets onthoudt. Klik op <b>Volgende stap</b> en kijk wat Python bij elke regel doet.</p><div class="varles" data-stap="0" data-a="5">${varlesHTML(0,5)}</div>${VAR_TIPS}`;
-/* Bij deze oefeningen staat de uitleg over variabelen erbij */
-const MET_VAR_UITLEG=["4.1","4.2","4.3","H2","H2b","H2c","H5","H8","V3","V5"];
+
+/* ---------------- THEORIE ----------------
+   Uitleg met oefeningen die niet meetellen voor het cijfer en niet verstuurd worden. */
+const THEORIE=[
+{ id:"variabelen", icoon:"📦", titel:"Variabelen", sub:"Een doos met een naam waarin Python iets onthoudt",
+  quiz:[
+    { code:'fruit = "appel"\nprint("fruit")\nprint(fruit)', q:"Wat toont dit programma?", opties:["fruit\nappel","appel\nappel","fruit\nfruit","appel\nfruit"], juist:0,
+      uitleg:"Met aanhalingstekens is \"fruit\" gewoon tekst: Python toont het woord fruit. Zonder aanhalingstekens is fruit de variabele: Python kijkt in de doos en toont appel." },
+    { code:'punten = 10\npunten = punten + 5\nprint(punten)', q:"Wat toont dit programma?", opties:["10","15","105","punten + 5"], juist:1,
+      uitleg:"Python rekent eerst rechts van het =-teken uit: punten + 5 is 10 + 5 = 15. Dat nieuwe getal komt in de doos punten en vervangt de oude waarde 10." },
+    { code:'getal = input("Geef een getal: ")\nprint(getal * 2)', vooraf:"De gebruiker typt 4.", q:"Wat toont dit programma?", opties:["8","44","getal * 2","Een foutmelding"], juist:1,
+      uitleg:"input() geeft altijd tekst: in de doos zit \"4\", niet het getal 4. Tekst × 2 plakt de tekst twee keer aan elkaar: 44. Wil je rekenen, zet de tekst dan om: getal = int(input(\"Geef een getal: \"))." } ],
+  oefeningen:[
+    { id:"o1", titel:"Je eerste variabele", eenvoudig:true,
+      html:`<p>Dit programma wil tonen hoe oud je bent, maar de variabele <code>leeftijd</code> bestaat nog niet. Maak op de lege regel de variabele <code>leeftijd</code> met de waarde <code>15</code>. Het programma toont dan: <i>Ik ben 15 jaar.</i></p>`,
+      starter:'# Maak hieronder de variabele leeftijd.\n\nprint("Ik ben", leeftijd, "jaar.")',
+      tests:[{invoer:[],regels:["Ik ben 15 jaar."]}],
+      moet:[[/^\s*leeftijd\s*=\s*15\b/m,"Maak de variabele zo: leeftijd = 15 (links de naam, rechts de waarde)."]],
+      tip:"Een variabele maak je met het =-teken: links de naam, rechts de waarde. Zet die regel bóven print(), want Python leest van boven naar onder.",
+      oplossing:'# Maak hieronder de variabele leeftijd.\nleeftijd = 15\nprint("Ik ben", leeftijd, "jaar.")' },
+    { id:"e1", titel:"Tekst of variabele?",
+      html:`<p>Dit programma moet <i>Hallo Lina !</i> tonen, maar het toont <i>Hallo naam !</i>. Zoek en verbeter de fout.</p>`,
+      starter:'naam = "Lina"\nprint("Hallo", "naam", "!")',
+      tests:[{invoer:[],regels:["Hallo Lina !"]}],
+      maxAantal:[[/Lina/g,1,"Typ Lina maar één keer: in de variabele. In print() gebruik je de variabele naam."]],
+      tip:"Kijk naar de aanhalingstekens. Met aanhalingstekens toont Python letterlijk het woord. Zonder aanhalingstekens kijkt Python in de doos.",
+      oplossing:'naam = "Lina"\nprint("Hallo", naam, "!")' },
+    { id:"e2", titel:"Rekenen met variabelen",
+      html:`<p>Maak de variabele <code>totaal</code> en reken die uit met <code>prijs</code> en <code>aantal</code>. Toon daarna: <i>Je betaalt 12 euro.</i></p><p style="font-size:15px;color:var(--muted)">Klaar? Verander de prijs in 5 en voer opnieuw uit. Je hoeft verder niets aan te passen!</p>`,
+      starter:'prijs = 3\naantal = 4\n\n# Maak de variabele totaal en toon het totaal.\n',
+      tests:[{invoer:[],regels:["Je betaalt 12 euro."]}],
+      moet:[[/^\s*totaal\s*=\s*(prijs\s*\*\s*aantal|aantal\s*\*\s*prijs)/m,"Reken het totaal uit met de variabelen: totaal = prijs * aantal"],[/print\s*\(.*\btotaal\b/,"Toon de variabele totaal met print()."]],
+      tip:"Eerst rekenen en bewaren: totaal = prijs * aantal. Daarna tonen: print(\"Je betaalt\", totaal, \"euro.\")",
+      oplossing:'prijs = 3\naantal = 4\n\n# Maak de variabele totaal en toon het totaal.\ntotaal = prijs * aantal\nprint("Je betaalt", totaal, "euro.")' },
+    { id:"e3", titel:"Eerst maken, dan gebruiken",
+      html:`<p>Klik op <b>▶ Uitvoeren</b>: dit programma geeft een foutmelding. Waarom? Verbeter het zodat het <i>Je woont in Gent .</i> toont.</p>`,
+      starter:'print("Je woont in", gemeente, ".")\ngemeente = "Gent"',
+      tests:[{invoer:[],regels:["Je woont in Gent ."]}],
+      tip:"Python leest van boven naar onder. Op regel 1 bestaat de doos gemeente nog niet. Welke regel moet eerst komen?",
+      oplossing:'gemeente = "Gent"\nprint("Je woont in", gemeente, ".")' },
+    { id:"e4", titel:"Een variabele verandert",
+      html:`<p>De score start op 0. Verhoog de score eerst met <b>10</b> en daarna nog eens met <b>5</b>. Gebruik telkens <code>score = score + …</code>. Het programma toont dan: <i>Je score is 15 .</i></p>`,
+      starter:'score = 0\n\n# Verhoog de score met 10 en daarna met 5.\n\nprint("Je score is", score, ".")',
+      tests:[{invoer:[],regels:["Je score is 15 ."]}],
+      moet:[[/score\s*(?:=\s*score\s*\+|\+=)[\s\S]*score\s*(?:=\s*score\s*\+|\+=)/,"Verhoog de score twee keer met score = score + ..."]],
+      tip:"score = score + 10 betekent: neem wat nu in de doos score zit, tel er 10 bij en stop het resultaat terug in de doos.",
+      oplossing:'score = 0\n\n# Verhoog de score met 10 en daarna met 5.\nscore = score + 10\nscore = score + 5\n\nprint("Je score is", score, ".")' },
+    { id:"e5", titel:"Invoer bewaren en omzetten",
+      html:`<p>Schrijf zelf een programma. Vraag met <code>input()</code> hoe oud iemand is, bewaar het antwoord in de variabele <code>leeftijd</code> en zet het om met <code>int()</code>. Toon daarna hoe oud die persoon volgend jaar is, bv. <i>Volgend jaar ben je 16 jaar.</i></p>`,
+      starter:'', invoer:"15", invoerNamen:["leeftijd"],
+      fouten:[[/can only concatenate str|unsupported operand type/,"In leeftijd zit nog tekst, want input() geeft altijd tekst. Zet de invoer om met int(): leeftijd = int(input(\"Hoe oud ben je? \"))"]],
+      tests:[{invoer:["15"],getallen:[16]},{invoer:["9"],getallen:[10]}],
+      moet:[[/input\s*\(/,"Vraag de leeftijd met input()."],[/int\s*\(/,"Zet de invoer om naar een getal met int()."]],
+      tip:"Drie stappen: leeftijd = int(input(\"Hoe oud ben je? \")). Daarna rekenen in print(): leeftijd + 1.",
+      oplossing:'leeftijd = int(input("Hoe oud ben je? "))\nprint("Volgend jaar ben je", leeftijd + 1, "jaar.")' } ] } ];
+const NAAM_AFSPRAAK=/^(Zet je naam als commentaar|Vervang ‘Voornaam Naam’|De eerste commentaarregel is altijd je naam)/;
+const TH=id=>{ if(!S.theorie) S.theorie={}; return S.theorie[id]||(S.theorie[id]={quiz:{},oef:{}}) };
+function theorieTel(les){ const t=TH(les.id); return {k:Object.values(t.quiz).filter(x=>x===true).length+les.oefeningen.filter(o=>(t.oef[o.id]||{}).ok).length, n:les.quiz.length+les.oefeningen.length} }
+
+function renderTheorie(m,les){
+  const t=TH(les.id);
+  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Terug naar de theorie</button></div><div class="kicker">Theorie</div><h2>${les.icoon} ${esc(les.titel)}</h2>
+    <p>In Python bewaar je gegevens in een <b>variabele</b>. Denk aan een <b>doos met een naam</b> erop. In de doos zit één waarde: een woord, een getal … Telkens je de naam gebruikt, kijkt Python in de doos.</p>
+    <div class="th-dozen">${[["naam",'"Sara"',"tekst"],["leeftijd","15","geheel getal"],["prijs","2.5","kommagetal"]].map(([n,w,s])=>`<div><div class="vl-doos"><span class="naam">${n}</span><span class="waarde">${w}</span></div><span>${s}</span></div>`).join("")}</div>
+    <div class="th-regel"><code><b class="n">leeftijd</b> <b class="is">=</b> <b class="w">15</b></code><div><span class="n">de naam van de doos</span><span class="is">bewaar in</span><span class="w">wat erin komt</span></div></div>
+    <div class="box">📖 Dit is <b>theorie</b>: oefen zoveel je wilt. De oefeningen hier tellen niet mee voor je cijfer en je verstuurt ze niet.</div></div>`));
+  m.querySelector("#terug").onclick=()=>{ S.deel="theorie"; go("start") };
+
+  /* 1. stap voor stap */
+  m.appendChild($(`<div class="card"><div class="kicker">Deel 1</div><h3>Kijk mee met Python</h3><p>Hieronder staat een programma voor de havenkraan. Klik op <b>Volgende stap</b> en kijk wat Python bij elke regel doet en wat er in de doos <code>afstand</code> zit.</p><div class="varles" data-stap="0" data-a="5">${varlesHTML(0,5)}</div></div>`));
+
+  /* 2. quiz */
+  const qk=$(`<div class="card"><div class="kicker">Deel 2</div><h3>Test jezelf: wat toont Python?</h3><p>Lees de code en kies wat je op het scherm ziet. Fout? Lees de uitleg en probeer opnieuw.</p></div>`); m.appendChild(qk);
+  les.quiz.forEach((v,k)=>{ const q=$(`<div class="th-quiz"><b>Vraag ${k+1}</b><pre>${esc(v.code)}</pre>${v.vooraf?`<p style="margin:4px 0">${esc(v.vooraf)}</p>`:""}<div style="margin:6px 0"><b>${esc(v.q)}</b></div></div>`);
+    v.opties.forEach((o,i)=>q.appendChild($(`<label class="opt"><input type="radio" name="th${k}" value="${i}"><span style="white-space:pre-line;font-family:ui-monospace,Consolas,monospace">${esc(o)}</span></label>`)));
+    const act=$(`<div class="actions"><button class="btn">Controleer</button></div>`); q.appendChild(act); const f=$(`<div class="fb"></div>`); q.appendChild(f);
+    const juist=()=>{ q.querySelectorAll(".opt").forEach(o=>{const i=+o.querySelector("input").value; o.querySelector("input").disabled=true; if(i===v.juist){o.classList.add("right");o.querySelector("input").checked=true}}); act.remove(); f.className="fb ok"; f.textContent="✔ Juist! "+v.uitleg };
+    act.querySelector("button").onclick=()=>{ const s=q.querySelector("input:checked"); if(!s){f.className="fb info";f.textContent="Kies eerst een antwoord.";return}
+      if(+s.value===v.juist){ t.quiz[k]=true; save(); juist() } else { t.quiz[k]=t.quiz[k]||false; save(); f.className="fb bad"; f.textContent="✘ Nog niet. "+v.uitleg.split(". ")[0]+". Kies opnieuw." } };
+    if(t.quiz[k]===true) juist();
+    qk.appendChild(q) });
+
+  /* 3 en 4. oefeningen */
+  const oefKaart=(o,nr)=>{ const ps=t.oef[o.id]||(t.oef[o.id]={pog:0});
+    const c=$(`<div class="card step ${ps.ok?"done":""}"><h3>${nr} ${esc(o.titel)}</h3>${o.html}</div>`);
+    const fb=$(`<div class="fb"></div>`), hulp=$(`<div class="actions"></div>`), extra=$(`<div></div>`);
+    const blok=codeBlok({waarde:ps.code??o.starter, onCode:v=>{ps.code=v;save()}, invoer:ps.invoer??o.invoer, onInvoer:v=>{ps.invoer=v;save()},
+      controleer:async(code,out)=>{ const r=await nakijken(code,o,o.invoerNamen);
+        if(r.stijl){ r.stijl=r.stijl.filter(x=>!NAAM_AFSPRAAK.test(x.msg)); if(r.stijlFout&&!r.stijl.length){ r.ok=true; r.stijlFout=false; r.msg="Juist!" } }
+        if(r.toon) toonUit(out,{out:r.toon.out,err:r.toon.err}); else out.style.display="none";
+        if(r.ok){ ps.ok=true; save(); blok.vergrendel(); c.classList.add("done"); toonFb(fb,{ok:true,msg:"Juist! Goed gedaan."}) }
+        else { ps.pog=(ps.pog||0)+1; save(); toonFb(fb,r) }
+        verfHulp() }});
+    c.appendChild(blok); c.appendChild(fb); c.appendChild(hulp); c.appendChild(extra);
+    function verfHulp(){ hulp.innerHTML=""; if(ps.ok) return;
+      const tb=$(`<button class="btn hint">💡 Tip</button>`); tb.onclick=()=>{ extra.innerHTML=`<div class="hintbox"><b>💡 Tip</b><div>${esc(o.tip)}</div></div>` }; hulp.appendChild(tb);
+      if((ps.pog||0)>=2){ const ob=$(`<button class="btn secondary">👀 Toon een oplossing</button>`); ob.onclick=()=>{ extra.innerHTML=`<div class="hintbox"><b>👀 Zo kan het</b><pre>${esc(o.oplossing)}</pre>Typ het zelf over en probeer te begrijpen wat elke regel doet.</div>` }; hulp.appendChild(ob) } }
+    if(ps.ok){ blok.vergrendel(); toonFb(fb,{ok:true,msg:"Juist! Goed gedaan."}) }
+    verfHulp(); return c };
+  const eenv=les.oefeningen.filter(o=>o.eenvoudig), meer=les.oefeningen.filter(o=>!o.eenvoudig);
+  m.appendChild($(`<div class="th-kop"><div class="kicker">Deel 3</div><h3>Eenvoudige oefening</h3></div>`));
+  eenv.forEach(o=>m.appendChild(oefKaart(o,"")));
+  m.appendChild($(`<div class="th-kop"><div class="kicker">Deel 4</div><h3>Extra inoefeningen</h3><p style="margin:0">Elke oefening oefent één ding. Lukt het niet? Vraag een tip. Na twee pogingen mag je ook een oplossing bekijken.</p></div>`));
+  meer.forEach((o,i)=>m.appendChild(oefKaart(o,(i+1)+".")));
+
+  /* spiekbriefje */
+  m.appendChild($(`<div class="card"><div class="kicker">Spiekbriefje</div><h3>Zo gebruik je een variabele goed</h3>${VAR_TIPS}</div>`));
+  const tel=theorieTel(les);
+  m.appendChild($(`<div class="actions"><button class="btn secondary" id="terug2">← Terug naar de theorie</button></div>`));
+  m.querySelector("#terug2").onclick=()=>{ S.deel="theorie"; go("start") };
+}
 
 function fbVak(box){let f=box.querySelector(":scope > .fb"); if(!f){f=$(`<div class="fb"></div>`);box.appendChild(f)} return f}
 
@@ -3667,6 +3760,7 @@ function codeBlok({waarde,onCode,invoer,onInvoer,controleer,uitvoeren}){
 function lvlNr(o,i){ const m=o.titel.match(/^\S+ (\d+[a-z]?) - /); return m?m[1]:i+1 }
 function go(id){S.huidig=id;save();render();window.scrollTo(0,0)}
 function render(){const m=document.getElementById("main"); m.innerHTML="";
+  if(String(S.huidig).startsWith("T:")){ const les=THEORIE.find(l=>"T:"+l.id===S.huidig); if(les) return renderTheorie(m,les) }
   const oef=OEFENINGEN.find(o=>o.id===S.huidig&&o.klaar);
   if(oef && S.naam && S.klas) return renderOef(m,oef);
   renderStart(m)}
@@ -3705,7 +3799,16 @@ function renderStart(m){
       <button type="button" data-tab="werelden">🎮 Programmeerwerelden <span class="tel">${telKlaar(wereldOef)}/${telOpen(wereldOef)}</span></button>
       <button type="button" data-tab="tekenen">🐢 Tekenen <span class="tel">${telKlaar(tekenOef)}/${telOpen(tekenOef)}</span></button>
     </div><div class="tabinhoud"></div></div>`);
+  if(!S.deel) S.deel="oef";
+  const hoofd=$(`<div class="hoofdtabs" role="tablist"><button type="button" data-deel="theorie">📖 Theorie<span>Uitleg en inoefenen</span></button><button type="button" data-deel="oef">✏️ Oefeningen<span>Voor je cijfer</span></button></div>`);
+  m.appendChild(hoofd);
+  const theorie=$(`<div class="card"><p class="w-intro" style="margin-top:0">Hier lees je de uitleg en oefen je in. Deze oefeningen tellen <b>niet</b> mee voor je cijfer.</p><div class="th-lessen"></div></div>`); m.appendChild(theorie);
+  THEORIE.forEach(les=>{ const tl=theorieTel(les);
+    const b=$(`<button type="button" class="th-les"><span class="w-icoon">${les.icoon}</span><span><span class="w-naam">${esc(les.titel)}</span><span class="w-sub">${esc(les.sub)}</span></span><span class="tel">${tl.k}/${tl.n}</span></button>`);
+    b.onclick=()=>go("T:"+les.id); theorie.querySelector(".th-lessen").appendChild(b) });
   m.appendChild(kaart);
+  const kiesDeel=d=>{ S.deel=d; save(); hoofd.querySelectorAll("button").forEach(b=>b.classList.toggle("aan",b.dataset.deel===d)); theorie.hidden=d!=="theorie"; kaart.hidden=d==="theorie" };
+  hoofd.querySelectorAll("button").forEach(b=>b.onclick=()=>kiesDeel(b.dataset.deel));
   const inhoud=kaart.querySelector(".tabinhoud");
   const voortgang=(lijst,tekst)=>{ const k=telKlaar(lijst), n=telOpen(lijst), pct=n?Math.round(k/n*100):0;
     return `<div class="voortgang"><div class="vg-tekst">${tekst}: <b>${k} van ${n}</b> verstuurd</div><div class="vg-balk"><div style="width:${pct}%"></div></div></div>` };
@@ -3745,14 +3848,14 @@ function renderStart(m){
   const kies=tab=>{ S.tab=tab; save(); tabs.forEach(b=>b.classList.toggle("aan",b.dataset.tab===tab)); tab==="werelden"?tekenWerelden():tab==="tekenen"?tekenTekenen():tekenKlas() };
   tabs.forEach(b=>b.onclick=()=>kies(b.dataset.tab));
   kies(S.tab);
+  kiesDeel(S.deel);
 
-  m.appendChild($(`<div class="card"><details class="afspraken-kaart"><summary>📦 Wat is een variabele? Uitleg met voorbeeld</summary>${varUitleg()}</details></div>`));
   if(KLASAFSPRAKEN) m.appendChild($(`<div class="card"><details class="afspraken-kaart"><summary>📏 Klasafspraken voor je code</summary><p>Bij <b>✓ Controleer</b> kijkt de app ook na of je code deze afspraken volgt. Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details></div>`));
 }
 
 function renderOef(m,oef){
   const a=O(oef.id);
-  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Alle oefeningen</button></div><div class="kicker">Oefening</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${MET_VAR_UITLEG.includes(oef.id)?`<details class="afspraken"><summary>📦 Wat is een variabele? (klik voor de uitleg)</summary>${varUitleg()}</details>`:""}${KLASAFSPRAKEN&&!oef.geenCode?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
+  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Alle oefeningen</button></div><div class="kicker">Oefening</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${KLASAFSPRAKEN&&!oef.geenCode?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
   m.querySelector("#terug").onclick=()=>go("start");
 
   /* stappen (probeer + vraag) */
