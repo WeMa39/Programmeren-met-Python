@@ -190,6 +190,34 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .fl-legende{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0}
 .fl-lg{display:flex;gap:8px;align-items:center;font-size:14px}
 .fl-lg span{color:var(--muted)}
+.top a.editor{text-decoration:none;color:var(--card);background:var(--accent);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;white-space:nowrap}
+/* Variabelen-uitleg */
+.varles{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0;background:var(--card)}
+.vl-kies{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:14px;margin-bottom:10px}
+.vl-kies button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:3px 12px;cursor:pointer;font:inherit;font-size:14px}
+.vl-kies button.aan{background:var(--brand);color:var(--card);border-color:var(--brand)}
+.vl-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px}
+@media (max-width:640px){ .vl-grid{grid-template-columns:1fr} }
+.vl-code{background:var(--code-bg);border-radius:8px;padding:8px 0;font-family:ui-monospace,Consolas,monospace;font-size:14px;overflow-x:auto}
+.vl-r{display:flex;gap:10px;padding:1px 10px;white-space:pre;border-left:4px solid transparent}
+.vl-r .nr{color:var(--muted);min-width:14px;text-align:right;user-select:none}
+.vl-r.nu{background:var(--brand-soft);border-left-color:var(--brand)}
+.vl-r mark{background:#ffd76a;color:#1d2433;border-radius:3px;padding:0 2px}
+.vl-mem{display:flex;flex-direction:column;gap:10px}
+.vl-kop{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.vl-doos{display:flex;align-items:stretch;border:2px solid var(--brand);border-radius:8px;overflow:hidden;font-family:ui-monospace,Consolas,monospace}
+.vl-doos .naam{background:var(--brand);color:var(--card);padding:6px 10px;font-weight:700}
+.vl-doos .waarde{padding:6px 12px;font-size:18px;font-weight:800;min-width:60px}
+.vl-doos.leeg{border-style:dashed;opacity:.55}
+.vl-doos.kijk{box-shadow:0 0 0 4px #ffd76a}
+.vl-hand{font-family:ui-monospace,Consolas,monospace;font-size:15px}
+.vl-haven{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;font-size:12px;text-align:center}
+.vl-haven div{border-bottom:3px solid #2f6fae;padding:2px 0;min-height:44px;display:flex;flex-direction:column;justify-content:flex-end;line-height:1.2}
+.vl-haven div span{color:var(--muted);font-size:11px}
+.vl-uitleg{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--brand-soft);font-size:15px}
+.vl-knoppen{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.vl-knoppen .tel{color:var(--muted);font-size:14px}
+.volg-hint{font-size:13.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -197,6 +225,7 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
   <div class="top">
     <h1 id="home">Python Oefeningen</h1>
     <span id="who" style="color:var(--muted);font-size:14px"></span>
+    <a class="editor" href="https://editor.raspberrypi.org/en/" target="_blank" rel="noopener" title="Open de online Python-editor van Raspberry Pi in een nieuw tabblad">🍓 Python-editor</a>
     <a href="index.html" title="Terug naar de startpagina met beide cursussen" style="text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap">⌂ Alle cursussen</a>
     <button class="theme" id="themeBtn" title="Licht of donker scherm">◐ Thema</button>
   </div>
@@ -300,6 +329,8 @@ def _getal(n, wat):
     if isinstance(n, bool):
         _fout(wat + " verwacht een getal.")
     if isinstance(n, str):
+        if n.isidentifier():
+            _fout(wat + " verwacht een getal, maar je gaf het woord '" + n + "'. Bedoel je de variabele " + n + "? Schrijf de naam dan zonder aanhalingstekens: (" + n + ") en niet ('" + n + "').")
         _fout(wat + " verwacht een getal, maar je gaf tekst ('" + n + "'). Zet de tekst eerst om met int().")
     if isinstance(n, float):
         if n == int(n):
@@ -329,6 +360,7 @@ class _Kraan:
         _ST["schepen"] = {}
         _ST["over"] = len(rij)
         _ST["vast"] = None
+        _ST["pos"] = 0
 
     def _boven(self):
         if self.vast is not None:
@@ -347,6 +379,7 @@ class _Kraan:
             if nieuw < 0 or nieuw > 7:
                 _fout("De kraan rijdt van de rails! De rails lopen van vak 0 tot vak 7.")
             self.pos = nieuw
+            _ST["pos"] = nieuw
             _ev(t="pos", v=self.pos)
 
     def rechts(self, stappen=1):
@@ -1301,6 +1334,15 @@ function havenDoel(sc,st,out){
   if(st.geplaatst==null) return "De container hangt nog aan de kraan. Zet hem neer met kraan.zet().";
   if(st.geplaatst!==sc.doel) return `De container staat op het schip op vak ${st.geplaatst}, maar hij moest naar ${sc.doelNaam} op vak ${sc.doel}.`;
   return null }
+function havenTerugDoel(sc,st,out){
+  const f=havenDoel(sc,st,out); if(f) return f;
+  if(st.pos!==0) return `De container staat op het schip, maar de kraan staat nog op vak ${st.pos}. Rijd terug naar de kade (vak 0) met kraan.links(...).`;
+  if(!bevat(out,[sc.afstand],0.01)) return `De kraan werkt, maar ik vind de afstand (${sc.afstand}) niet in je uitvoer. Toon ze met print(): de variabele zonder aanhalingstekens.`;
+  return null }
+function havenSchipBDoel(sc,st,out){
+  const f=havenDoel(sc,st,out); if(f) return f;
+  if(!bevat(out,[sc.doel],0.01)) return `De container staat op schip B, maar ik vind de afstand tot schip B (${sc.doel}) niet in je uitvoer. Toon je tweede variabele met print().`;
+  return null }
 function stationDoel(sc,st,out){
   if(!st.vertrokken) return "De trein is niet vertrokken. Vergeet trein.rijd() niet.";
   if(st.spoor!==sc.doel) return `De trein reed naar spoor ${st.spoor} (${sc.sporen[st.spoor]}), maar moest naar spoor ${sc.doel} (${sc.sporen[sc.doel]}).`;
@@ -1505,6 +1547,28 @@ wLevel({ id:"H2", groep:"🏗️ De Havenkraan", titel:"Haven 2 - Lees de afstan
     moet:[[/lees_afstand\s*\(/, "Lees de afstand met kraan.lees_afstand(): het schip ligt telkens ergens anders."]],
     hulp:["Een vast getal in kraan.rechts() werkt maar in één situatie. Hoe gebruik je de afstand die de kraan leest?","kraan.lees_afstand() geeft tekst, zoals bij input(). Zet ze om met int() en bewaar ze in een variabele: <code>afstand = int(kraan.lees_afstand())</code>.","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nafstand = int(kraan.lees_afstand())\nkraan.pak()\nkraan.rechts(afstand)\nkraan.zet()</pre>"],
     ok:"Je kraan vindt het schip, waar het ook ligt!" } }),
+wLevel({ id:"H2b", groep:"🏗️ De Havenkraan", titel:"Haven 2b - Heen en terug",
+  opdracht:`<p>Na elke lading moet de kraan terug naar de <b>kade (vak 0)</b>, want daar staat de volgende container. Het schip ligt telkens op een andere afstand.</p><p>Lees de afstand daarom <b>één keer</b> en bewaar ze in een <b>variabele</b>. Die variabele gebruik je daarna <b>drie keer</b>: om te tonen hoe ver het schip ligt, om naar het schip te rijden en om terug te rijden. Twijfel je wat een variabele is? Open dan hieronder de uitleg 📦.</p>${API_HAVEN}`,
+  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
+    html:`<p>Toon eerst met <code>print()</code> hoe ver het schip ligt, bv. <i>Het schip ligt op 5 vakken.</i> Breng daarna de container naar het schip en rijd terug naar vak 0.</p>`,
+    starter:"from haven import kraan\n\n",
+    scenarios:[4,6,3,7].map((a,i)=>hSc({naam:`schip op ${a} vakken`,schepen:[a],namen:{[a]:"Schip"},doel:a,doelNaam:"het schip",afstand:a,kleur:["blauw","groen","rood","geel"][i],paneel:`📟 Afstand tot het schip: ${a}`})),
+    doel:havenTerugDoel,
+    moet:[[/^\s*[A-Za-z_]\w*\s*=.*lees_afstand\s*\(/m, "Bewaar de afstand in een variabele: afstand = int(kraan.lees_afstand())"]],
+    maxAantal:[[/lees_afstand\s*\(/g,1,"Je leest de afstand meer dan één keer. Lees ze één keer, bewaar ze in een variabele en gebruik daarna die variabele."]],
+    hulp:["Hoeveel vakken moet de kraan terug naar links? Is dat hetzelfde getal als naar rechts? Waar heb je dat getal bewaard?","<pre>afstand = int(kraan.lees_afstand())\nprint(\"Het schip ligt op\", afstand, \"vakken.\")</pre>Gebruik daarna <code>afstand</code> (zonder aanhalingstekens) in <code>kraan.rechts()</code> én in <code>kraan.links()</code>.","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nafstand = int(kraan.lees_afstand())\nprint(\"Het schip ligt op\", afstand, \"vakken.\")\nkraan.pak()\nkraan.rechts(afstand)\nkraan.zet()\nkraan.links(afstand)</pre>"],
+    ok:"De container staat op het schip en de kraan is terug op de kade. Eén variabele, drie keer gebruikt!" } }),
+wLevel({ id:"H2c", groep:"🏗️ De Havenkraan", titel:"Haven 2c - Het tweede schip",
+  opdracht:`<p>Er liggen nu <b>twee schepen</b> achter elkaar. De kraan meet alleen de afstand tot <b>schip A</b>. <b>Schip B</b> ligt altijd <b>2 vakken verder</b> dan schip A. De container moet naar <b>schip B</b>.</p><p>Maak daarom een <b>tweede variabele</b> voor de afstand tot schip B en reken ze uit met je eerste variabele.</p>${API_HAVEN}`,
+  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
+    html:`<p>Toon met <code>print()</code> hoe ver schip B ligt, bv. <i>Schip B ligt op 6 vakken.</i> Breng daarna de container naar schip B.</p>`,
+    starter:"from haven import kraan\n\n",
+    scenarios:[2,4,1,5].map((a,i)=>hSc({naam:`schip A op ${a} vakken`,schepen:[a,a+2],namen:{[a]:"Schip A",[a+2]:"Schip B"},doel:a+2,doelNaam:"schip B",afstand:a,kleur:["rood","blauw","groen","geel"][i],paneel:`📟 Afstand tot schip A: ${a}`})),
+    doel:havenSchipBDoel,
+    moet:[[/lees_afstand\s*\(/, "Lees de afstand tot schip A met kraan.lees_afstand()."],[/^\s*[A-Za-z_]\w*\s*=\s*(?:[A-Za-z_]\w*\s*\+\s*\d|\d+\s*\+\s*[A-Za-z_])/m, "Maak een tweede variabele en reken ze uit met je eerste variabele, bv. afstand_b = afstand + 2"]],
+    maxAantal:[[/lees_afstand\s*\(/g,1,"Je leest de afstand meer dan één keer. Lees ze één keer en bewaar ze in een variabele."]],
+    hulp:["Als schip A op 3 vakken ligt, waar ligt schip B dan? En als schip A op 5 vakken ligt? Welke berekening maak je telkens?","<pre>afstand = int(kraan.lees_afstand())\nafstand_b = afstand + 2</pre>Nu zit in <code>afstand_b</code> de afstand tot schip B. Gebruik die variabele in <code>print()</code> en in <code>kraan.rechts()</code>.","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nafstand = int(kraan.lees_afstand())\nafstand_b = afstand + 2\nprint(\"Schip B ligt op\", afstand_b, \"vakken.\")\nkraan.pak()\nkraan.rechts(afstand_b)\nkraan.zet()</pre>"],
+    ok:"Juist gerekend: de container staat op schip B!" } }),
 wLevel({ id:"H3", groep:"🏗️ De Havenkraan", titel:"Haven 3 - Rood of niet",
   opdracht:`<p>Er liggen twee schepen. <b>Rode</b> containers gaan naar <b>schip A</b> op vak 2. Alle <b>andere</b> containers gaan naar <b>schip B</b> op vak 6.</p>${API_HAVEN}`,
   hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
@@ -3283,6 +3347,11 @@ function klasafspraken(code,naam){
       const vorige=(regels[ln-2]||"").trim();
       if(vorige!=="" && !vorige.startsWith("#")) add(c.s,"Zet een lege regel boven deze commentaarregel (zo spraken we af voor commentaar na regel 5).") } }
 
+  /* Afspraak 8: na de import-regels komt een lege regel */
+  const isImport=r=>/^\s*(import\s|from\s+\S+\s+import\s)/.test(r);
+  regels.forEach((r,i)=>{ if(isImport(r)&&i+1<regels.length&&regels[i+1].trim()!==""&&!isImport(regels[i+1]))
+    add(starts[i],"Na de regel met import komt altijd een lege regel.") });
+
   /* Afspraak 5-7: operatoren, haakjes en komma's */
   const st=toks.filter(t=>t.t!=="comment");
   const ws=c=>c===" "||c==="\t";
@@ -3521,7 +3590,51 @@ const AFSPRAKEN_HTML=`<ol class="afspr">
 <li>Voor en na een operator (<code>=</code> <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>&lt;=</code> …) staat een spatie.<br><span class="ok">totaal = prijs * aantal</span><span class="nok">totaal=prijs*aantal</span></li>
 <li>Geen spatie vóór het haakje van een functie.<br><span class="ok">print("Naam.")</span><span class="nok">print ("Naam.")</span></li>
 <li>Geen spatie vóór een komma, wel erna.<br><span class="ok">print("Jouw naam is dus", naam, ".")</span><span class="nok">print("Jouw naam is dus" ,naam,".")</span></li>
+<li>Na de regel(s) met <code>import</code> komt altijd een lege regel.<br><span class="ok">from haven import kraan<br><br>kraan.pak()</span><span class="nok">from haven import kraan<br>kraan.pak()</span></li>
 </ol>`;
+/* ---------------- Uitleg: wat is een variabele? ---------------- */
+const VAR_CODE=["# Voornaam Naam","from haven import kraan","","afstand = int(kraan.lees_afstand())","kraan.pak()","kraan.rechts(afstand)","kraan.zet()"];
+/* r = regel (vanaf 0), m = stukje dat oplicht, doos: leeg / vol / kijk, hand = wat Python net heeft, kraan = vak van de kraan */
+const VAR_STAPPEN=[
+  {r:0,doos:"geen",kraan:0,t:A=>`Regel 1 is <b>commentaar</b>: Python slaat die over. De variabele <code>afstand</code> bestaat nog niet.`},
+  {r:1,doos:"geen",kraan:0,t:A=>`Python haalt de kraan op. Daarna volgt een <b>lege regel</b> (klasafspraak).`},
+  {r:3,m:"kraan.lees_afstand()",doos:"geen",kraan:0,hand:A=>`"${A}"`,t:A=>`Python begint <b>rechts</b> van het <code>=</code>-teken. De kraan meet de afstand en geeft <code>"${A}"</code> terug. Let op de aanhalingstekens: het is <b>tekst</b>, nog geen getal.`},
+  {r:3,m:"int(kraan.lees_afstand())",doos:"geen",kraan:0,hand:A=>`${A}`,t:A=>`<code>int()</code> maakt van de tekst <code>"${A}"</code> het <b>getal</b> <code>${A}</code>. Met tekst kan de kraan niet rijden, met een getal wel.`},
+  {r:3,m:"afstand =",doos:"vol",kraan:0,t:A=>`Het <code>=</code>-teken <b>bewaart</b> het getal in een doos met de naam <code>afstand</code>. Vanaf nu onthoudt Python: <code>afstand</code> is ${A}. Zo maak je een <b>variabele</b>.`},
+  {r:4,doos:"vol",kraan:0,vast:1,t:A=>`De kraan pakt de container. De doos <code>afstand</code> blijft gewoon bewaard.`},
+  {r:5,m:"afstand",mLaatste:true,doos:"kijk",kraan:"A",vast:1,t:A=>`Python ziet de naam <code>afstand</code>, kijkt in de doos en vindt <b>${A}</b>. Deze regel wordt dus <code>kraan.rechts(${A})</code>.`},
+  {r:6,doos:"vol",kraan:"A",klaar:1,t:A=>`Klaar! Kies bovenaan een <b>andere afstand</b> en loop opnieuw door de code. De code blijft precies dezelfde: alleen wat in de doos zit, verandert. Dáárom gebruik je een variabele.`}];
+function varlesHTML(stap,A){ const st=VAR_STAPPEN[stap], esc2=t=>esc(t);
+  const code=VAR_CODE.map((r,i)=>{ let h=esc2(r);
+    if(i===st.r&&st.m){ const k=st.mLaatste?r.lastIndexOf(st.m):r.indexOf(st.m); h=esc2(r.slice(0,k))+"<mark>"+esc2(st.m)+"</mark>"+esc2(r.slice(k+st.m.length)) }
+    return `<div class="vl-r ${i===st.r?"nu":""}"><span class="nr">${i+1}</span><span>${h||" "}</span></div>` }).join("");
+  const kraanVak=st.kraan==="A"?A:0;
+  const haven=[...Array(8)].map((_,v)=>`<div>${v===kraanVak?"🏗️"+(st.vast?"📦":""):""}${v===A?(st.klaar?"📦":"")+"🚢":""}<span>${v}</span></div>`).join("");
+  return `<div class="vl-kies">De kraan meet een afstand van: ${[3,5,7].map(a=>`<button type="button" data-vl-a="${a}" class="${a===A?"aan":""}">${a}</button>`).join("")}</div>
+  <div class="vl-grid"><div class="vl-code">${code}</div>
+  <div class="vl-mem"><div><div class="vl-kop">Geheugen van Python</div>
+    <div class="vl-doos ${st.doos==="geen"?"leeg":""} ${st.doos==="kijk"?"kijk":""}"><span class="naam">afstand</span><span class="waarde">${st.doos==="geen"?"":A}</span></div></div>
+    ${st.hand?`<div><div class="vl-kop">Wat Python nu vasthoudt</div><div class="vl-hand">${esc2(st.hand(A))}</div></div>`:""}
+    <div><div class="vl-kop">De haven</div><div class="vl-haven">${haven}</div></div></div></div>
+  <div class="vl-uitleg">${st.t(A)}</div>
+  <div class="vl-knoppen"><button type="button" class="btn secondary" data-vl-stap="-1" ${stap===0?"disabled":""}>◀ Vorige</button><button type="button" class="btn" data-vl-stap="1" ${stap===VAR_STAPPEN.length-1?"disabled":""}>Volgende stap ▶</button><span class="tel">Stap ${stap+1} van ${VAR_STAPPEN.length}</span></div>` }
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-vl-stap],[data-vl-a]"); if(!b) return; const root=b.closest(".varles"); if(!root) return;
+  let stap=+root.dataset.stap||0, A=+root.dataset.a||5;
+  if(b.dataset.vlA){ A=+b.dataset.vlA; stap=0 } else stap=Math.max(0,Math.min(VAR_STAPPEN.length-1,stap+ +b.dataset.vlStap));
+  root.dataset.stap=stap; root.dataset.a=A; root.innerHTML=varlesHTML(stap,A) });
+const VAR_TIPS=`<h4 style="margin:16px 0 4px;color:var(--brand)">Zo gebruik je een variabele goed</h4><ol class="afspr">
+<li><b>Een variabele is een doos met een naam.</b> Links van <code>=</code> staat de naam, rechts wat erin moet. <code>=</code> betekent <i>bewaar in</i>, niet <i>is gelijk aan</i>.<br><span class="ok">afstand = 5</span><span class="nok">5 = afstand</span></li>
+<li><b>Kies een naam die zegt wat erin zit.</b> Kleine letters, geen spaties: gebruik <code>_</code>.<br><span class="ok">afstand_b = afstand + 2</span><span class="nok">x = a + 2</span><span class="nok">afstand b = 7</span></li>
+<li><b>Eerst maken, dan gebruiken.</b> Python leest van boven naar onder. Gebruik je de naam vóór de regel met <code>=</code>, dan krijg je een <code>NameError</code>.</li>
+<li><b>De naam schrijf je zónder aanhalingstekens.</b> Met aanhalingstekens is het gewoon tekst.<br><span class="ok">kraan.rechts(afstand)</span><span class="nok">kraan.rechts("afstand")</span><br><span class="ok">print("Het schip ligt op", afstand, "vakken.")</span><span class="nok">print("Het schip ligt op afstand vakken.")</span></li>
+<li><b>Tekst omzetten naar een getal?</b> <code>input()</code> en <code>kraan.lees_afstand()</code> geven tekst. Wil je rekenen of rijden, zet ze dan om met <code>int()</code> (of <code>float()</code> voor kommagetallen).<br><span class="ok">afstand = int(kraan.lees_afstand())</span><span class="nok">afstand = kraan.lees_afstand()</span></li>
+<li><b>Eén keer lezen, vaak gebruiken.</b> Bewaar wat je leest of berekent in een variabele en gebruik die variabele daarna zo vaak als je wilt.<br><span class="ok">kraan.rechts(afstand)<br>kraan.links(afstand)</span></li>
+<li><b>Rekenen met variabelen mag.</b> Een nieuwe waarde vervangt de oude.<br><span class="ok">totaal = prijs * aantal</span><span class="ok">teller = teller + 1</span></li>
+</ol>`;
+const varUitleg=()=>`<p style="margin:10px 0 0">Een <b>variabele</b> is een doos met een naam waarin Python iets onthoudt. Klik op <b>Volgende stap</b> en kijk wat Python bij elke regel doet.</p><div class="varles" data-stap="0" data-a="5">${varlesHTML(0,5)}</div>${VAR_TIPS}`;
+/* Bij deze oefeningen staat de uitleg over variabelen erbij */
+const MET_VAR_UITLEG=["4.1","4.2","4.3","H2","H2b","H2c","H5","H8","V3","V5"];
+
 function fbVak(box){let f=box.querySelector(":scope > .fb"); if(!f){f=$(`<div class="fb"></div>`);box.appendChild(f)} return f}
 
 /* Foutmelding als Python niet start of de app zelf een fout geeft */
@@ -3551,6 +3664,7 @@ function codeBlok({waarde,onCode,invoer,onInvoer,controleer,uitvoeren}){
 }
 
 /* ---------------- Schermen ---------------- */
+function lvlNr(o,i){ const m=o.titel.match(/^\S+ (\d+[a-z]?) - /); return m?m[1]:i+1 }
 function go(id){S.huidig=id;save();render();window.scrollTo(0,0)}
 function render(){const m=document.getElementById("main"); m.innerHTML="";
   const oef=OEFENINGEN.find(o=>o.id===S.huidig&&o.klaar);
@@ -3615,7 +3729,7 @@ function renderStart(m){
       const t=$(`<div class="wtegel" style="--wk:${info.kleur||"var(--brand)"}"><div class="w-kop"><span class="w-icoon">${info.icoon||""}</span><div><div class="w-naam">${esc(info.naam||g)}</div><div class="w-sub">${esc(info.sub||"")}</div></div><span class="tel">${telKlaar(lijst)}/${lijst.length}</span></div><div class="w-levels"></div></div>`);
       const lv=t.querySelector(".w-levels");
       lijst.forEach((o,i)=>{ const s=status(o), naam=o.titel.replace(/^.*? - /,"");
-        const b=$(`<button type="button" class="lvl ${s}"><span class="lvl-nr">${s==="verstuurd"?"✔":i+1}</span><span class="lvl-t">${esc(naam)}</span>${o.lus?'<span class="lvl-lus" title="Met een while-lus">🔁 while</span>':""}${s==="verstuurd"?`<span class="lvl-c">${fmt(S.oef[o.id].verstuurd.cijfer)}</span>`:s==="klaar"?'<span class="lvl-c mid">versturen</span>':s==="bezig"?'<span class="lvl-c mid">bezig</span>':""}</button>`);
+        const b=$(`<button type="button" class="lvl ${s}"><span class="lvl-nr">${s==="verstuurd"?"✔":lvlNr(o,i)}</span><span class="lvl-t">${esc(naam)}</span>${o.lus?'<span class="lvl-lus" title="Met een while-lus">🔁 while</span>':""}${s==="verstuurd"?`<span class="lvl-c">${fmt(S.oef[o.id].verstuurd.cijfer)}</span>`:s==="klaar"?'<span class="lvl-c mid">versturen</span>':s==="bezig"?'<span class="lvl-c mid">bezig</span>':""}</button>`);
         b.onclick=()=>open(o); lv.appendChild(b) });
       grid.appendChild(t) });
   }
@@ -3624,7 +3738,7 @@ function renderStart(m){
     const t=$(`<div class="wtegel" style="--wk:#2a9d4b"><div class="w-kop"><span class="w-icoon">🐢</span><div><div class="w-naam">Tekenen met Python</div><div class="w-sub">Van een lijn tot je eigen kunstwerk</div></div><span class="tel">${telKlaar(tekenOef)}/${tekenOef.length}</span></div><div class="w-levels tgrid"></div></div>`);
     const lv=t.querySelector(".w-levels");
     tekenOef.forEach((o,i)=>{ const s=status(o), naam=o.titel.replace(/^.*? - /,"");
-      const b=$(`<button type="button" class="lvl ${s}"><span class="lvl-nr">${s==="verstuurd"?"✔":i+1}</span><span class="lvl-t">${esc(naam)}</span>${/class="video"/.test(o.opdracht)?'<span title="Met filmpje">🎬</span>':""}${s==="verstuurd"?`<span class="lvl-c">${fmt(S.oef[o.id].verstuurd.cijfer)}</span>`:s==="klaar"?'<span class="lvl-c mid">versturen</span>':s==="bezig"?'<span class="lvl-c mid">bezig</span>':""}</button>`);
+      const b=$(`<button type="button" class="lvl ${s}"><span class="lvl-nr">${s==="verstuurd"?"✔":lvlNr(o,i)}</span><span class="lvl-t">${esc(naam)}</span>${/class="video"/.test(o.opdracht)?'<span title="Met filmpje">🎬</span>':""}${s==="verstuurd"?`<span class="lvl-c">${fmt(S.oef[o.id].verstuurd.cijfer)}</span>`:s==="klaar"?'<span class="lvl-c mid">versturen</span>':s==="bezig"?'<span class="lvl-c mid">bezig</span>':""}</button>`);
       b.onclick=()=>open(o); lv.appendChild(b) });
     inhoud.appendChild(t) }
   const tabs=[...kaart.querySelectorAll(".tabs button")];
@@ -3632,12 +3746,13 @@ function renderStart(m){
   tabs.forEach(b=>b.onclick=()=>kies(b.dataset.tab));
   kies(S.tab);
 
+  m.appendChild($(`<div class="card"><details class="afspraken-kaart"><summary>📦 Wat is een variabele? Uitleg met voorbeeld</summary>${varUitleg()}</details></div>`));
   if(KLASAFSPRAKEN) m.appendChild($(`<div class="card"><details class="afspraken-kaart"><summary>📏 Klasafspraken voor je code</summary><p>Bij <b>✓ Controleer</b> kijkt de app ook na of je code deze afspraken volgt. Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details></div>`));
 }
 
 function renderOef(m,oef){
   const a=O(oef.id);
-  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Alle oefeningen</button></div><div class="kicker">Oefening</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${KLASAFSPRAKEN&&!oef.geenCode?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
+  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Alle oefeningen</button></div><div class="kicker">Oefening</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${MET_VAR_UITLEG.includes(oef.id)?`<details class="afspraken"><summary>📦 Wat is een variabele? (klik voor de uitleg)</summary>${varUitleg()}</details>`:""}${KLASAFSPRAKEN&&!oef.geenCode?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
   m.querySelector("#terug").onclick=()=>go("start");
 
   /* stappen (probeer + vraag) */
@@ -3740,6 +3855,7 @@ function renderOef(m,oef){
   tekenExtra();
 
   /* afronden */
+  const volgende=volgendeOef(oef);
   const af=$(`<div class="card" id="afronden"></div>`); m.appendChild(af);
   function tekenAf(){ const c=berekenCijfer(a);
     af.innerHTML=`<div class="kicker">Afronden</div><h3>Jouw cijfer voor deze oefening</h3>
@@ -3752,12 +3868,25 @@ function renderOef(m,oef){
         ${c.basis===CIJFER.minimum&&CIJFER.start-c.aftrekPog-c.aftrekHulp-c.aftrekAfspr<CIJFER.minimum?`<div class="line"><span>Minimum voor een correct programma</span><span>${fmt(CIJFER.minimum)}</span></div>`:""}
         <div class="line"><span>Extra uitdaging</span><span>${!oef.extra?"geen bij deze oefening":a.extraOk?"+ "+fmt(c.bonus):"—"}</span></div>
       </div>
-      <div class="actions" style="margin-top:14px"><button class="btn" id="stuur" ${a.ok?"":"disabled"}>📤 Verstuur naar mijn leerkracht</button></div>
+      <div class="actions" style="margin-top:14px"><button class="btn" id="stuur" ${a.ok?"":"disabled"}>📤 Verstuur naar mijn leerkracht</button>
+        <button class="btn secondary" id="volgende" ${a.verstuurd?"":"disabled"}>${volgende?"Volgende oefening →":"✔ Terug naar alle oefeningen"}</button>
+        <span class="volg-hint" id="volghint" ${a.verstuurd?"hidden":""}>${volgende?"De knop naar de volgende oefening":"Deze knop"} wordt actief zodra je je resultaat verstuurd hebt.</span></div>
       <div class="fb" id="stuurfb"></div>`;
     if(a.verstuurd){const f=af.querySelector("#stuurfb"); f.className="fb ok"; f.innerHTML=`✔ Verstuurd op ${esc(a.verstuurd.op)} met cijfer ${fmt(a.verstuurd.cijfer)}.`+(a.verstuurd.cijfer!==c.cijfer?` <b>Je cijfer is sindsdien veranderd: verstuur opnieuw.</b>`:"")}
     af.querySelector("#stuur").onclick=()=>verstuur(oef,a,c);
+    af.querySelector("#volgende").onclick=()=>{ if(a.verstuurd) go(volgende?volgende.id:"start") };
   }
   tekenAf();
+}
+
+/* Volgende oefening in dezelfde volgorde als op het startscherm */
+function volgendeOef(oef){
+  let lijst;
+  if(!oef.groep){ lijst=OEFENINGEN.filter(o=>!o.groep).map((o,k)=>[o,k]).sort((x,y)=>(x[0].id.split(".")[0]-y[0].id.split(".")[0])||(x[1]-y[1])).map(x=>x[0]) }
+  else if(oef.teken) lijst=OEFENINGEN.filter(o=>o.teken);
+  else { const W=OEFENINGEN.filter(o=>o.groep&&!o.teken); lijst=[...new Set(W.map(o=>o.groep))].flatMap(g=>W.filter(o=>o.groep===g)) }
+  lijst=lijst.filter(o=>o.klaar||o===oef);
+  return lijst[lijst.indexOf(oef)+1]||null;
 }
 
 /* ---------------- Versturen via Microsoft Forms ---------------- */
@@ -3786,6 +3915,7 @@ function verstuur(oef,a,c){
   if(!l||!l.gevonden){ f.className="fb bad"; f.textContent="De link naar het Form is niet goed ingesteld. Verwittig je leerkracht."; return }
   window.open(l.url,"_blank","noopener");
   a.verstuurd={cijfer:c.cijfer,op:new Date().toLocaleString("nl-BE",{dateStyle:"short",timeStyle:"short"})}; save();
+  const vk=document.querySelector("#volgende"), vh=document.querySelector("#volghint"); if(vk) vk.disabled=false; if(vh) vh.hidden=true;
   f.className="fb ok"; f.innerHTML="✔ Het Form opent in een nieuw tabblad. <b>Controleer of deze gegevens erin staan</b> en klik dan op <b>Verzenden</b>. Pas niets aan: je leerkracht haalt je cijfer uit de controlecode, niet uit het veld Cijfer."+overzicht;
 }
 
