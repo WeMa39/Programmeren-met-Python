@@ -3620,7 +3620,7 @@ const VAR_TIPS=`<ol class="afspr">
 /* ---------------- THEORIE ----------------
    Uitleg met oefeningen die niet meetellen voor het cijfer en niet verstuurd worden. */
 const THEORIE=[
-{ id:"variabelen", icoon:"📦", titel:"Variabelen", sub:"Een doos met een naam waarin Python iets onthoudt",
+{ id:"variabelen", icoon:"📦", titel:"Variabelen", formTitel:"Theorie - Variabelen", sub:"Een doos met een naam waarin Python iets onthoudt",
   quiz:[
     { code:'fruit = "appel"\nprint("fruit")\nprint(fruit)', q:"Wat toont dit programma?", opties:["fruit\nappel","appel\nappel","fruit\nfruit","appel\nfruit"], juist:0,
       uitleg:"Met aanhalingstekens is \"fruit\" gewoon tekst: Python toont het woord fruit. Zonder aanhalingstekens is fruit de variabele: Python kijkt in de doos en toont appel." },
@@ -3673,47 +3673,68 @@ const THEORIE=[
       oplossing:'leeftijd = int(input("Hoe oud ben je? "))\nprint("Volgend jaar ben je", leeftijd + 1, "jaar.")' } ] } ];
 const NAAM_AFSPRAAK=/^(Zet je naam als commentaar|Vervang ‘Voornaam Naam’|De eerste commentaarregel is altijd je naam)/;
 const TH=id=>{ if(!S.theorie) S.theorie={}; return S.theorie[id]||(S.theorie[id]={quiz:{},oef:{}}) };
+/* Punten bij de theorie (zelfde start, minimum en pogingenregels als bij de oefeningen) */
+const THEORIE_KOST={tip:0.5, oplossing:1, quizFout:0.25};
+function cijferTheorie(les){ const t=TH(les.id), P=les.oefeningen.map(o=>t.oef[o.id]||{}), C=CIJFER;
+  const a={controles:P.reduce((x,p)=>x+(p.controles||0),0), nDelen:P.length,
+    hulpPunten:P.reduce((x,p)=>x+(p.tip?THEORIE_KOST.tip:0)+(p.opl?THEORIE_KOST.oplossing:0),0),
+    afspraken:P.reduce((x,p)=>x+(p.afspraken||0),0)};
+  const c=berekenCijfer(a), quizFout=Object.values(t.quizFout||{}).reduce((x,n)=>x+n,0), aftrekQuiz=quizFout*THEORIE_KOST.quizFout;
+  const cijfer=Math.round(Math.min(C.maximum,Math.max(C.minimum,C.start-c.aftrekPog-c.aftrekHulp-c.aftrekAfspr-aftrekQuiz))*100)/100;
+  const klaar=les.quiz.every((_,k)=>t.quiz[k]===true)&&P.every(p=>p.ok);
+  return {...c, cijfer, aftrekQuiz, quizFout, klaar, a:{...a, hulp:P.reduce((x,p)=>x+(p.tip?1:0)+(p.opl?1:0),0)}} }
 function theorieTel(les){ const t=TH(les.id); return {k:Object.values(t.quiz).filter(x=>x===true).length+les.oefeningen.filter(o=>(t.oef[o.id]||{}).ok).length, n:les.quiz.length+les.oefeningen.length} }
 
 function renderTheorie(m,les){
-  const t=TH(les.id);
+  const t=TH(les.id); if(!t.quizFout) t.quizFout={};
   m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Terug naar de theorie</button></div><div class="kicker">Theorie</div><h2>${les.icoon} ${esc(les.titel)}</h2>
     <p>In Python bewaar je gegevens in een <b>variabele</b>. Denk aan een <b>doos met een naam</b> erop. In de doos zit één waarde: een woord, een getal … Telkens je de naam gebruikt, kijkt Python in de doos.</p>
     <div class="th-dozen">${[["naam",'"Sara"',"tekst"],["leeftijd","15","geheel getal"],["prijs","2.5","kommagetal"]].map(([n,w,s])=>`<div><div class="vl-doos"><span class="naam">${n}</span><span class="waarde">${w}</span></div><span>${s}</span></div>`).join("")}</div>
     <div class="th-regel"><code><b class="n">leeftijd</b> <b class="is">=</b> <b class="w">15</b></code><div><span class="n">de naam van de doos</span><span class="is">bewaar in</span><span class="w">wat erin komt</span></div></div>
-    <div class="box">📖 Dit is <b>theorie</b>: oefen zoveel je wilt. De oefeningen hier tellen niet mee voor je cijfer en je verstuurt ze niet.</div></div>`));
+    <div class="box">📖 Ook de theorie krijgt <b>punten</b>. Je start op 10. Een foute keuze bij de vragen kost ${fmt(THEORIE_KOST.quizFout)} punt, een tip ${fmt(THEORIE_KOST.tip)} punt en een oplossing bekijken ${fmt(THEORIE_KOST.oplossing)} punt. Pogingen en klasafspraken tellen zoals bij de oefeningen. Op het einde verstuur je je resultaat naar je leerkracht.</div></div>`));
   m.querySelector("#terug").onclick=()=>{ S.deel="theorie"; go("start") };
 
   /* 1. stap voor stap */
   m.appendChild($(`<div class="card"><div class="kicker">Deel 1</div><h3>Kijk mee met Python</h3><p>Hieronder staat een programma voor de havenkraan. Klik op <b>Volgende stap</b> en kijk wat Python bij elke regel doet en wat er in de doos <code>afstand</code> zit.</p><div class="varles" data-stap="0" data-a="5">${varlesHTML(0,5)}</div></div>`));
 
   /* 2. quiz */
-  const qk=$(`<div class="card"><div class="kicker">Deel 2</div><h3>Test jezelf: wat toont Python?</h3><p>Lees de code en kies wat je op het scherm ziet. Fout? Lees de uitleg en probeer opnieuw.</p></div>`); m.appendChild(qk);
+  const qk=$(`<div class="card"><div class="kicker">Deel 2</div><h3>Test jezelf: wat toont Python?</h3><p>Lees de code en kies wat je op het scherm ziet. Fout? Lees de uitleg en probeer opnieuw. Elke foute keuze kost ${fmt(THEORIE_KOST.quizFout)} punt.</p></div>`); m.appendChild(qk);
   les.quiz.forEach((v,k)=>{ const q=$(`<div class="th-quiz"><b>Vraag ${k+1}</b><pre>${esc(v.code)}</pre>${v.vooraf?`<p style="margin:4px 0">${esc(v.vooraf)}</p>`:""}<div style="margin:6px 0"><b>${esc(v.q)}</b></div></div>`);
     v.opties.forEach((o,i)=>q.appendChild($(`<label class="opt"><input type="radio" name="th${k}" value="${i}"><span style="white-space:pre-line;font-family:ui-monospace,Consolas,monospace">${esc(o)}</span></label>`)));
     const act=$(`<div class="actions"><button class="btn">Controleer</button></div>`); q.appendChild(act); const f=$(`<div class="fb"></div>`); q.appendChild(f);
-    const juist=()=>{ q.querySelectorAll(".opt").forEach(o=>{const i=+o.querySelector("input").value; o.querySelector("input").disabled=true; if(i===v.juist){o.classList.add("right");o.querySelector("input").checked=true}}); act.remove(); f.className="fb ok"; f.textContent="✔ Juist! "+v.uitleg };
+    const juist=()=>{ q.querySelectorAll(".opt").forEach(o=>{const i=+o.querySelector("input").value; o.querySelector("input").disabled=true; if(i===v.juist){o.classList.add("right");o.querySelector("input").checked=true}}); act.remove(); f.className="fb ok"; f.textContent="✔ Juist! "+v.uitleg+((t.quizFout[k]||0)?` (${t.quizFout[k]} ${t.quizFout[k]===1?"foute keuze":"foute keuzes"})`:"") };
     act.querySelector("button").onclick=()=>{ const s=q.querySelector("input:checked"); if(!s){f.className="fb info";f.textContent="Kies eerst een antwoord.";return}
-      if(+s.value===v.juist){ t.quiz[k]=true; save(); juist() } else { t.quiz[k]=t.quiz[k]||false; save(); f.className="fb bad"; f.textContent="✘ Nog niet. "+v.uitleg.split(". ")[0]+". Kies opnieuw." } };
+      if(+s.value===v.juist){ t.quiz[k]=true; save(); juist() } else { t.quizFout[k]=(t.quizFout[k]||0)+1; t.quiz[k]=false; save(); f.className="fb bad"; f.textContent="✘ Nog niet (−"+fmt(THEORIE_KOST.quizFout)+"). "+v.uitleg.split(". ")[0]+". Kies opnieuw." }
+      tekenAfT() };
     if(t.quiz[k]===true) juist();
     qk.appendChild(q) });
 
   /* 3 en 4. oefeningen */
-  const oefKaart=(o,nr)=>{ const ps=t.oef[o.id]||(t.oef[o.id]={pog:0});
+  const oefKaart=(o,nr)=>{ const ps=t.oef[o.id]||(t.oef[o.id]={});
+    if(ps.controles==null) ps.controles=ps.pog||0;
     const c=$(`<div class="card step ${ps.ok?"done":""}"><h3>${nr} ${esc(o.titel)}</h3>${o.html}</div>`);
     const fb=$(`<div class="fb"></div>`), hulp=$(`<div class="actions"></div>`), extra=$(`<div></div>`);
+    const pogTxt=()=>` <span style="color:var(--muted)">(${ps.controles} ${ps.controles===1?"poging":"pogingen"})</span>`;
     const blok=codeBlok({waarde:ps.code??o.starter, onCode:v=>{ps.code=v;save()}, invoer:ps.invoer??o.invoer, onInvoer:v=>{ps.invoer=v;save()},
       controleer:async(code,out)=>{ const r=await nakijken(code,o,o.invoerNamen);
-        if(r.stijl){ r.stijl=r.stijl.filter(x=>!NAAM_AFSPRAAK.test(x.msg)); if(r.stijlFout&&!r.stijl.length){ r.ok=true; r.stijlFout=false; r.msg="Juist!" } }
+        if(r.stijl){ r.stijl=r.stijl.filter(x=>!NAAM_AFSPRAAK.test(x.msg)); if(r.stijlFout&&!r.stijl.length){ r.ok=true; r.stijlFout=false; r.msg="Juist! Goed gedaan." } }
+        const werktNu=r.ok||r.stijlFout;
+        if(!(ps.werkt&&werktNu)) ps.controles++;
+        if(werktNu&&!ps.werkt){ ps.werkt=true; ps.afspraken=r.ok?0:r.stijl.length }
         if(r.toon) toonUit(out,{out:r.toon.out,err:r.toon.err}); else out.style.display="none";
-        if(r.ok){ ps.ok=true; save(); blok.vergrendel(); c.classList.add("done"); toonFb(fb,{ok:true,msg:"Juist! Goed gedaan."}) }
-        else { ps.pog=(ps.pog||0)+1; save(); toonFb(fb,r) }
-        verfHulp() }});
+        if(r.ok){ ps.ok=true; ps.oplossing=code; save(); blok.vergrendel(); c.classList.add("done"); toonFb(fb,{ok:true,msg:"Juist! Goed gedaan."},pogTxt()) }
+        else { save(); toonFb(fb,r); if(r.stijlFout) fb.insertAdjacentHTML("beforeend",`<div class="ex" style="margin-top:6px;font-size:14px">${ps.afspraken?`Dit kost ${fmt(ps.afspraken*CIJFER.perAfspraak)} punt. `:""}Verbeter de overtredingen. Opnieuw controleren kost geen pogingen meer.</div>`) }
+        verfHulp(); tekenAfT() }});
     c.appendChild(blok); c.appendChild(fb); c.appendChild(hulp); c.appendChild(extra);
-    function verfHulp(){ hulp.innerHTML=""; if(ps.ok) return;
-      const tb=$(`<button class="btn hint">💡 Tip</button>`); tb.onclick=()=>{ extra.innerHTML=`<div class="hintbox"><b>💡 Tip</b><div>${esc(o.tip)}</div></div>` }; hulp.appendChild(tb);
-      if((ps.pog||0)>=2){ const ob=$(`<button class="btn secondary">👀 Toon een oplossing</button>`); ob.onclick=()=>{ extra.innerHTML=`<div class="hintbox"><b>👀 Zo kan het</b><pre>${esc(o.oplossing)}</pre>Typ het zelf over en probeer te begrijpen wat elke regel doet.</div>` }; hulp.appendChild(ob) } }
-    if(ps.ok){ blok.vergrendel(); toonFb(fb,{ok:true,msg:"Juist! Goed gedaan."}) }
+    function verfHulp(){ hulp.innerHTML=""; extra.innerHTML="";
+      if(ps.tip) extra.appendChild($(`<div class="hintbox"><b>💡 Tip</b><div>${esc(o.tip)}</div></div>`));
+      if(ps.opl) extra.appendChild($(`<div class="hintbox"><b>👀 Zo kan het</b><pre>${esc(o.oplossing)}</pre>Typ het zelf over en probeer te begrijpen wat elke regel doet.</div>`));
+      if(ps.ok) return;
+      if(!ps.tip){ const tb=$(`<button class="btn hint">💡 Tip (kost ${fmt(THEORIE_KOST.tip)} punt)</button>`);
+        tb.onclick=()=>{ if(confirm(`De tip kost ${fmt(THEORIE_KOST.tip)} punt. Wil je de tip zien?`)){ ps.tip=true; save(); verfHulp(); tekenAfT() } }; hulp.appendChild(tb) }
+      if(!ps.opl&&ps.controles>=2){ const ob=$(`<button class="btn secondary">👀 Toon een oplossing (kost ${fmt(THEORIE_KOST.oplossing)} punt)</button>`);
+        ob.onclick=()=>{ if(confirm(`Een oplossing bekijken kost ${fmt(THEORIE_KOST.oplossing)} punt. Wil je ze zien?`)){ ps.opl=true; save(); verfHulp(); tekenAfT() } }; hulp.appendChild(ob) } }
+    if(ps.ok){ blok.vergrendel(); toonFb(fb,{ok:true,msg:"Juist! Goed gedaan."},pogTxt()) }
     verfHulp(); return c };
   const eenv=les.oefeningen.filter(o=>o.eenvoudig), meer=les.oefeningen.filter(o=>!o.eenvoudig);
   m.appendChild($(`<div class="th-kop"><div class="kicker">Deel 3</div><h3>Eenvoudige oefening</h3></div>`));
@@ -3723,9 +3744,26 @@ function renderTheorie(m,les){
 
   /* spiekbriefje */
   m.appendChild($(`<div class="card"><div class="kicker">Spiekbriefje</div><h3>Zo gebruik je een variabele goed</h3>${VAR_TIPS}</div>`));
-  const tel=theorieTel(les);
-  m.appendChild($(`<div class="actions"><button class="btn secondary" id="terug2">← Terug naar de theorie</button></div>`));
-  m.querySelector("#terug2").onclick=()=>{ S.deel="theorie"; go("start") };
+
+  /* afronden en versturen */
+  const af=$(`<div class="card" id="afronden"></div>`); m.appendChild(af);
+  function tekenAfT(){ const c=cijferTheorie(les), C=CIJFER, nOk=les.oefeningen.filter(o=>(t.oef[o.id]||{}).ok).length, nQ=les.quiz.filter((_,k)=>t.quiz[k]===true).length;
+    af.innerHTML=`<div class="kicker">Afronden</div><h3>Jouw cijfer voor deze theorie</h3>
+      <div style="display:flex;gap:18px;align-items:baseline;flex-wrap:wrap"><span class="score">${c.klaar?fmt(c.cijfer):"…"}</span><span>${c.klaar?"op "+C.maximum:`Je cijfer verschijnt zodra alles af is: ${nQ} van ${les.quiz.length} vragen en ${nOk} van ${les.oefeningen.length} oefeningen juist.`}</span></div>
+      <div style="margin-top:10px">
+        <div class="line"><span>Start</span><span>${fmt(C.start)}</span></div>
+        <div class="line"><span>Foute keuzes bij de vragen: ${c.quizFout} × ${fmt(THEORIE_KOST.quizFout)}</span><span>− ${fmt(c.aftrekQuiz)}</span></div>
+        <div class="line"><span>Pogingen met ✓ Controleer: ${c.a.controles} (${C.gratisControles*les.oefeningen.length} gratis)</span><span>− ${fmt(c.aftrekPog)}</span></div>
+        <div class="line"><span>Tips en oplossingen bekeken: ${c.a.hulp}</span><span>− ${fmt(c.aftrekHulp)}</span></div>
+        ${KLASAFSPRAKEN?`<div class="line"><span>Klasafspraken: ${c.a.afspraken} ${c.a.afspraken===1?"overtreding":"overtredingen"} × ${fmt(C.perAfspraak)}</span><span>− ${fmt(c.aftrekAfspr)}</span></div>`:""}
+      </div>
+      <div class="actions" style="margin-top:14px"><button class="btn" id="stuur" ${c.klaar?"":"disabled"}>📤 Verstuur naar mijn leerkracht</button></div>
+      <div class="fb" id="stuurfb"></div>`;
+    if(t.verstuurd){const f=af.querySelector("#stuurfb"); f.className="fb ok"; f.innerHTML=`✔ Verstuurd op ${esc(t.verstuurd.op)} met cijfer ${fmt(t.verstuurd.cijfer)}.`+(t.verstuurd.cijfer!==c.cijfer?` <b>Je cijfer is sindsdien veranderd: verstuur opnieuw.</b>`:"")}
+    af.querySelector("#stuur").onclick=()=>{ Object.assign(t,{controles:c.a.controles,hulp:c.a.hulp,afspraken:c.a.afspraken,extraOk:false,
+      oplossing:les.oefeningen.map((o,i)=>"# "+(o.eenvoudig?"Eenvoudige oefening":"Inoefening "+i)+": "+o.titel+"\n"+((t.oef[o.id]||{}).oplossing||"")).join("\n\n")});
+      verstuur({titel:les.formTitel},t,c) } }
+  tekenAfT();
 }
 
 function fbVak(box){let f=box.querySelector(":scope > .fb"); if(!f){f=$(`<div class="fb"></div>`);box.appendChild(f)} return f}
@@ -3760,7 +3798,7 @@ function codeBlok({waarde,onCode,invoer,onInvoer,controleer,uitvoeren}){
 function lvlNr(o,i){ const m=o.titel.match(/^\S+ (\d+[a-z]?) - /); return m?m[1]:i+1 }
 function go(id){S.huidig=id;save();render();window.scrollTo(0,0)}
 function render(){const m=document.getElementById("main"); m.innerHTML="";
-  if(String(S.huidig).startsWith("T:")){ const les=THEORIE.find(l=>"T:"+l.id===S.huidig); if(les) return renderTheorie(m,les) }
+  if(String(S.huidig).startsWith("T:")&&S.naam&&S.klas){ const les=THEORIE.find(l=>"T:"+l.id===S.huidig); if(les) return renderTheorie(m,les) }
   const oef=OEFENINGEN.find(o=>o.id===S.huidig&&o.klaar);
   if(oef && S.naam && S.klas) return renderOef(m,oef);
   renderStart(m)}
@@ -3800,12 +3838,12 @@ function renderStart(m){
       <button type="button" data-tab="tekenen">🐢 Tekenen <span class="tel">${telKlaar(tekenOef)}/${telOpen(tekenOef)}</span></button>
     </div><div class="tabinhoud"></div></div>`);
   if(!S.deel) S.deel="oef";
-  const hoofd=$(`<div class="hoofdtabs" role="tablist"><button type="button" data-deel="theorie">📖 Theorie<span>Uitleg en inoefenen</span></button><button type="button" data-deel="oef">✏️ Oefeningen<span>Voor je cijfer</span></button></div>`);
+  const hoofd=$(`<div class="hoofdtabs" role="tablist"><button type="button" data-deel="theorie">📖 Theorie<span>Uitleg, inoefenen en punten</span></button><button type="button" data-deel="oef">✏️ Oefeningen<span>Klas, werelden en tekenen</span></button></div>`);
   m.appendChild(hoofd);
-  const theorie=$(`<div class="card"><p class="w-intro" style="margin-top:0">Hier lees je de uitleg en oefen je in. Deze oefeningen tellen <b>niet</b> mee voor je cijfer.</p><div class="th-lessen"></div></div>`); m.appendChild(theorie);
+  const theorie=$(`<div class="card"><p class="w-intro" style="margin-top:0">Hier lees je de uitleg en oefen je in. Ook hier krijg je <b>punten</b>: op het einde verstuur je je resultaat naar je leerkracht.</p><div class="th-lessen"></div></div>`); m.appendChild(theorie);
   THEORIE.forEach(les=>{ const tl=theorieTel(les);
-    const b=$(`<button type="button" class="th-les"><span class="w-icoon">${les.icoon}</span><span><span class="w-naam">${esc(les.titel)}</span><span class="w-sub">${esc(les.sub)}</span></span><span class="tel">${tl.k}/${tl.n}</span></button>`);
-    b.onclick=()=>go("T:"+les.id); theorie.querySelector(".th-lessen").appendChild(b) });
+    const b=$(`<button type="button" class="th-les"><span class="w-icoon">${les.icoon}</span><span><span class="w-naam">${esc(les.titel)}</span><span class="w-sub">${esc(les.sub)}</span></span>${TH(les.id).verstuurd?`<span class="pill ok">✔ ${fmt(TH(les.id).verstuurd.cijfer)}/10</span>`:`<span class="tel">${tl.k}/${tl.n}</span>`}</button>`);
+    b.onclick=()=>open({id:"T:"+les.id}); theorie.querySelector(".th-lessen").appendChild(b) });
   m.appendChild(kaart);
   const kiesDeel=d=>{ S.deel=d; save(); hoofd.querySelectorAll("button").forEach(b=>b.classList.toggle("aan",b.dataset.deel===d)); theorie.hidden=d!=="theorie"; kaart.hidden=d==="theorie" };
   hoofd.querySelectorAll("button").forEach(b=>b.onclick=()=>kiesDeel(b.dataset.deel));
