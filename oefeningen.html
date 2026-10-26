@@ -232,6 +232,25 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .th-regel .n{color:#1f6fd1} .th-regel .is{color:var(--accent)} .th-regel .w{color:var(--ok)}
 .th-quiz{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
 .th-kop{margin:22px 4px 10px}
+.dt-dozen{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.dt-doos{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.dt-type{display:inline-block;font-family:ui-monospace,Consolas,monospace;font-weight:800;border-radius:6px;padding:1px 8px;color:#fff}
+.dt-int{background:#1f6fd1} .dt-float{background:#2a8a4a} .dt-str{background:#c05621} .dt-bool{background:#7a4cc2}
+.dt-doos .vl-doos .naam{min-width:52px;text-align:center}
+.dt-doos.int .vl-doos{border-color:#1f6fd1} .dt-doos.int .naam{background:#1f6fd1}
+.dt-doos.float .vl-doos{border-color:#2a8a4a} .dt-doos.float .naam{background:#2a8a4a}
+.dt-doos.str .vl-doos{border-color:#c05621} .dt-doos.str .naam{background:#c05621}
+.dt-doos.bool .vl-doos{border-color:#7a4cc2} .dt-doos.bool .naam{background:#7a4cc2}
+.dt-tabel{overflow-x:auto;margin:10px 0}
+.dt-tabel table{min-width:560px;font-size:14.5px}
+.bw-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:10px 0;background:#fff}
+.bw-wrap iframe{display:block;width:100%;height:640px;border:0}
+.dt-fn{border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:10px;padding:10px 14px;margin:12px 0}
+.dt-fn h4{margin:0 0 4px;font-size:18px}
+.dt-fn h4 code{font-size:18px}
+.dt-fn pre{margin:8px 0;font-size:14.5px}
+.dt-fn .uit{color:var(--muted)}
+.dt-fn .let{margin-top:6px;font-size:15px}
 .th-kop h3{margin:0}
 .volg-hint{font-size:13.5px;color:var(--muted)}
 </style>
@@ -3618,9 +3637,14 @@ const VAR_TIPS=`<ol class="afspr">
 </ol>`;
 
 /* ---------------- THEORIE ----------------
-   Uitleg met oefeningen die niet meetellen voor het cijfer en niet verstuurd worden. */
+   Elke les: intro, delen (uitleg), quiz, oefeningen en spiekbriefje. Ook de theorie krijgt punten en wordt verstuurd. */
 const THEORIE=[
 { id:"variabelen", icoon:"📦", titel:"Variabelen", formTitel:"Theorie - Variabelen", sub:"Een doos met een naam waarin Python iets onthoudt",
+  intro:`<p>In Python bewaar je gegevens in een <b>variabele</b>. Denk aan een <b>doos met een naam</b> erop. In de doos zit één waarde: een woord, een getal … Telkens je de naam gebruikt, kijkt Python in de doos.</p>
+    <div class="th-dozen">${[["naam",'"Sara"',"tekst"],["leeftijd","15","geheel getal"],["prijs","2.5","kommagetal"]].map(([n,w,s])=>`<div><div class="vl-doos"><span class="naam">${n}</span><span class="waarde">${w}</span></div><span>${s}</span></div>`).join("")}</div>
+    <div class="th-regel"><code><b class="n">leeftijd</b> <b class="is">=</b> <b class="w">15</b></code><div><span class="n">de naam van de doos</span><span class="is">bewaar in</span><span class="w">wat erin komt</span></div></div>`,
+  delen:[{ titel:"Kijk mee met Python", html:()=>`<p>Hieronder staat een programma voor de havenkraan. Klik op <b>Volgende stap</b> en kijk wat Python bij elke regel doet en wat er in de doos <code>afstand</code> zit.</p><div class="varles" data-stap="0" data-a="5">${varlesHTML(0,5)}</div>` }],
+  spiek:{ titel:"Zo gebruik je een variabele goed", html:VAR_TIPS },
   quiz:[
     { code:'fruit = "appel"\nprint("fruit")\nprint(fruit)', q:"Wat toont dit programma?", opties:["fruit\nappel","appel\nappel","fruit\nfruit","appel\nfruit"], juist:0,
       uitleg:"Met aanhalingstekens is \"fruit\" gewoon tekst: Python toont het woord fruit. Zonder aanhalingstekens is fruit de variabele: Python kijkt in de doos en toont appel." },
@@ -3670,7 +3694,147 @@ const THEORIE=[
       tests:[{invoer:["15"],getallen:[16]},{invoer:["9"],getallen:[10]}],
       moet:[[/input\s*\(/,"Vraag de leeftijd met input()."],[/int\s*\(/,"Zet de invoer om naar een getal met int()."]],
       tip:"Drie stappen: leeftijd = int(input(\"Hoe oud ben je? \")). Daarna rekenen in print(): leeftijd + 1.",
-      oplossing:'leeftijd = int(input("Hoe oud ben je? "))\nprint("Volgend jaar ben je", leeftijd + 1, "jaar.")' } ] } ];
+      oplossing:'leeftijd = int(input("Hoe oud ben je? "))\nprint("Volgend jaar ben je", leeftijd + 1, "jaar.")' } ] },
+{ id:"datatypes", icoon:"🔢", titel:"Datatypes", formTitel:"Theorie - Datatypes", sub:"Getal, kommagetal, tekst of waar/onwaar: welk soort waarde zit er in je doos?",
+  intro:`<p>In een variabele kan een getal zitten, een kommagetal, een tekst … Dat soort waarde noemen we het <b>datatype</b>. Python heeft er <b>4</b> die je moet kennen. Het datatype bepaalt wat je met een waarde kan doen: met een getal kan je rekenen, met een tekst niet.</p>
+    <div class="dt-dozen">${[["int","leeftijd","15","geheel getal"],["float","prijs","2.5","kommagetal"],["str","naam",'"Sara"',"tekst"],["bool","geslaagd","True","waar of onwaar"]].map(([t,n,w,s])=>`<div class="dt-doos ${t}"><div class="vl-doos"><span class="naam">${n}</span><span class="waarde">${w}</span></div><span><span class="dt-type dt-${t}">${t}</span> ${s}</span></div>`).join("")}</div>`,
+  delen:[
+    { titel:"De 4 datatypes", html:()=>`<p>Bekijk eerst de BookWidget hieronder en doe de oefeningen erin. Lukt het niet om ze hier te zien? Open ze dan in een nieuw venster.</p>
+      <div class="actions" style="margin:6px 0"><a class="btn secondary" href="https://www.bookwidgets.com/play/t:bAZQrKMPlKafNujULZ5zPal9sM5UKNX4wrDJZj2qJ5FTSkYyUVNO" target="_blank" rel="noopener">↗ Open de BookWidget in een nieuw venster</a></div>
+      <div class="bw-wrap"><iframe src="https://www.bookwidgets.com/play/t:bAZQrKMPlKafNujULZ5zPal9sM5UKNX4wrDJZj2qJ5FTSkYyUVNO" title="BookWidget over datatypes" loading="lazy" allow="fullscreen; autoplay; clipboard-write" allowfullscreen></iframe></div>
+      <p>Zo herken je de 4 datatypes:</p>
+      <div class="dt-tabel"><table><tr><th>Type</th><th>Betekenis</th><th>Herken je aan</th><th>Voorbeelden</th><th>Gebruik je voor</th></tr>
+        <tr><td><span class="dt-type dt-int">int</span></td><td>Geheel getal (<i>integer</i>)</td><td>Geen punt, geen aanhalingstekens</td><td><code>2</code> <code>8</code> <code>-15</code></td><td>Rekenen of tellen, bv. punten of leeftijd</td></tr>
+        <tr><td><span class="dt-type dt-float">float</span></td><td>Kommagetal</td><td>Altijd een <b>punt</b>, nooit een komma</td><td><code>1.2</code> <code>-7.5</code> <code>4.99</code></td><td>Rekenen met kommagetallen, bv. een prijs of je lengte</td></tr>
+        <tr><td><span class="dt-type dt-str">str</span></td><td>Tekst (<i>string</i>)</td><td>Aanhalingstekens <code>" "</code> of <code>' '</code></td><td><code>"Wat doe je?"</code> <code>"15"</code> <code>"True"</code></td><td>Namen, zinnen, alles van <code>input()</code></td></tr>
+        <tr><td><span class="dt-type dt-bool">bool</span></td><td>Waar of onwaar (<i>boolean</i>)</td><td><code>True</code> of <code>False</code>, met een hoofdletter en zonder aanhalingstekens</td><td><code>True</code> <code>False</code></td><td>Keuzes, ja/nee-vragen</td></tr></table></div>
+      <div class="box">⚠️ <b>Let op de aanhalingstekens!</b> <code>15</code> is een getal, maar <code>"15"</code> is tekst. <code>True</code> is een bool, maar <code>"True"</code> is tekst. Alles tussen aanhalingstekens is tekst, ook als het op een getal lijkt.</div>` },
+    { titel:"De functies: type(), int(), float(), str(), bool() en input()", html:()=>`<p>Met deze functies vraag je het datatype op of zet je een waarde om naar een ander datatype. Wat je tussen de haakjes zet, is de waarde die de functie gebruikt. Wat eruit komt, kan je tonen met <code>print()</code> of bewaren in een variabele.</p>
+      <div class="dt-fn"><h4><code>type()</code>: welk datatype is het?</h4><p style="margin:0">Python vertelt je welk datatype een waarde of variabele heeft. Handig als je twijfelt of een probleem zoekt.</p>
+        <pre>print(type(15))       <span class="uit"># &lt;class 'int'&gt;</span>
+print(type(2.5))      <span class="uit"># &lt;class 'float'&gt;</span>
+print(type("15"))     <span class="uit"># &lt;class 'str'&gt;</span>
+print(type(True))     <span class="uit"># &lt;class 'bool'&gt;</span></pre>
+        <div class="let">💡 <code>&lt;class 'int'&gt;</code> is de manier waarop Python zegt: <i>dit is een int</i>.</div></div>
+      <div class="dt-fn"><h4><code>input()</code>: geeft altijd tekst</h4><p style="margin:0"><code>input()</code> wacht tot de gebruiker iets typt en geeft dat terug als <span class="dt-type dt-str">str</span>. Ook als de gebruiker een getal typt!</p>
+        <pre>leeftijd = input("Hoe oud ben je? ")   <span class="uit"># de gebruiker typt 15</span>
+print(type(leeftijd))                  <span class="uit"># &lt;class 'str'&gt;: in de doos zit "15"</span>
+print(leeftijd * 2)                    <span class="uit"># 1515: tekst × 2 herhaalt de tekst</span></pre>
+        <div class="let">💡 Wil je rekenen met wat de gebruiker typt? Zet het dan meteen om: <code>int(input(...))</code> of <code>float(input(...))</code>. Python voert eerst <code>input()</code> uit en zet het antwoord daarna om.</div></div>
+      <div class="dt-fn"><h4><code>int()</code>: maak er een geheel getal van</h4>
+        <pre>print(int("7"))      <span class="uit"># 7: tekst wordt een getal</span>
+print(int(7.9))      <span class="uit"># 7: alles na het punt wordt weggeknipt (niet afgerond!)</span>
+leeftijd = int(input("Hoe oud ben je? "))</pre>
+        <div class="let">✘ <b>Lukt niet</b> bij tekst met een punt, een komma of letters: <code>int("7.9")</code>, <code>int("7,9")</code> en <code>int("zeven")</code> geven een <code>ValueError</code>. Typt de gebruiker een kommagetal, gebruik dan <code>float()</code>.</div></div>
+      <div class="dt-fn"><h4><code>float()</code>: maak er een kommagetal van</h4>
+        <pre>print(float(7))       <span class="uit"># 7.0: Python zet er .0 achter</span>
+print(float("7.9"))   <span class="uit"># 7.9: tekst wordt een kommagetal</span>
+prijs = float(input("Wat kost het? "))</pre>
+        <div class="let">✘ <b>Lukt niet</b> bij tekst met een komma of letters: <code>float("7,9")</code> geeft een <code>ValueError</code>. Typ kommagetallen altijd met een punt: <code>7.9</code>.</div></div>
+      <div class="dt-fn"><h4><code>str()</code>: maak er tekst van</h4>
+        <pre>print(str(7))                        <span class="uit"># 7, maar nu als tekst '7'</span>
+leeftijd = 15
+print("Ik ben " + str(leeftijd) + " jaar.")   <span class="uit"># Ik ben 15 jaar.</span>
+print(str(10) + "1")                 <span class="uit"># 101: tekst + tekst plakt aan elkaar</span></pre>
+        <div class="let">✔ Lukt altijd, maar met tekst kan je niet meer rekenen. Je hebt <code>str()</code> nodig als je tekst en een getal aan elkaar plakt met <code>+</code>: <code>"Ik ben " + 15</code> geeft een <code>TypeError</code>. Met komma's in <code>print()</code> hoef je niets om te zetten: <code>print("Ik ben", leeftijd, "jaar.")</code>.</div></div>
+      <div class="dt-fn"><h4><code>bool()</code>: maak er True of False van</h4>
+        <pre>print(bool(0))         <span class="uit"># False</span>
+print(bool(0.0))       <span class="uit"># False</span>
+print(bool(""))        <span class="uit"># False: lege tekst</span>
+print(bool("False"))   <span class="uit"># True: dit is niet-lege tekst!</span>
+print(bool(478))       <span class="uit"># True</span></pre>
+        <div class="let">💡 Alleen <code>0</code>, <code>0.0</code> en lege tekst <code>""</code> geven <code>False</code>. Al de rest geeft <code>True</code>.</div></div>
+      <div class="dt-fn"><h4>Rekenen en het datatype</h4>
+        <table><tr><th>Code</th><th>Uitkomst</th><th>Waarom?</th></tr>
+          <tr><td><code>5 + 2</code></td><td><code>7</code></td><td>int + int geeft een int</td></tr>
+          <tr><td><code>5 + 2.0</code></td><td><code>7.0</code></td><td>Zit er een float bij, dan is de uitkomst een float</td></tr>
+          <tr><td><code>6 / 2</code></td><td><code>3.0</code></td><td>Delen met <code>/</code> geeft altijd een float</td></tr>
+          <tr><td><code>"5" + "2"</code></td><td><code>52</code></td><td>Tekst + tekst plakt aan elkaar</td></tr>
+          <tr><td><code>"5" * 3</code></td><td><code>555</code></td><td>Tekst × getal herhaalt de tekst</td></tr>
+          <tr><td><code>"5" + 2</code></td><td><code>TypeError</code></td><td>Tekst en getal kan je niet optellen. Zet eerst om!</td></tr></table></div>
+      <h4 style="margin:16px 0 4px">Probeer het zelf</h4><p style="margin:0">Voer dit programma uit en verander gerust de waarden. Dit telt niet mee voor je punten.</p><div class="dt-probeer"></div>`,
+      na:k=>{ const t=TH("datatypes");
+        k.querySelector(".dt-probeer").appendChild(codeBlok({waarde:t.probeer??'print(type(7))\nprint(type(7.5))\nprint(type("7"))\nprint(type(True))\n\nprint(int(7.9))\nprint(float(7))\nprint(str(7) + "3")\nprint(bool(""))\n\ngetal = int(input("Geef een getal: "))\nprint(getal * 2)', onCode:v=>{t.probeer=v;save()}, invoer:t.probeerIn??"4", onInvoer:v=>{t.probeerIn=v;save()}})) } } ],
+  spiek:{ titel:"De datatypes en hun functies", html:`<div class="dt-tabel"><table><tr><th>Type</th><th>Betekenis</th><th>Herken je aan</th><th>Voorbeelden</th></tr>
+      <tr><td><span class="dt-type dt-int">int</span></td><td>Geheel getal</td><td>Geen punt, geen aanhalingstekens</td><td><code>2</code> <code>8</code> <code>-15</code></td></tr>
+      <tr><td><span class="dt-type dt-float">float</span></td><td>Kommagetal</td><td>Altijd een punt (geen komma)</td><td><code>1.2</code> <code>-7.5</code> <code>4.99</code></td></tr>
+      <tr><td><span class="dt-type dt-str">str</span></td><td>Tekst</td><td>Aanhalingstekens <code>" "</code> of <code>' '</code></td><td><code>"Wat doe je?"</code> <code>"15"</code> <code>"True"</code></td></tr>
+      <tr><td><span class="dt-type dt-bool">bool</span></td><td>Waar of onwaar</td><td><code>True</code> of <code>False</code> (hoofdletter, geen aanhalingstekens)</td><td><code>True</code> <code>False</code></td></tr></table></div>
+    <div class="dt-tabel"><table><tr><th>Functie</th><th>Zet om naar</th><th>Wat gebeurt er?</th><th>Lukt niet bij</th><th>Voorbeeld</th></tr>
+      <tr><td><code>int()</code></td><td>Geheel getal</td><td>Afkappen na het punt (niet afronden)</td><td>Tekst met een punt, een komma of letters</td><td><code>int(7.9)</code> → <code>7</code><br><code>int("7")</code> → <code>7</code></td></tr>
+      <tr><td><code>float()</code></td><td>Kommagetal</td><td>Voegt <code>.0</code> toe aan een geheel getal</td><td>Tekst met een komma of letters</td><td><code>float(7)</code> → <code>7.0</code><br><code>float("7.9")</code> → <code>7.9</code></td></tr>
+      <tr><td><code>str()</code></td><td>Tekst</td><td>Lukt altijd, maar je kan er niet meer mee rekenen</td><td>/</td><td><code>str(7)</code> → <code>'7'</code></td></tr>
+      <tr><td><code>bool()</code></td><td>True / False</td><td>Alleen <code>0</code>, <code>0.0</code> en <code>""</code> geven False</td><td>/</td><td><code>bool(0)</code> → <code>False</code><br><code>bool("False")</code> → <code>True</code></td></tr>
+      <tr><td><code>type()</code></td><td>/</td><td>Toont het datatype</td><td>/</td><td><code>type(7.5)</code> → <code>&lt;class 'float'&gt;</code></td></tr>
+      <tr><td><code>input()</code></td><td>/</td><td>Geeft <b>altijd</b> tekst terug</td><td>/</td><td><code>int(input("Hoe oud ben je? "))</code></td></tr></table></div>` },
+  quiz:[
+    { code:'print(type(4.0))', q:"Wat toont dit programma?", opties:["<class 'int'>","<class 'float'>","<class 'str'>","<class 'bool'>"], juist:1,
+      uitleg:"4.0 heeft een punt, dus het is een kommagetal: een float. Ook al is het getal na het punt 0." },
+    { code:'print(type("True"))', q:"Wat toont dit programma?", opties:["<class 'bool'>","<class 'str'>","<class 'int'>","Een foutmelding"], juist:1,
+      uitleg:"\"True\" staat tussen aanhalingstekens, dus het is tekst: een str. Alleen True zonder aanhalingstekens is een bool." },
+    { code:'print(int(7.9))', q:"Wat toont dit programma?", opties:["7","8","7.9","Een foutmelding"], juist:0,
+      uitleg:"int() knipt alles na het punt weg, het rondt niet af. Van 7.9 blijft 7 over." },
+    { code:'print(int("7.9"))', q:"Wat toont dit programma?", opties:["7","8","7.9","Een foutmelding"], juist:3,
+      uitleg:"int() kan tekst met een punt niet omzetten: je krijgt een ValueError. Zet zo'n tekst eerst om met float(): int(float(\"7.9\")) geeft 7." },
+    { code:'print(str(10) + "1")', q:"Wat toont dit programma?", opties:["11","101","10 1","Een foutmelding"], juist:1,
+      uitleg:"str(10) maakt er de tekst \"10\" van. Tekst + tekst plakt de teksten aan elkaar: \"10\" + \"1\" geeft 101." },
+    { code:'getal = input("Geef een getal: ")\nprint(float(getal) * 2)', vooraf:"De gebruiker typt 3.", q:"Wat toont dit programma?", opties:["6","6.0","33","Een foutmelding"], juist:1,
+      uitleg:"float(getal) zet de tekst \"3\" om naar het kommagetal 3.0. En 3.0 × 2 geeft 6.0: zit er een float bij, dan is de uitkomst ook een float." },
+    { code:'print(bool("False"))', q:"Wat toont dit programma?", opties:["True","False","\"False\"","Een foutmelding"], juist:0,
+      uitleg:"\"False\" is een tekst die niet leeg is. Alleen 0, 0.0 en lege tekst \"\" geven False. Dus bool(\"False\") geeft True." } ],
+  oefeningen:[
+    { id:"o1", titel:"Van tekst naar getal", eenvoudig:true,
+      html:`<p>In de variabele <code>aantal</code> zit de <b>tekst</b> <code>"12"</code>. Daarom geeft dit programma een foutmelding. Zet op de lege regel <code>aantal</code> om naar een geheel getal met <code>int()</code>. Het programma toont dan: <i>20</i></p>`,
+      starter:'aantal = "12"\n# Zet aantal om naar een geheel getal.\n\nprint(aantal + 8)',
+      tests:[{invoer:[],regels:["20"]}],
+      moet:[[/^\s*aantal\s*=\s*int\s*\(\s*aantal\s*\)/m,"Zet de variabele om zo: aantal = int(aantal)"]],
+      maxAantal:[[/"12"/g,1,"Laat aantal = \"12\" staan en zet de variabele daarna om met int()."]],
+      fouten:[[/can only concatenate str/,"In aantal zit nog tekst. Zet de tekst om met int(): aantal = int(aantal)"]],
+      tip:"Schrijf op de lege regel: aantal = int(aantal). Python neemt de tekst \"12\" uit de doos, maakt er het getal 12 van en stopt dat terug in de doos.",
+      oplossing:'aantal = "12"\n# Zet aantal om naar een geheel getal.\naantal = int(aantal)\nprint(aantal + 8)' },
+    { id:"e1", titel:"Welk datatype?",
+      html:`<p>Toon met <code>print()</code> en <code>type()</code> het datatype van de vier variabelen. Het programma toont dan:</p><pre>&lt;class 'int'&gt;\n&lt;class 'float'&gt;\n&lt;class 'str'&gt;\n&lt;class 'bool'&gt;</pre>`,
+      starter:'a = 7\nb = 7.0\nc = "7"\nd = True\n\n# Toon het datatype van a, b, c en d.\n',
+      tests:[{invoer:[],regels:["<class 'int'>","<class 'float'>","<class 'str'>","<class 'bool'>"]}],
+      moet:[[/print\s*\(\s*type\s*\(\s*a\s*\)\s*\)[\s\S]*print\s*\(\s*type\s*\(\s*b\s*\)\s*\)[\s\S]*print\s*\(\s*type\s*\(\s*c\s*\)\s*\)[\s\S]*print\s*\(\s*type\s*\(\s*d\s*\)\s*\)/,"Toon het type van elke variabele, in de volgorde a, b, c, d: print(type(a)) enzovoort."]],
+      tip:"Zet type() binnen print(): print(type(a)). Doe dat daarna ook voor b, c en d.",
+      oplossing:'a = 7\nb = 7.0\nc = "7"\nd = True\n\n# Toon het datatype van a, b, c en d.\nprint(type(a))\nprint(type(b))\nprint(type(c))\nprint(type(d))' },
+    { id:"e2", titel:"Tekst en getal aan elkaar plakken",
+      html:`<p>Klik op <b>▶ Uitvoeren</b>: dit programma geeft een <code>TypeError</code>. Je kan tekst en een getal niet met <code>+</code> aan elkaar plakken. Verbeter het met <code>str()</code>, zodat het <i>Ik ben 15 jaar.</i> toont.</p>`,
+      starter:'leeftijd = 15\nprint("Ik ben " + leeftijd + " jaar.")',
+      tests:[{invoer:[],regels:["Ik ben 15 jaar."]}],
+      moet:[[/str\s*\(\s*leeftijd\s*\)/,"Zet de variabele leeftijd om naar tekst met str(leeftijd)."]],
+      maxAantal:[[/15/g,1,"Typ 15 maar één keer: in de variabele leeftijd."]],
+      fouten:[[/can only concatenate str/,"Je plakt nog steeds tekst en een getal aan elkaar. Zet het getal om met str(leeftijd)."]],
+      tip:"Vervang leeftijd in print() door str(leeftijd). Dan is het tekst + tekst + tekst, en dat mag.",
+      oplossing:'leeftijd = 15\nprint("Ik ben " + str(leeftijd) + " jaar.")' },
+    { id:"e3", titel:"Een kommagetal inlezen",
+      html:`<p>Vraag met <code>input()</code> de prijs van een broodje en zet ze om met <code>float()</code>. Toon daarna wat twee broodjes kosten, bv. <i>Twee broodjes kosten 5.0 euro.</i> als de prijs 2.5 is.</p>`,
+      starter:'', invoer:"2.5", invoerNamen:["prijs"],
+      fouten:[[/can't multiply sequence|can only concatenate str|unsupported operand type/,"In prijs zit nog tekst, want input() geeft altijd tekst. Zet de invoer om met float(): prijs = float(input(\"Wat kost een broodje? \"))"],
+              [/invalid literal for int/,"De prijs is een kommagetal. int() kan tekst met een punt niet omzetten: gebruik float()."]],
+      tests:[{invoer:["2.5"],getallen:[5]},{invoer:["3.25"],getallen:[6.5]}],
+      moet:[[/input\s*\(/,"Vraag de prijs met input()."],[/float\s*\(/,"Zet de invoer om naar een kommagetal met float()."]],
+      tip:"prijs = float(input(\"Wat kost een broodje? \")). Daarna rekenen in print(): prijs * 2.",
+      oplossing:'prijs = float(input("Wat kost een broodje? "))\nprint("Twee broodjes kosten", prijs * 2, "euro.")' },
+    { id:"e4", titel:"Afkappen met int()",
+      html:`<p>Vraag met <code>input()</code> een kommagetal, bv. <code>7.9</code>. Toon daarna het getal zonder wat na het punt komt, bv. <i>Zonder kommadeel wordt het 7 .</i></p><p style="font-size:15px;color:var(--muted)">Let op: <code>int("7.9")</code> lukt niet. Zet de tekst eerst om naar een float en die float daarna naar een int.</p>`,
+      starter:'', invoer:"7.9", invoerNamen:["getal"],
+      fouten:[[/invalid literal for int/,"int() kan de tekst \"7.9\" niet omzetten, want er staat een punt in. Zet eerst om met float() en dan pas met int(): int(float(...))."]],
+      tests:[{invoer:["7.9"],getallen:[7],nietWoorden:["7.9","8"],tip:"Toon alleen het getal zonder kommadeel."},{invoer:["3.2"],getallen:[3],nietWoorden:["3.2"],tip:"Toon alleen het getal zonder kommadeel."}],
+      moet:[[/input\s*\(/,"Vraag het kommagetal met input()."],[/float\s*\(/,"Zet de invoer eerst om met float()."],[/int\s*\(/,"Knip het kommadeel weg met int()."]],
+      tip:"Werk van binnen naar buiten: input() geeft tekst, float() maakt er een kommagetal van en int() knipt het kommadeel weg. Samen: int(float(input(\"Geef een kommagetal: \")))",
+      oplossing:'getal = float(input("Geef een kommagetal: "))\nprint("Zonder kommadeel wordt het", int(getal), ".")' },
+    { id:"e5", titel:"Het juiste datatype kiezen",
+      html:`<p>Vraag met <code>input()</code> drie dingen: een <b>naam</b>, een <b>leeftijd</b> (geheel getal) en een <b>lengte in meter</b> (kommagetal, bv. 1.65). Kies telkens zelf of je de invoer moet omzetten, en met welke functie. Toon daarna bv.:<br><i>Sara is 15 jaar en 1.65 m groot.<br>Volgend jaar is Sara 16 jaar.</i></p>`,
+      starter:'', invoer:"Sara\n15\n1.65", invoerNamen:["naam","leeftijd","lengte"],
+      fouten:[[/can only concatenate str|unsupported operand type/,"Rekenen met tekst lukt niet. Welke invoer moet je omzetten naar een getal?"],
+              [/invalid literal for int/,"De lengte is een kommagetal. Gebruik daarvoor float(), niet int()."]],
+      tests:[{invoer:["Sara","15","1.65"],getallen:[16,1.65],woorden:[["sara"]],aantalInvoer:3},{invoer:["Tom","12","1.5"],getallen:[13,1.5],woorden:[["tom"]],aantalInvoer:3}],
+      moet:[[/int\s*\(\s*input/,"Zet de leeftijd om naar een geheel getal met int(input(...))."],[/float\s*\(\s*input/,"Zet de lengte om naar een kommagetal met float(input(...))."]],
+      tip:"Een naam is tekst: niet omzetten. De leeftijd is een geheel getal: int(input(...)). De lengte is een kommagetal: float(input(...)). Volgend jaar = leeftijd + 1.",
+      oplossing:'naam = input("Hoe heet je? ")\nleeftijd = int(input("Hoe oud ben je? "))\nlengte = float(input("Hoe groot ben je in meter? "))\nprint(naam, "is", leeftijd, "jaar en", lengte, "m groot.")\nprint("Volgend jaar is", naam, leeftijd + 1, "jaar.")' } ] }
+];
 const NAAM_AFSPRAAK=/^(Zet je naam als commentaar|Vervang ‘Voornaam Naam’|De eerste commentaarregel is altijd je naam)/;
 const TH=id=>{ if(!S.theorie) S.theorie={}; return S.theorie[id]||(S.theorie[id]={quiz:{},oef:{}}) };
 /* Punten bij de theorie (zelfde start, minimum en pogingenregels als bij de oefeningen) */
@@ -3688,17 +3852,16 @@ function theorieTel(les){ const t=TH(les.id); return {k:Object.values(t.quiz).fi
 function renderTheorie(m,les){
   const t=TH(les.id); if(!t.quizFout) t.quizFout={};
   m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Terug naar de theorie</button></div><div class="kicker">Theorie</div><h2>${les.icoon} ${esc(les.titel)}</h2>
-    <p>In Python bewaar je gegevens in een <b>variabele</b>. Denk aan een <b>doos met een naam</b> erop. In de doos zit één waarde: een woord, een getal … Telkens je de naam gebruikt, kijkt Python in de doos.</p>
-    <div class="th-dozen">${[["naam",'"Sara"',"tekst"],["leeftijd","15","geheel getal"],["prijs","2.5","kommagetal"]].map(([n,w,s])=>`<div><div class="vl-doos"><span class="naam">${n}</span><span class="waarde">${w}</span></div><span>${s}</span></div>`).join("")}</div>
-    <div class="th-regel"><code><b class="n">leeftijd</b> <b class="is">=</b> <b class="w">15</b></code><div><span class="n">de naam van de doos</span><span class="is">bewaar in</span><span class="w">wat erin komt</span></div></div>
+    ${les.intro}
     <div class="box">📖 Ook de theorie krijgt <b>punten</b>. Je start op 10. Een foute keuze bij de vragen kost ${fmt(THEORIE_KOST.quizFout)} punt, een tip ${fmt(THEORIE_KOST.tip)} punt en een oplossing bekijken ${fmt(THEORIE_KOST.oplossing)} punt. Pogingen en klasafspraken tellen zoals bij de oefeningen. Op het einde verstuur je je resultaat naar je leerkracht.</div></div>`));
   m.querySelector("#terug").onclick=()=>{ S.deel="theorie"; go("start") };
 
-  /* 1. stap voor stap */
-  m.appendChild($(`<div class="card"><div class="kicker">Deel 1</div><h3>Kijk mee met Python</h3><p>Hieronder staat een programma voor de havenkraan. Klik op <b>Volgende stap</b> en kijk wat Python bij elke regel doet en wat er in de doos <code>afstand</code> zit.</p><div class="varles" data-stap="0" data-a="5">${varlesHTML(0,5)}</div></div>`));
+  /* 1. uitleg (een of meer delen) */
+  let nrDeel=0;
+  les.delen.forEach(d=>{ const kaart=$(`<div class="card"><div class="kicker">Deel ${++nrDeel}</div><h3>${d.titel}</h3>${d.html()}</div>`); m.appendChild(kaart); if(d.na) d.na(kaart) });
 
   /* 2. quiz */
-  const qk=$(`<div class="card"><div class="kicker">Deel 2</div><h3>Test jezelf: wat toont Python?</h3><p>Lees de code en kies wat je op het scherm ziet. Fout? Lees de uitleg en probeer opnieuw. Elke foute keuze kost ${fmt(THEORIE_KOST.quizFout)} punt.</p></div>`); m.appendChild(qk);
+  const qk=$(`<div class="card"><div class="kicker">Deel ${++nrDeel}</div><h3>Test jezelf: wat toont Python?</h3><p>Lees de code en kies wat je op het scherm ziet. Fout? Lees de uitleg en probeer opnieuw. Elke foute keuze kost ${fmt(THEORIE_KOST.quizFout)} punt.</p></div>`); m.appendChild(qk);
   les.quiz.forEach((v,k)=>{ const q=$(`<div class="th-quiz"><b>Vraag ${k+1}</b><pre>${esc(v.code)}</pre>${v.vooraf?`<p style="margin:4px 0">${esc(v.vooraf)}</p>`:""}<div style="margin:6px 0"><b>${esc(v.q)}</b></div></div>`);
     v.opties.forEach((o,i)=>q.appendChild($(`<label class="opt"><input type="radio" name="th${k}" value="${i}"><span style="white-space:pre-line;font-family:ui-monospace,Consolas,monospace">${esc(o)}</span></label>`)));
     const act=$(`<div class="actions"><button class="btn">Controleer</button></div>`); q.appendChild(act); const f=$(`<div class="fb"></div>`); q.appendChild(f);
@@ -3737,13 +3900,13 @@ function renderTheorie(m,les){
     if(ps.ok){ blok.vergrendel(); toonFb(fb,{ok:true,msg:"Juist! Goed gedaan."},pogTxt()) }
     verfHulp(); return c };
   const eenv=les.oefeningen.filter(o=>o.eenvoudig), meer=les.oefeningen.filter(o=>!o.eenvoudig);
-  m.appendChild($(`<div class="th-kop"><div class="kicker">Deel 3</div><h3>Eenvoudige oefening</h3></div>`));
+  m.appendChild($(`<div class="th-kop"><div class="kicker">Deel ${++nrDeel}</div><h3>Eenvoudige oefening</h3></div>`));
   eenv.forEach(o=>m.appendChild(oefKaart(o,"")));
-  m.appendChild($(`<div class="th-kop"><div class="kicker">Deel 4</div><h3>Extra inoefeningen</h3><p style="margin:0">Elke oefening oefent één ding. Lukt het niet? Vraag een tip. Na twee pogingen mag je ook een oplossing bekijken.</p></div>`));
+  m.appendChild($(`<div class="th-kop"><div class="kicker">Deel ${++nrDeel}</div><h3>Extra inoefeningen</h3><p style="margin:0">Elke oefening oefent één ding. Lukt het niet? Vraag een tip. Na twee pogingen mag je ook een oplossing bekijken.</p></div>`));
   meer.forEach((o,i)=>m.appendChild(oefKaart(o,(i+1)+".")));
 
   /* spiekbriefje */
-  m.appendChild($(`<div class="card"><div class="kicker">Spiekbriefje</div><h3>Zo gebruik je een variabele goed</h3>${VAR_TIPS}</div>`));
+  m.appendChild($(`<div class="card"><div class="kicker">Spiekbriefje</div><h3>${les.spiek.titel}</h3>${les.spiek.html}</div>`));
 
   /* afronden en versturen */
   const af=$(`<div class="card" id="afronden"></div>`); m.appendChild(af);
