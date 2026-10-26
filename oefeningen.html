@@ -243,8 +243,9 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .dt-doos.bool .vl-doos{border-color:#7a4cc2} .dt-doos.bool .naam{background:#7a4cc2}
 .dt-tabel{overflow-x:auto;margin:10px 0}
 .dt-tabel table{min-width:560px;font-size:14.5px}
-.bw-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:10px 0;background:#fff}
-.bw-wrap iframe{display:block;width:100%;height:640px;border:0}
+.th-koppel{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:center;margin:8px 0;max-width:420px}
+.th-koppel select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.th-koppel select.right{border-color:var(--ok);background:var(--ok-soft)}
 .dt-fn{border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:10px;padding:10px 14px;margin:12px 0}
 .dt-fn h4{margin:0 0 4px;font-size:18px}
 .dt-fn h4 code{font-size:18px}
@@ -3699,10 +3700,7 @@ const THEORIE=[
   intro:`<p>In een variabele kan een getal zitten, een kommagetal, een tekst … Dat soort waarde noemen we het <b>datatype</b>. Python heeft er <b>4</b> die je moet kennen. Het datatype bepaalt wat je met een waarde kan doen: met een getal kan je rekenen, met een tekst niet.</p>
     <div class="dt-dozen">${[["int","leeftijd","15","geheel getal"],["float","prijs","2.5","kommagetal"],["str","naam",'"Sara"',"tekst"],["bool","geslaagd","True","waar of onwaar"]].map(([t,n,w,s])=>`<div class="dt-doos ${t}"><div class="vl-doos"><span class="naam">${n}</span><span class="waarde">${w}</span></div><span><span class="dt-type dt-${t}">${t}</span> ${s}</span></div>`).join("")}</div>`,
   delen:[
-    { titel:"De 4 datatypes", html:()=>`<p>Bekijk eerst de BookWidget hieronder en doe de oefeningen erin. Lukt het niet om ze hier te zien? Open ze dan in een nieuw venster.</p>
-      <div class="actions" style="margin:6px 0"><a class="btn secondary" href="https://www.bookwidgets.com/play/t:bAZQrKMPlKafNujULZ5zPal9sM5UKNX4wrDJZj2qJ5FTSkYyUVNO" target="_blank" rel="noopener">↗ Open de BookWidget in een nieuw venster</a></div>
-      <div class="bw-wrap"><iframe src="https://www.bookwidgets.com/play/t:bAZQrKMPlKafNujULZ5zPal9sM5UKNX4wrDJZj2qJ5FTSkYyUVNO" title="BookWidget over datatypes" loading="lazy" allow="fullscreen; autoplay; clipboard-write" allowfullscreen></iframe></div>
-      <p>Zo herken je de 4 datatypes:</p>
+    { titel:"De 4 datatypes", html:()=>`<p>Python heeft 4 datatypes die je moet kennen. Zo herken je ze:</p>
       <div class="dt-tabel"><table><tr><th>Type</th><th>Betekenis</th><th>Herken je aan</th><th>Voorbeelden</th><th>Gebruik je voor</th></tr>
         <tr><td><span class="dt-type dt-int">int</span></td><td>Geheel getal (<i>integer</i>)</td><td>Geen punt, geen aanhalingstekens</td><td><code>2</code> <code>8</code> <code>-15</code></td><td>Rekenen of tellen, bv. punten of leeftijd</td></tr>
         <tr><td><span class="dt-type dt-float">float</span></td><td>Kommagetal</td><td>Altijd een <b>punt</b>, nooit een komma</td><td><code>1.2</code> <code>-7.5</code> <code>4.99</code></td><td>Rekenen met kommagetallen, bv. een prijs of je lengte</td></tr>
@@ -3767,21 +3765,44 @@ print(bool(478))       <span class="uit"># True</span></pre>
       <tr><td><code>bool()</code></td><td>True / False</td><td>Alleen <code>0</code>, <code>0.0</code> en <code>""</code> geven False</td><td>/</td><td><code>bool(0)</code> → <code>False</code><br><code>bool("False")</code> → <code>True</code></td></tr>
       <tr><td><code>type()</code></td><td>/</td><td>Toont het datatype</td><td>/</td><td><code>type(7.5)</code> → <code>&lt;class 'float'&gt;</code></td></tr>
       <tr><td><code>input()</code></td><td>/</td><td>Geeft <b>altijd</b> tekst terug</td><td>/</td><td><code>int(input("Hoe oud ben je? "))</code></td></tr></table></div>` },
+  quizTitel:"Test jezelf: datatypes", quizUitleg:"Lees de vraag en kies het juiste antwoord.",
   quiz:[
+    { koppel:{links:["int","float","str","bool"], rechts:["geheel getal","kommagetal","waar of onwaar","tekst"], juist:[0,1,3,2]}, q:"Combineer het datatype met de juiste betekenis.",
+      uitleg:"Kijk nog eens naar de tabel in deel 1", uitlegJuist:"int is een geheel getal, float een kommagetal, str tekst en bool waar of onwaar." },
+    { code:'x = 5\nx = x + 3\nx = "klaar"', q:"Wat staat er in x na deze code?", opties:['5','"klaar"','8','5, 8, "klaar"'], juist:1,
+      uitleg:"Een variabele onthoudt maar één waarde: een nieuwe waarde vervangt de oude. Eerst zit er 5 in, dan 8 en op het einde \"klaar\"." },
+    { code:'float("2,5")', q:"Wat is de uitkomst?", opties:["2,5","25,0","2.5","ValueError"], juist:3,
+      uitleg:"Let op de komma in de tekst. Python gebruikt een punt voor kommagetallen, dus \"2,5\" kan float() niet omzetten: je krijgt een ValueError." },
+    { code:'bool(0)', q:"Wat is de uitkomst?", opties:["True","False","0","ValueError"], juist:1,
+      uitleg:"Denk aan de regel bij bool(). Alleen 0, 0.0 en lege tekst \"\" geven False, dus bool(0) geeft False." },
+    { code:'int("3.5")', q:"Wat is de uitkomst?", opties:["3","3.5","4","ValueError"], juist:3,
+      uitleg:"Let op het punt in de tekst. int() kan tekst met een punt niet omzetten: je krijgt een ValueError. Met int(float(\"3.5\")) krijg je wel 3." },
+    { code:'x = "True"', q:"Welk type heeft deze waarde?", opties:["int","float","str","bool"], juist:2,
+      uitleg:"Kijk naar de aanhalingstekens. Alles tussen aanhalingstekens is tekst: een str. Alleen True zonder aanhalingstekens is een bool." },
+    { code:'x = "42"', q:"Welk type heeft deze waarde?", opties:["int","float","str","bool"], juist:2,
+      uitleg:"Kijk naar de aanhalingstekens. \"42\" lijkt op een getal, maar het staat tussen aanhalingstekens: het is een str." },
+    { code:'leeftijd = input("Leeftijd? ")\n# De gebruiker typt 16', q:"Welk type heeft leeftijd?", opties:["int","float","str","bool"], juist:2,
+      uitleg:"Denk aan wat input() teruggeeft. input() geeft altijd tekst, ook als de gebruiker een getal typt: in leeftijd zit \"16\", een str." },
+    { q:"Welke regel maakt correct een variabele?", opties:["5 = x","x = 5","int x = 5","x == 5"], juist:1,
+      uitleg:"De naam staat links van het =-teken. x = 5 is juist. In Python schrijf je geen type voor de naam, en == vergelijkt alleen, het bewaart niets." },
+    { code:'resultaat = 10 / 2', q:"Welk type heeft resultaat?", opties:["int","float","str","bool"], juist:1,
+      uitleg:"Denk aan wat delen met / geeft. Delen met / geeft altijd een kommagetal: 10 / 2 is 5.0, een float." },
+    { code:'x = 42', q:"Welk type heeft deze waarde?", opties:["int","float","str","bool"], juist:0,
+      uitleg:"Geen punt en geen aanhalingstekens. Dus 42 is een geheel getal: een int." },
+    { code:'getal = input("Getal? ")\n# De gebruiker typt 4\nprint(getal * 2)', q:"Wat loopt hier mis? Wat toont dit programma?", opties:["8","4.0","44","Een foutmelding"], juist:2,
+      uitleg:"Denk aan wat input() teruggeeft. In getal zit de tekst \"4\". Tekst × 2 herhaalt de tekst: 44. Zet de invoer om met int() als je wilt rekenen." },
+    { code:'bool("False")', q:"Wat is de uitkomst?", opties:['"False"',"ValueError","False","True"], juist:3,
+      uitleg:"\"False\" is tekst, en die tekst is niet leeg. Alleen 0, 0.0 en lege tekst \"\" geven False. Dus bool(\"False\") geeft True." },
+    { q:"Welke naam mag je gebruiken voor een variabele?", opties:["mijn naam","mijn_naam","2klas","mijn-naam"], juist:1,
+      uitleg:"Een naam heeft geen spaties en geen streepjes, en begint niet met een cijfer. Gebruik _ tussen de woorden: mijn_naam." },
+    { code:'int(7.9)', q:"Wat is de uitkomst?", opties:["ValueError","7.9","8","7"], juist:3,
+      uitleg:"int() rondt niet af. Het knipt alles na het punt weg: van 7.9 blijft 7 over." },
     { code:'print(type(4.0))', q:"Wat toont dit programma?", opties:["<class 'int'>","<class 'float'>","<class 'str'>","<class 'bool'>"], juist:1,
-      uitleg:"4.0 heeft een punt, dus het is een kommagetal: een float. Ook al is het getal na het punt 0." },
-    { code:'print(type("True"))', q:"Wat toont dit programma?", opties:["<class 'bool'>","<class 'str'>","<class 'int'>","Een foutmelding"], juist:1,
-      uitleg:"\"True\" staat tussen aanhalingstekens, dus het is tekst: een str. Alleen True zonder aanhalingstekens is een bool." },
-    { code:'print(int(7.9))', q:"Wat toont dit programma?", opties:["7","8","7.9","Een foutmelding"], juist:0,
-      uitleg:"int() knipt alles na het punt weg, het rondt niet af. Van 7.9 blijft 7 over." },
-    { code:'print(int("7.9"))', q:"Wat toont dit programma?", opties:["7","8","7.9","Een foutmelding"], juist:3,
-      uitleg:"int() kan tekst met een punt niet omzetten: je krijgt een ValueError. Zet zo'n tekst eerst om met float(): int(float(\"7.9\")) geeft 7." },
+      uitleg:"Kijk naar het punt. 4.0 heeft een punt, dus het is een kommagetal: een float. Ook al is het getal na het punt 0." },
     { code:'print(str(10) + "1")', q:"Wat toont dit programma?", opties:["11","101","10 1","Een foutmelding"], juist:1,
-      uitleg:"str(10) maakt er de tekst \"10\" van. Tekst + tekst plakt de teksten aan elkaar: \"10\" + \"1\" geeft 101." },
+      uitleg:"str(10) maakt er tekst van. Tekst + tekst plakt de teksten aan elkaar: \"10\" + \"1\" geeft 101." },
     { code:'getal = input("Geef een getal: ")\nprint(float(getal) * 2)', vooraf:"De gebruiker typt 3.", q:"Wat toont dit programma?", opties:["6","6.0","33","Een foutmelding"], juist:1,
-      uitleg:"float(getal) zet de tekst \"3\" om naar het kommagetal 3.0. En 3.0 × 2 geeft 6.0: zit er een float bij, dan is de uitkomst ook een float." },
-    { code:'print(bool("False"))', q:"Wat toont dit programma?", opties:["True","False","\"False\"","Een foutmelding"], juist:0,
-      uitleg:"\"False\" is een tekst die niet leeg is. Alleen 0, 0.0 en lege tekst \"\" geven False. Dus bool(\"False\") geeft True." } ],
+      uitleg:"Zit er een float bij, dan is de uitkomst ook een float. float(getal) maakt van de tekst \"3\" het kommagetal 3.0, en 3.0 × 2 geeft 6.0." } ],
   oefeningen:[
     { id:"o1", titel:"Van tekst naar getal", eenvoudig:true,
       html:`<p>In de variabele <code>aantal</code> zit de <b>tekst</b> <code>"12"</code>. Daarom geeft dit programma een foutmelding. Zet op de lege regel <code>aantal</code> om naar een geheel getal met <code>int()</code>. Het programma toont dan: <i>20</i></p>`,
@@ -3861,13 +3882,19 @@ function renderTheorie(m,les){
   les.delen.forEach(d=>{ const kaart=$(`<div class="card"><div class="kicker">Deel ${++nrDeel}</div><h3>${d.titel}</h3>${d.html()}</div>`); m.appendChild(kaart); if(d.na) d.na(kaart) });
 
   /* 2. quiz */
-  const qk=$(`<div class="card"><div class="kicker">Deel ${++nrDeel}</div><h3>Test jezelf: wat toont Python?</h3><p>Lees de code en kies wat je op het scherm ziet. Fout? Lees de uitleg en probeer opnieuw. Elke foute keuze kost ${fmt(THEORIE_KOST.quizFout)} punt.</p></div>`); m.appendChild(qk);
-  les.quiz.forEach((v,k)=>{ const q=$(`<div class="th-quiz"><b>Vraag ${k+1}</b><pre>${esc(v.code)}</pre>${v.vooraf?`<p style="margin:4px 0">${esc(v.vooraf)}</p>`:""}<div style="margin:6px 0"><b>${esc(v.q)}</b></div></div>`);
-    v.opties.forEach((o,i)=>q.appendChild($(`<label class="opt"><input type="radio" name="th${k}" value="${i}"><span style="white-space:pre-line;font-family:ui-monospace,Consolas,monospace">${esc(o)}</span></label>`)));
+  const qk=$(`<div class="card"><div class="kicker">Deel ${++nrDeel}</div><h3>${les.quizTitel||"Test jezelf: wat toont Python?"}</h3><p>${les.quizUitleg||"Lees de code en kies wat je op het scherm ziet."} Fout? Lees de uitleg en probeer opnieuw. Elke foute keuze kost ${fmt(THEORIE_KOST.quizFout)} punt.</p></div>`); m.appendChild(qk);
+  les.quiz.forEach((v,k)=>{ const q=$(`<div class="th-quiz"><b>Vraag ${k+1}</b>${v.code?`<pre>${esc(v.code)}</pre>`:""}${v.vooraf?`<p style="margin:4px 0">${esc(v.vooraf)}</p>`:""}<div style="margin:6px 0"><b>${esc(v.q)}</b></div></div>`);
+    if(v.koppel){ const kp=$(`<div class="th-koppel"></div>`); v.koppel.links.forEach((l,i)=>{ kp.appendChild($(`<span class="dt-type dt-${esc(l)}">${esc(l)}</span>`));
+        kp.appendChild($(`<select data-i="${i}"><option value="">— kies —</option>${v.koppel.rechts.map((r,j)=>`<option value="${j}">${esc(r)}</option>`).join("")}</select>`)) }); q.appendChild(kp) }
+    else v.opties.forEach((o,i)=>q.appendChild($(`<label class="opt"><input type="radio" name="th${k}" value="${i}"><span style="white-space:pre-line;font-family:ui-monospace,Consolas,monospace">${esc(o)}</span></label>`)));
     const act=$(`<div class="actions"><button class="btn">Controleer</button></div>`); q.appendChild(act); const f=$(`<div class="fb"></div>`); q.appendChild(f);
-    const juist=()=>{ q.querySelectorAll(".opt").forEach(o=>{const i=+o.querySelector("input").value; o.querySelector("input").disabled=true; if(i===v.juist){o.classList.add("right");o.querySelector("input").checked=true}}); act.remove(); f.className="fb ok"; f.textContent="✔ Juist! "+v.uitleg+((t.quizFout[k]||0)?` (${t.quizFout[k]} ${t.quizFout[k]===1?"foute keuze":"foute keuzes"})`:"") };
-    act.querySelector("button").onclick=()=>{ const s=q.querySelector("input:checked"); if(!s){f.className="fb info";f.textContent="Kies eerst een antwoord.";return}
-      if(+s.value===v.juist){ t.quiz[k]=true; save(); juist() } else { t.quizFout[k]=(t.quizFout[k]||0)+1; t.quiz[k]=false; save(); f.className="fb bad"; f.textContent="✘ Nog niet (−"+fmt(THEORIE_KOST.quizFout)+"). "+v.uitleg.split(". ")[0]+". Kies opnieuw." }
+    const juist=()=>{ q.querySelectorAll(".th-koppel select").forEach(s=>{ s.value=v.koppel.juist[+s.dataset.i]; s.disabled=true; s.classList.add("right") });
+      q.querySelectorAll(".opt").forEach(o=>{const i=+o.querySelector("input").value; o.querySelector("input").disabled=true; if(i===v.juist){o.classList.add("right");o.querySelector("input").checked=true}}); act.remove(); f.className="fb ok"; f.textContent="✔ Juist! "+(v.uitlegJuist||v.uitleg)+((t.quizFout[k]||0)?` (${t.quizFout[k]} ${t.quizFout[k]===1?"foute keuze":"foute keuzes"})`:"") };
+    act.querySelector("button").onclick=()=>{ let goed;
+      if(v.koppel){ const sel=[...q.querySelectorAll(".th-koppel select")]; if(sel.some(x=>x.value==="")){f.className="fb info";f.textContent="Kies eerst bij elk datatype een betekenis.";return}
+        goed=sel.every(x=>+x.value===v.koppel.juist[+x.dataset.i]) }
+      else { const s=q.querySelector("input:checked"); if(!s){f.className="fb info";f.textContent="Kies eerst een antwoord.";return} goed=+s.value===v.juist }
+      if(goed){ t.quiz[k]=true; save(); juist() } else { t.quizFout[k]=(t.quizFout[k]||0)+1; t.quiz[k]=false; save(); f.className="fb bad"; f.textContent="✘ Nog niet (−"+fmt(THEORIE_KOST.quizFout)+"). "+v.uitleg.split(". ")[0]+". Kies opnieuw." }
       tekenAfT() };
     if(t.quiz[k]===true) juist();
     qk.appendChild(q) });
