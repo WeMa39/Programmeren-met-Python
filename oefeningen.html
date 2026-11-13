@@ -217,7 +217,7 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .vl-uitleg{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--brand-soft);font-size:15px}
 .vl-knoppen{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
 .vl-knoppen .tel{color:var(--muted);font-size:14px}
-.hoofdtabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
+.hoofdtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 16px}
 .hoofdtabs button{font:inherit;font-weight:800;font-size:18px;padding:12px 14px;border-radius:var(--radius);border:2px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 .hoofdtabs button span{font-size:13px;font-weight:600;color:var(--muted)}
 .hoofdtabs button.aan{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
@@ -258,16 +258,12 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
 :root{--oefen:#6b3fa0;--oefen-soft:#f0e8fa}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--oefen:#c9a6f0;--oefen-soft:#2e2340} }
 :root[data-theme="dark"]{--oefen:#c9a6f0;--oefen-soft:#2e2340}
-.modus{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
-.modus button{font:inherit;font-weight:800;font-size:16px;padding:10px 12px;border-radius:var(--radius);border:2px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
-.modus button span{font-size:13px;font-weight:600}
-.modus button.aan{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
-.modus button.aan[data-m="oefen"]{border-color:var(--oefen);color:var(--oefen);background:var(--oefen-soft)}
-@media (max-width:560px){ .modus{grid-template-columns:1fr} }
 .oefenbanner{background:var(--oefen-soft);color:var(--ink);border:2px solid var(--oefen);border-radius:var(--radius);padding:10px 14px;margin:0 0 16px;font-size:15px}
 .oefenbanner b{color:var(--oefen)}
 body.oefenmodus header{border-bottom:4px solid var(--oefen)}
-body.oefenmodus .hoofdtabs button.aan{border-color:var(--oefen);color:var(--oefen);background:var(--oefen-soft)}
+.hoofdtabs button.aan[data-deel="oefenruimte"]{border-color:var(--oefen);color:var(--oefen);background:var(--oefen-soft)}
+@media (max-width:560px){ .hoofdtabs button{font-size:15px;padding:10px 6px} .hoofdtabs button span{font-size:12px} }
+.or-sectie h3{margin:14px 0 6px;font-size:17px}
 .btn.reset{background:var(--card);color:var(--oefen);border:2px solid var(--oefen)}
 </style>
 </head>
@@ -3895,7 +3891,7 @@ function renderTheorie(m,les){
   m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Terug naar de theorie</button></div><div class="kicker">Theorie</div><h2>${les.icoon} ${esc(les.titel)}</h2>
     ${les.intro}
     ${OEFEN()?`<div class="box">🏋️ In de oefenruimte krijg je geen punten. Foute keuzes, tips en oplossingen zijn gratis, en er wordt niets verstuurd.</div>`:`<div class="box">📖 Ook de theorie krijgt <b>punten</b>. Je start op 10. Een foute keuze bij de vragen kost ${fmt(THEORIE_KOST.quizFout)} punt, een tip ${fmt(THEORIE_KOST.tip)} punt en een oplossing bekijken ${fmt(THEORIE_KOST.oplossing)} punt. Pogingen en klasafspraken tellen zoals bij de oefeningen. Op het einde verstuur je je resultaat naar je leerkracht.</div>`}</div>`));
-  m.querySelector("#terug").onclick=()=>{ S.deel="theorie"; go("start") };
+  m.querySelector("#terug").onclick=()=>{ S.deel=OEFEN()?"oefenruimte":"theorie"; go("start") };
   const herbeginT=()=>wisOefen("theorie",les.id,"Deze les helemaal leegmaken en opnieuw beginnen? (Alleen in de oefenruimte. Je punten blijven bewaard.)");
   if(OEFEN()){ const rb=$(`<button class="btn reset">🔄 Opnieuw beginnen</button>`); rb.onclick=herbeginT; m.querySelector("#terug").after(rb) }
 
@@ -4014,12 +4010,16 @@ function codeBlok({waarde,onCode,invoer,onInvoer,controleer,uitvoeren}){
 function lvlNr(o,i){ const m=o.titel.match(/^\S+ (\d+[a-z]?) - /); return m?m[1]:i+1 }
 function go(id){S.huidig=id;save();render();window.scrollTo(0,0)}
 function render(){const m=document.getElementById("main"); m.innerHTML="";
+  if(OEFEN()&&!oefenOpen(S.huidig)) S.modus="punten";
   document.body.classList.toggle("oefenmodus",OEFEN());
-  if(OEFEN()) m.appendChild($(`<div class="oefenbanner">🏋️ <b>Oefenruimte</b> · Je oefent voor de toets. Dit telt <b>niet</b> mee voor je punten en er wordt <b>niets verstuurd</b>. Hulp, tips en oplossingen zijn hier gratis.</div>`));
+  if(OEFEN()&&S.naam&&S.klas) m.appendChild($(`<div class="oefenbanner">🏋️ <b>Oefenruimte</b> · Je oefent voor de toets. Dit telt <b>niet</b> mee voor je punten en er wordt <b>niets verstuurd</b>. Hulp, tips en oplossingen zijn hier gratis.</div>`));
   if(String(S.huidig).startsWith("T:")&&S.naam&&S.klas){ const les=THEORIE.find(l=>"T:"+l.id===S.huidig); if(les) return renderTheorie(m,les) }
   const oef=OEFENINGEN.find(o=>o.id===S.huidig&&o.klaar);
   if(oef && S.naam && S.klas) return renderOef(m,oef);
+  if(OEFEN()){ S.modus="punten"; save(); return render() }
   renderStart(m)}
+/* Oefenruimte: een oefening gaat pas open als ze op punten verstuurd is */
+function oefenOpen(id){ id=String(id); if(id.startsWith("T:")){ const t=(S.theorie||{})[id.slice(2)]; return !!(t&&t.verstuurd) } const a=(S.oef||{})[id]; return !!(a&&a.verstuurd) }
 
 function renderStart(m){
   const c=$(`<div class="card"><div class="kicker">Welkom</div><h2>Python oefeningen</h2>
@@ -4057,20 +4057,27 @@ function renderStart(m){
       <button type="button" data-tab="tekenen">🐢 Tekenen <span class="tel">${telKlaar(tekenOef)}/${telOpen(tekenOef)}</span></button>
     </div><div class="tabinhoud"></div></div>`);
   if(!S.deel) S.deel="oef";
-  const hoofd=$(`<div class="hoofdtabs" role="tablist"><button type="button" data-deel="theorie">📖 Theorie<span>Uitleg, inoefenen en punten</span></button><button type="button" data-deel="oef">✏️ Oefeningen<span>Klas, werelden en tekenen</span></button></div>`);
-  const modus=$(`<div class="modus" role="tablist"><button type="button" data-m="punten">📝 Met punten<span>Je resultaat gaat naar je leerkracht</span></button><button type="button" data-m="oefen">🏋️ Oefenruimte<span>Oefen voor de toets, telt niet mee</span></button></div>`);
-  modus.querySelectorAll("button").forEach(b=>{ b.classList.toggle("aan",(b.dataset.m==="oefen")===OEFEN()); b.onclick=()=>{ S.modus=b.dataset.m==="oefen"?"oefen":"punten"; save(); render(); window.scrollTo(0,0) } });
-  m.appendChild(modus);
-  if(OEFEN()){ const uit=$(`<div class="card"><h3 style="margin-top:0">🏋️ Oefenen voor de toets</h3><p style="margin:0 0 8px">Maak alle oefeningen en de theorie hier zo vaak opnieuw als je wilt. Je punten bij <b>📝 Met punten</b> blijven altijd zoals ze zijn.</p><ul style="margin:0 0 8px;padding-left:20px"><li>Je begint met een lege oefening, los van wat je eerder instuurde.</li><li>Hulp, tips en oplossingen zijn gratis. Pogingen tellen niet.</li><li>Je krijgt geen cijfer en er wordt niets verstuurd.</li><li>Met <b>🔄 Opnieuw beginnen</b> maak je een oefening helemaal leeg.</li></ul><div class="actions"><button class="btn reset" id="wisalles">🔄 Hele oefenruimte leegmaken</button></div></div>`);
-    uit.querySelector("#wisalles").onclick=()=>{ if(confirm("Alles wat je in de oefenruimte deed, wordt gewist. Je punten blijven gewoon bewaard. Doorgaan?")){ S.oefen={}; save(); render() } };
-    m.appendChild(uit) }
+  const hoofd=$(`<div class="hoofdtabs" role="tablist"><button type="button" data-deel="theorie">📖 Theorie<span>Uitleg, inoefenen en punten</span></button><button type="button" data-deel="oef">✏️ Oefeningen<span>Klas, werelden en tekenen</span></button><button type="button" data-deel="oefenruimte">🏋️ Oefenruimte<span>Oefen voor de toets</span></button></div>`);
   m.appendChild(hoofd);
-  const theorie=$(`<div class="card"><p class="w-intro" style="margin-top:0">${OEFEN()?"Lees de uitleg opnieuw en oefen in. In de oefenruimte krijg je geen punten.":"Hier lees je de uitleg en oefen je in. Ook hier krijg je <b>punten</b>: op het einde verstuur je je resultaat naar je leerkracht."}</p><div class="th-lessen"></div></div>`); m.appendChild(theorie);
+  const theorie=$(`<div class="card"><p class="w-intro" style="margin-top:0">Hier lees je de uitleg en oefen je in. Ook hier krijg je <b>punten</b>: op het einde verstuur je je resultaat naar je leerkracht.</p><div class="th-lessen"></div></div>`); m.appendChild(theorie);
   THEORIE.forEach(les=>{ const tl=theorieTel(les);
     const b=$(`<button type="button" class="th-les"><span class="w-icoon">${les.icoon}</span><span><span class="w-naam">${esc(les.titel)}</span><span class="w-sub">${esc(les.sub)}</span></span>${TH(les.id).verstuurd?`<span class="pill ok">✔ ${fmt(TH(les.id).verstuurd.cijfer)}/10</span>`:`<span class="tel">${tl.k}/${tl.n}</span>`}</button>`);
     b.onclick=()=>open({id:"T:"+les.id}); theorie.querySelector(".th-lessen").appendChild(b) });
   m.appendChild(kaart);
-  const kiesDeel=d=>{ S.deel=d; save(); hoofd.querySelectorAll("button").forEach(b=>b.classList.toggle("aan",b.dataset.deel===d)); theorie.hidden=d!=="theorie"; kaart.hidden=d==="theorie" };
+  /* ---- oefenruimte ---- */
+  const ruimte=$(`<div class="card"><p class="w-intro" style="margin-top:0">🏋️ Hier oefen je opnieuw voor de toets. Een oefening gaat hier pas open <b>nadat je ze op punten verstuurd hebt</b>. In de oefenruimte begin je met een lege oefening, is hulp gratis, krijg je geen punten en wordt er niets verstuurd. Je cijfers blijven zoals ze zijn.</p></div>`); m.appendChild(ruimte);
+  const oefenStatus=id=>{ const so=S.oefen||{}; if(String(id).startsWith("T:")){ const t=(so.theorie||{})[id.slice(2)]; if(!t) return ""; const les=THEORIE.find(l=>l.id===id.slice(2)); const k=Object.values(t.quiz||{}).filter(x=>x===true).length+les.oefeningen.filter(o=>((t.oef||{})[o.id]||{}).ok).length; return k?`<span class="pill mid">${k}/${les.quiz.length+les.oefeningen.length}</span>`:"" }
+    const a=(so.oef||{})[id]; return !a?"":a.ok?'<span class="pill ok">✔ geoefend</span>':(a.controles||a.code)?'<span class="pill mid">bezig</span>':"" };
+  const oefenIn=o=>{ if(S.klas&&S.naam.trim()) S.modus="oefen"; open(o) };
+  [["📖 Theorie",THEORIE.map(l=>({id:"T:"+l.id,titel:l.titel,klaar:true}))],["📘 Klasoefeningen",volgordeKlas()],["🎮 Programmeerwerelden",wereldOef],["🐢 Tekenen",tekenOef]].forEach(([kop,lijst])=>{
+    lijst=lijst.filter(o=>o.klaar); if(!lijst.length) return;
+    const n=lijst.filter(o=>oefenOpen(o.id)).length;
+    const sec=$(`<div class="or-sectie"><h3>${kop} <span class="tel">${n}/${lijst.length} open</span></h3><div class="exlist"></div></div>`);
+    lijst.forEach(o=>{ const op=oefenOpen(o.id);
+      const b=$(`<button ${op?"":"disabled"}><span class="t">${esc(o.titel)}</span>${op?oefenStatus(o.id):'<span class="pill off">🔒 eerst op punten versturen</span>'}</button>`);
+      if(op) b.onclick=()=>oefenIn(o); sec.querySelector(".exlist").appendChild(b) });
+    ruimte.appendChild(sec) });
+  const kiesDeel=d=>{ S.deel=d; save(); hoofd.querySelectorAll("button").forEach(b=>b.classList.toggle("aan",b.dataset.deel===d)); theorie.hidden=d!=="theorie"; kaart.hidden=d!=="oef"; ruimte.hidden=d!=="oefenruimte" };
   hoofd.querySelectorAll("button").forEach(b=>b.onclick=()=>kiesDeel(b.dataset.deel));
   const inhoud=kaart.querySelector(".tabinhoud");
   const voortgang=(lijst,tekst)=>{ const k=telKlaar(lijst), n=telOpen(lijst), pct=n?Math.round(k/n*100):0;
@@ -4118,8 +4125,8 @@ function renderStart(m){
 
 function renderOef(m,oef){
   const a=O(oef.id);
-  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Alle oefeningen</button>${OEFEN()?'<button class="btn reset" id="reset1">🔄 Opnieuw beginnen</button>':""}</div><div class="kicker">${OEFEN()?"Oefenruimte":"Oefening"}</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${KLASAFSPRAKEN&&!oef.geenCode?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
-  m.querySelector("#terug").onclick=()=>go("start");
+  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">${OEFEN()?"← Oefenruimte":"← Alle oefeningen"}</button>${OEFEN()?'<button class="btn reset" id="reset1">🔄 Opnieuw beginnen</button>':""}</div><div class="kicker">${OEFEN()?"Oefenruimte":"Oefening"}</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${KLASAFSPRAKEN&&!oef.geenCode?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
+  m.querySelector("#terug").onclick=()=>{ if(OEFEN()) S.deel="oefenruimte"; go("start") };
   const herbegin=()=>wisOefen("oef",oef.id,"Deze oefening helemaal leegmaken en opnieuw beginnen? (Alleen in de oefenruimte. Je punten blijven bewaard.)");
   if(OEFEN()) m.querySelector("#reset1").onclick=herbegin;
 
@@ -4223,13 +4230,13 @@ function renderOef(m,oef){
   tekenExtra();
 
   /* afronden */
-  const volgende=volgendeOef(oef);
+  let volgende=volgendeOef(oef); if(OEFEN()) while(volgende&&!oefenOpen(volgende.id)) volgende=volgendeOef(volgende);
   const af=$(`<div class="card" id="afronden"></div>`); m.appendChild(af);
   function tekenAf(){ const c=berekenCijfer(a);
     if(OEFEN()){ af.innerHTML=`<div class="kicker">Afronden</div><h3>Oefenruimte: geen cijfer</h3>
         <p style="margin:0">${a.ok?`✔ <b>Gelukt!</b> Je had ${a.controles||0} ${(a.controles||0)===1?"poging":"pogingen"} en ${a.hulp||0} keer hulp nodig. Lukt het de volgende keer zonder hulp?`:"Nog niet af. Neem je tijd: pogingen en hulp tellen hier niet."} Er wordt niets verstuurd.</p>
-        <div class="actions" style="margin-top:14px"><button class="btn reset" id="reset2">🔄 Opnieuw beginnen</button><button class="btn secondary" id="volgende">${volgende?"Volgende oefening →":"✔ Terug naar alle oefeningen"}</button></div>`;
-      af.querySelector("#reset2").onclick=herbegin; af.querySelector("#volgende").onclick=()=>go(volgende?volgende.id:"start"); return }
+        <div class="actions" style="margin-top:14px"><button class="btn reset" id="reset2">🔄 Opnieuw beginnen</button><button class="btn secondary" id="volgende">${volgende?"Volgende oefening →":"✔ Terug naar de oefenruimte"}</button></div>`;
+      af.querySelector("#reset2").onclick=herbegin; af.querySelector("#volgende").onclick=()=>{ if(!volgende) S.deel="oefenruimte"; go(volgende?volgende.id:"start") }; return }
     af.innerHTML=`<div class="kicker">Afronden</div><h3>Jouw cijfer voor deze oefening</h3>
       <div style="display:flex;gap:18px;align-items:baseline;flex-wrap:wrap"><span class="score">${a.ok?fmt(c.cijfer):"…"}</span><span>${a.ok?"op "+CIJFER.maximum:"Je cijfer verschijnt zodra je programma correct is."}</span></div>
       <div style="margin-top:10px">
@@ -4251,6 +4258,7 @@ function renderOef(m,oef){
   tekenAf();
 }
 
+function volgordeKlas(){ return OEFENINGEN.filter(o=>!o.groep).map((o,k)=>[o,k]).sort((x,y)=>(x[0].id.split(".")[0]-y[0].id.split(".")[0])||(x[1]-y[1])).map(x=>x[0]) }
 /* Volgende oefening in dezelfde volgorde als op het startscherm */
 function volgendeOef(oef){
   let lijst;
