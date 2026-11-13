@@ -263,7 +263,13 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
 body.oefenmodus header{border-bottom:4px solid var(--oefen)}
 .hoofdtabs button.aan[data-deel="oefenruimte"]{border-color:var(--oefen);color:var(--oefen);background:var(--oefen-soft)}
 @media (max-width:560px){ .hoofdtabs button{font-size:15px;padding:10px 6px} .hoofdtabs button span{font-size:12px} }
-.or-sectie h3{margin:14px 0 6px;font-size:17px}
+details.or-cat>summary{font-size:18px;padding:14px 16px}
+details.or-cat>summary .hfd-nr{background:var(--oefen);font-size:17px}
+details.or-cat[open]{border-color:var(--oefen)}
+.or-in{padding:0 12px 8px}
+.or-in details.hfd{margin:8px 0}
+.or-in details.hfd summary{padding:9px 12px;font-size:15.5px}
+.or-in .hfd-nr{width:26px;height:26px;font-size:14px}
 .btn.reset{background:var(--card);color:var(--oefen);border:2px solid var(--oefen)}
 </style>
 </head>
@@ -4069,14 +4075,27 @@ function renderStart(m){
   const oefenStatus=id=>{ const so=S.oefen||{}; if(String(id).startsWith("T:")){ const t=(so.theorie||{})[id.slice(2)]; if(!t) return ""; const les=THEORIE.find(l=>l.id===id.slice(2)); const k=Object.values(t.quiz||{}).filter(x=>x===true).length+les.oefeningen.filter(o=>((t.oef||{})[o.id]||{}).ok).length; return k?`<span class="pill mid">${k}/${les.quiz.length+les.oefeningen.length}</span>`:"" }
     const a=(so.oef||{})[id]; return !a?"":a.ok?'<span class="pill ok">✔ geoefend</span>':(a.controles||a.code)?'<span class="pill mid">bezig</span>':"" };
   const oefenIn=o=>{ if(S.klas&&S.naam.trim()) S.modus="oefen"; open(o) };
-  [["📖 Theorie",THEORIE.map(l=>({id:"T:"+l.id,titel:l.titel,klaar:true}))],["📘 Klasoefeningen",volgordeKlas()],["🎮 Programmeerwerelden",wereldOef],["🐢 Tekenen",tekenOef]].forEach(([kop,lijst])=>{
-    lijst=lijst.filter(o=>o.klaar); if(!lijst.length) return;
-    const n=lijst.filter(o=>oefenOpen(o.id)).length;
-    const sec=$(`<div class="or-sectie"><h3>${kop} <span class="tel">${n}/${lijst.length} open</span></h3><div class="exlist"></div></div>`);
-    lijst.forEach(o=>{ const op=oefenOpen(o.id);
-      const b=$(`<button ${op?"":"disabled"}><span class="t">${esc(o.titel)}</span>${op?oefenStatus(o.id):'<span class="pill off">🔒 eerst op punten versturen</span>'}</button>`);
-      if(op) b.onclick=()=>oefenIn(o); sec.querySelector(".exlist").appendChild(b) });
-    ruimte.appendChild(sec) });
+  if(!S.dicht) S.dicht={};
+  const telOpenR=l=>l.filter(o=>oefenOpen(o.id)).length;
+  const knop=o=>{ const op=oefenOpen(o.id);
+    const b=$(`<button ${op?"":"disabled"}><span class="t">${esc(o.titel)}</span>${op?oefenStatus(o.id):'<span class="pill off">🔒 eerst op punten versturen</span>'}</button>`);
+    if(op) b.onclick=()=>oefenIn(o); return b };
+  const uitvouw=(sleutel,cls,nr,titel,lijst,standaardOpen)=>{ const n=telOpenR(lijst);
+    const d=$(`<details class="hfd ${cls}"><summary><span class="hfd-nr">${nr}</span><span class="hfd-t">${esc(titel)}</span><span class="tel">${n}/${lijst.length} open</span></summary></details>`);
+    if(S.dicht[sleutel]!=null?!S.dicht[sleutel]:standaardOpen) d.open=true;
+    d.addEventListener("toggle",()=>{S.dicht[sleutel]=!d.open; save()}); return d };
+  const klasR=volgordeKlas().filter(o=>o.klaar), hfdR={}; klasR.forEach(o=>{ const h=o.id.split(".")[0]; (hfdR[h]=hfdR[h]||[]).push(o) });
+  const werR=wereldOef.filter(o=>o.klaar), tekR=tekenOef.filter(o=>o.klaar);
+  const CATS=[
+    {k:"th",nr:"📖",kop:"Theorie",groepen:[{lijst:THEORIE.map(l=>({id:"T:"+l.id,titel:l.titel,klaar:true}))}]},
+    {k:"klas",nr:"📘",kop:"Klasoefeningen",groepen:Object.keys(hfdR).sort((x,y)=>x-y).map(h=>({k:"h"+h,nr:h,titel:HOOFDSTUKKEN[h]||"Hoofdstuk "+h,lijst:hfdR[h]}))},
+    {k:"wer",nr:"🎮",kop:"Programmeerwerelden",groepen:[...new Set(werR.map(o=>o.groep))].map(g=>{ const info=WERELD_INFO[g]||{}; return {k:"w"+g,nr:info.icoon||"🎮",titel:info.naam||g,lijst:werR.filter(o=>o.groep===g)} })},
+    {k:"tek",nr:"🐢",kop:"Tekenen",groepen:[{lijst:tekR}]}];
+  CATS.forEach(c=>{ const alle=c.groepen.flatMap(g=>g.lijst); if(!alle.length) return;
+    const cat=uitvouw("or-"+c.k,"or-cat",c.nr,c.kop,alle,false), binnen=$(`<div class="or-in"></div>`); cat.appendChild(binnen);
+    c.groepen.forEach(g=>{ if(!g.k){ const ex=$(`<div class="exlist" style="padding:0"></div>`); g.lijst.forEach(o=>ex.appendChild(knop(o))); binnen.appendChild(ex); return }
+      const sub=uitvouw("or-"+g.k,"",g.nr,g.titel,g.lijst,telOpenR(g.lijst)>0), ex=$(`<div class="exlist"></div>`); g.lijst.forEach(o=>ex.appendChild(knop(o))); sub.appendChild(ex); binnen.appendChild(sub) });
+    ruimte.appendChild(cat) });
   const kiesDeel=d=>{ S.deel=d; save(); hoofd.querySelectorAll("button").forEach(b=>b.classList.toggle("aan",b.dataset.deel===d)); theorie.hidden=d!=="theorie"; kaart.hidden=d!=="oef"; ruimte.hidden=d!=="oefenruimte" };
   hoofd.querySelectorAll("button").forEach(b=>b.onclick=()=>kiesDeel(b.dataset.deel));
   const inhoud=kaart.querySelector(".tabinhoud");
