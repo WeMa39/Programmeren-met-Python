@@ -217,7 +217,8 @@ details.afspraken summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .vl-uitleg{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--brand-soft);font-size:15px}
 .vl-knoppen{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
 .vl-knoppen .tel{color:var(--muted);font-size:14px}
-.hoofdtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 16px}
+.hoofdtabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 16px}
+@media (max-width:760px){ .hoofdtabs{grid-template-columns:repeat(2,1fr)} }
 .hoofdtabs button{font:inherit;font-weight:800;font-size:18px;padding:12px 14px;border-radius:var(--radius);border:2px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 .hoofdtabs button span{font-size:13px;font-weight:600;color:var(--muted)}
 .hoofdtabs button.aan{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
@@ -3099,7 +3100,7 @@ function flValideer(d,m){
 async function nakijkenFlow(json,d){
   const m=flModel(json);
   if(d.flow==="lezen"){ const A=m.antw||[], fout=d.vragen.map((v,i)=>A[i]===v.juist?0:i+1).filter(x=>x);
-    if(fout.length) return {ok:false,msg:`${fout.length===1?"Vraag "+fout[0]+" klopt":"Vragen "+fout.join(", ")+" kloppen"} nog niet. Volg de pijlen nog eens met je vinger, van Start tot Stop.`};
+    if(fout.length){ const tip=d.vragen[fout[0]-1].tip; return {ok:false,msg:`${fout.length===1?"Vraag "+fout[0]+" klopt":"Vragen "+fout.join(", ")+" kloppen"} nog niet. `+(tip?`Tip bij vraag ${fout[0]}: ${tip}`:(d.foutTip||"Volg de pijlen nog eens met je vinger, van Start tot Stop."))} }
     return {ok:true,msg:d.ok} }
   const boom=flBoom(d,m);
   if(d.minKeuzes&&flTel(boom,"keuze")<d.minKeuzes) return {ok:false,msg:d.keuzeTip||`Je stroomdiagram heeft minstens ${d.minKeuzes} ${d.minKeuzes===1?"ruit":"ruiten"} nodig.`};
@@ -3121,12 +3122,12 @@ function flowBlok(d,{waarde,onCode,controleer,uitvoeren}){
   const out=$(`<div class="out" style="display:none"></div>`), st=$(`<div class="fl-st"></div>`);
   const act=$(`<div class="actions">${uitvoeren?'<button class="btn secondary run">▶ Uitvoeren</button>':""}<button class="btn chk">✓ Controleer</button></div>`);
   const bewaar=()=>{ onCode(JSON.stringify(m)); teken() };
-  const teken=()=>{ tek.innerHTML=flSvg(d.flow==="lezen"?d.boom:flBoom(d,m)) };
+  const teken=()=>{ if(d.flow==="lezen"&&!d.boom){ tek.style.display="none"; return } tek.innerHTML=flSvg(d.flow==="lezen"?d.boom:flBoom(d,m)) };
   const melding=t=>{ st.className="fb info fl-st"; st.textContent=t; st.style.display=t?"block":"none" };
   const opties=(lijst,gekozen)=>`<option value="">— kies —</option>`+lijst.map((p,i)=>`<option value="${i}" ${gekozen===i?"selected":""}>${esc(p.tekst)}</option>`).join("");
 
   function bouwLezen(){ werk.innerHTML=""; m.antw=m.antw||[];
-    d.vragen.forEach((v,i)=>{ const q=$(`<div class="fl-vraag"><b>${i+1}. ${esc(v.q)}</b></div>`);
+    d.vragen.forEach((v,i)=>{ const q=$(`<div class="fl-vraag">${v.code?`<div style="font-weight:700">Vraag ${i+1}</div><pre>${esc(v.code)}</pre>`:""}${v.vooraf?`<p style="margin:4px 0">${esc(v.vooraf)}</p>`:""}<b>${v.code?"":(i+1)+". "}${esc(v.q)}</b></div>`);
       v.opties.forEach((t,j)=>{ const o=$(`<label class="opt"><input type="radio" name="flv${FL_ID}_${i}" value="${j}" ${m.antw[i]===j?"checked":""}><span>${esc(t)}</span></label>`);
         o.querySelector("input").onchange=()=>{ m.antw[i]=j; bewaar(); melding("") }; q.appendChild(o) });
       werk.appendChild(q) }) }
@@ -3261,6 +3262,240 @@ kraan.zet()</pre>
 OEFENINGEN.push(...WERELD_OEFENINGEN);
 OEFENINGEN.push(...FLOW_OEFENINGEN);
 OEFENINGEN.push(...TEKEN_OEFENINGEN);
+
+/* ================================================================
+   REMEDIËRING (na een toets)
+   Elke remediëring heeft onderdelen A, B en C, zoals in de toets.
+   De leerling typt de code die de leerkracht geeft:
+   1 = A, 2 = B, 3 = C, 4 = A+B, 5 = A+C, 6 = A+B+C, 7 = B+C
+   De oefeningen werken en tellen zoals gewone oefeningen (punten + versturen).
+   ================================================================ */
+const REM_CODES={1:["A"],2:["B"],3:["C"],4:["A","B"],5:["A","C"],6:["A","B","C"],7:["B","C"]};
+const REM_UITLEG_QUIZ=`<div class="box"><b>Zo werk je</b><br>Lees elke code rustig, regel per regel, en kies wat Python doet. Klik daarna op <b>✓ Controleer</b>. Zijn er nog fouten, dan zie je welke vragen nog niet kloppen en krijg je een tip. Je mag de code ook overtypen in de <b>Python-editor</b> (link bovenaan) om ze uit te proberen.</div>`;
+const remQuiz=(o)=>({klaar:true,geenCode:true,stappen:[],...o,opdracht:o.opdracht+REM_UITLEG_QUIZ,
+  hoofd:{titel:o.kop||"Wat doet Python?",flow:"lezen",boom:null,html:o.html||"",vragen:o.vragen,hulp:o.hulp,ok:o.ok,foutTip:o.foutTip}});
+const MZ_GROOT={1:"klein",2:"middel",3:"groot"};
+const FL_REM_MZ=[{t:"actie",tekst:"Lees het gewicht",code:"gewicht = float(robot.lees_gewicht())"},
+  {t:"keuze",tekst:"Is het gewicht kleiner dan 2?",code:"gewicht < 2",ja:[{t:"actie",tekst:"Rijd naar bak 1",code:"robot.naar(1)"}],
+    nee:[{t:"keuze",tekst:"Is het gewicht kleiner dan 10?",code:"gewicht < 10",ja:[{t:"actie",tekst:"Rijd naar bak 2",code:"robot.naar(2)"}],nee:[{t:"actie",tekst:"Rijd naar bak 3",code:"robot.naar(3)"}]}]},
+  {t:"actie",tekst:"Leg het pakje in de bak",code:"robot.leg()"}];
+function remLichtDoel(sc,st,out){ const f=verkeerDoel(sc,st,out); if(f) return f;
+  const opg=/opgelet/i.test(out);
+  if(sc.licht==="oranje"&&!opg) return "Bij oranje moet het programma ook \"Opgelet!\" tonen.";
+  if(sc.licht!=="oranje"&&opg) return `Bij ${sc.licht} mag het programma "Opgelet!" niet tonen.`;
+  return null }
+const REM_MZ_SC=[2.5,5,5.5,8].map(g=>({naam:`${g.toFixed(1)} kg`,gewicht:g,postcode:8500,bakken:2,labels:MZ_ZWAAR,label:g.toFixed(1)+" kg",doel:g>5?2:1,paneel:`📦 Pakje van ${g.toFixed(1)} kg`,tip:g===5?"Precies 5 kg is niet méér dan 5 kg: dat pakje gaat naar bak 1.":""}));
+const REM_H_SC=[[6,2,"de boot"],[10,4,"het schip"],[18,4,"het schip"],[25,6,"het vrachtschip"],[31,6,"het vrachtschip"]].map(([g,d,n])=>hSc({naam:`${g} ton`,kleur:"geel",label:g+" t",gewicht:g,max:40,schepen:[2,4,6],namen:{2:"Boot",4:"Schip",6:"Vrachtschip"},doel:d,doelNaam:n,paneel:`📟 Gewicht: ${g} ton`,
+  tip:g===10?"Precies 10 ton is niet ‘minder dan 10 ton’: die container gaat naar het schip.":g===25?"Precies 25 ton hoort niet meer bij ‘minder dan 25 ton’.":""}));
+
+const REMEDIERINGEN=[
+{ id:"R1", icoon:"🩹", titel:"Variabelen, datatypes, input, output en if/elif/else", sub:"Na de toets ‘Python: datatypes en keuzes’",
+  onderdelen:{
+    A:{ titel:"Datatypes, invoer en uitvoer, if lezen", uitleg:"Zoals deel A van de toets: welk datatype heeft een waarde, wat doen int(), float() en str(), wat geeft input() en wat toont Python bij if, elif en else?" },
+    B:{ titel:"Stroomdiagrammen", uitleg:"Zoals deel B van de toets: een stroomdiagram lezen, vervolledigen en zelf opstellen." },
+    C:{ titel:"Zelf programmeren", uitleg:"Zoals deel C van de toets: programma's met input() en print(), en programma's in de werelden met if, elif en else." } },
+  oefeningen:[
+/* ---------- Onderdeel A ---------- */
+remQuiz({ id:"R1-A1", deel:"A", titel:"Remediëring 1 - A1 Datatypes en omzetten",
+  opdracht:`<p>Python heeft vier datatypes die je moet kennen: <code>int</code> (geheel getal), <code>float</code> (kommagetal), <code>str</code> (tekst, tussen aanhalingstekens) en <code>bool</code> (<code>True</code> of <code>False</code>). Met <code>int()</code>, <code>float()</code> en <code>str()</code> zet je een waarde om naar een ander datatype.</p>`,
+  vragen:[
+    {code:'x = "15"', q:"Welk datatype heeft x?", opties:["int","float","str","bool"], juist:2, tip:"Kijk of er aanhalingstekens rond de waarde staan."},
+    {code:"x = 15.0", q:"Welk datatype heeft x?", opties:["int","float","str","bool"], juist:1, tip:"Een getal met een punt is een kommagetal, ook als er .0 achter staat."},
+    {code:"x = False", q:"Welk datatype heeft x?", opties:["int","float","str","bool"], juist:3, tip:"True en False zonder aanhalingstekens zijn geen tekst."},
+    {code:'print(int("8") + 2)', q:"Wat toont dit programma?", opties:["10","82","8 + 2","Een foutmelding"], juist:0, tip:"int(\"8\") maakt van de tekst \"8\" het getal 8. Daarna rekent Python."},
+    {code:'print("8" + "2")', q:"Wat toont dit programma?", opties:["10","82","8 + 2","Een foutmelding"], juist:1, tip:"Twee teksten met + worden aan elkaar geplakt."},
+    {code:"print(int(6.9))", q:"Wat toont dit programma?", opties:["6","7","6.9","Een foutmelding"], juist:0, tip:"int() rondt niet af: het laat alles na de komma gewoon weg."},
+    {code:'getal = float("3")\nprint(getal)', q:"Wat toont dit programma?", opties:["3","3.0",'"3"',"Een foutmelding"], juist:1, tip:"float() maakt altijd een kommagetal."},
+    {code:"print(str(4) + str(4))", q:"Wat toont dit programma?", opties:["8","44","str(4)str(4)","Een foutmelding"], juist:1, tip:"str() maakt tekst van een getal. Tekst + tekst wordt aan elkaar geplakt."},
+    {code:'print(int("2.5"))', q:"Wat toont dit programma?", opties:["2","3","2.5","Een foutmelding"], juist:3, tip:"int() kan alleen tekst omzetten waarin een geheel getal staat."}
+  ],
+  hulp:["Bekijk elke waarde: staan er aanhalingstekens rond? Dan is het tekst (str). Een punt in een getal? Dan is het een float.","Tekst + tekst plakt aan elkaar (\"8\" + \"2\" wordt 82). Getal + getal telt op. int() laat de cijfers na de komma weg, float() geeft altijd een kommagetal."],
+  ok:"Je kent de datatypes en de omzetfuncties!" }),
+remQuiz({ id:"R1-A2", deel:"A", titel:"Remediëring 1 - A2 Invoer en uitvoer",
+  opdracht:`<p><code>input()</code> geeft <b>altijd tekst</b> terug, ook als de gebruiker een getal typt. Wil je ermee rekenen, dan zet je het eerst om met <code>int()</code> of <code>float()</code>. In <code>print()</code> kun je tekst en getallen niet zomaar met <code>+</code> aan elkaar plakken: gebruik <code>str()</code> of komma's.</p>`,
+  vragen:[
+    {code:'leeftijd = input("Hoe oud ben je? ")', vooraf:"De gebruiker typt 15.", q:"Welk datatype heeft leeftijd?", opties:["int","float","str","bool"], juist:2, tip:"input() geeft altijd tekst terug."},
+    {code:'getal = input("Geef een getal: ")\nprint(getal * 3)', vooraf:"De gebruiker typt 7.", q:"Wat toont dit programma (na de vraag)?", opties:["21","777","getalgetalgetal","Een foutmelding"], juist:1, tip:"getal is tekst. Tekst * 3 herhaalt de tekst 3 keer."},
+    {code:'getal = input("Geef een getal: ")\nprint(getal + 5)', vooraf:"De gebruiker typt 20.", q:"Wat toont dit programma (na de vraag)?", opties:["25","205","getal + 5","Een foutmelding"], juist:3, tip:"Tekst + getal kan Python niet: dat geeft een TypeError."},
+    {code:'getal = int(input("Geef een getal: "))\nprint(getal + 5)', vooraf:"De gebruiker typt 20.", q:"Wat toont dit programma (na de vraag)?", opties:["25","205","getal + 5","Een foutmelding"], juist:0, tip:"Hier wordt de invoer meteen omgezet met int()."},
+    {code:'prijs = input("Wat is de prijs? ")\nprint(float(prijs) * 2)', vooraf:"De gebruiker typt 2.5.", q:"Wat toont dit programma (na de vraag)?", opties:["5.0","2.52.5","5","Een foutmelding"], juist:0, tip:"float * int geeft een float, dus met .0 erachter."},
+    {code:'punten = 17\nprint("Je hebt " + punten + " punten.")', q:"Wat toont dit programma?", opties:["Je hebt 17 punten.","Je hebt punten punten.","Je hebt str(punten) punten.","Een foutmelding"], juist:3, tip:"punten is een int. Tekst + int geeft een foutmelding."},
+    {code:'punten = 17\nprint("Je hebt " + str(punten) + " punten.")', q:"Wat toont dit programma?", opties:["Je hebt 17 punten.","Je hebt punten punten.","Je hebt str(punten) punten.","Een foutmelding"], juist:0, tip:"str(punten) maakt van 17 de tekst \"17\". Nu is het tekst + tekst + tekst."},
+    {code:'punten = 17\nprint("Je hebt", punten, "punten.")', q:"Wat toont dit programma?", opties:["Je hebt 17 punten.","Je hebt17punten.","Je hebt, 17, punten.","Een foutmelding"], juist:0, tip:"Met komma's mag je tekst en getallen mengen. print() zet er zelf een spatie tussen."}
+  ],
+  hulp:["Stel je bij elke vraag eerst de vraag: is deze variabele tekst of een getal? Alles wat uit input() komt, is tekst.","Tekst * getal herhaalt de tekst. Tekst + getal geeft een foutmelding. Met str() of met komma's in print() kun je tekst en getallen wel samen tonen."],
+  ok:"Je weet hoe je met invoer en uitvoer werkt!" }),
+remQuiz({ id:"R1-A3", deel:"A", titel:"Remediëring 1 - A3 if, elif en else lezen",
+  opdracht:`<p>Bij <code>if</code>, <code>elif</code> en <code>else</code> kijkt Python de voorwaarden <b>van boven naar onder</b> na. Bij de <b>eerste</b> voorwaarde die <code>True</code> is, voert Python dat blok uit en slaat het de rest over. Is geen enkele voorwaarde <code>True</code>, dan voert Python het <code>else</code>-blok uit.</p>`,
+  vragen:[
+    {code:'punten = 12\nif punten >= 16:\n    print("Uitstekend")\nelif punten >= 10:\n    print("Geslaagd")\nelse:\n    print("Niet geslaagd")', q:"Wat toont dit programma?", opties:["Uitstekend","Geslaagd","Niet geslaagd","Geslaagd en daarna Niet geslaagd"], juist:1, tip:"Is 12 >= 16? En is 12 >= 10?"},
+    {code:'punten = 16\nif punten >= 16:\n    print("Uitstekend")\nelif punten >= 10:\n    print("Geslaagd")\nelse:\n    print("Niet geslaagd")', q:"Wat toont dit programma?", opties:["Uitstekend","Geslaagd","Niet geslaagd","Uitstekend en daarna Geslaagd"], juist:0, tip:"Python stopt bij de eerste voorwaarde die True is. De elif wordt dan niet meer bekeken."},
+    {code:'punten = 9\nif punten >= 16:\n    print("Uitstekend")\nelif punten >= 10:\n    print("Geslaagd")\nelse:\n    print("Niet geslaagd")', q:"Wat toont dit programma?", opties:["Uitstekend","Geslaagd","Niet geslaagd","Niets"], juist:2, tip:"Geen enkele voorwaarde is True. Wat gebeurt er dan?"},
+    {code:'temp = 20\nif temp > 20:\n    print("Warm")\nelif temp > 10:\n    print("Fris")\nelse:\n    print("Koud")', q:"Wat toont dit programma?", opties:["Warm","Fris","Koud","Warm en daarna Fris"], juist:1, tip:"Is 20 groter dan 20? Let op het verschil tussen > en >=."},
+    {code:'dier = "Kat"\nif dier == "kat":\n    print("Miauw")\nelse:\n    print("Onbekend dier")', q:"Wat toont dit programma?", opties:["Miauw","Onbekend dier","Miauw en daarna Onbekend dier","Een foutmelding"], juist:1, tip:"Bij == moet de tekst precies gelijk zijn, ook de hoofdletters."},
+    {code:'antwoord = "ja"\nif antwoord == "ja":\n    print("Fijn!")\nprint("Tot ziens.")', q:"Wat toont dit programma?", opties:["Fijn!","Tot ziens.","Fijn! en daarna Tot ziens.","Niets"], juist:2, tip:"De laatste regel springt niet in: die hoort niet bij de if en wordt altijd uitgevoerd."},
+    {code:'leeftijd = input("Hoe oud ben je? ")\nif leeftijd >= 12:\n    print("Tiener")\nelse:\n    print("Kind")', vooraf:"De gebruiker typt 14.", q:"Wat toont dit programma (na de vraag)?", opties:["Tiener","Kind","Niets","Een foutmelding"], juist:3, tip:"leeftijd is tekst. Tekst vergelijken met een getal (>=) geeft een foutmelding."}
+  ],
+  hulp:["Ga met je vinger van boven naar onder. Bij elke voorwaarde vraag je: True of False? Bij de eerste True stop je.","Let op drie valkuilen: > is niet hetzelfde als >=, bij == tellen hoofdletters mee, en tekst uit input() kun je niet vergelijken met een getal zonder int()."],
+  ok:"Je leest if, elif en else zoals Python het doet!" }),
+{ id:"R1-A4", deel:"A", titel:"Remediëring 1 - A4 Herstel het programma", klaar:true, stappen:[],
+  opdracht:`<p>Lina schreef een programma dat je naam en leeftijd vraagt en dan zegt hoe oud je volgend jaar bent. Maar het programma geeft een <b>foutmelding</b>. Klik op <b>▶ Uitvoeren</b>, lees de foutmelding en herstel het programma.</p>${ZO_WERK_JE}`,
+  hoofd:{ titel:"Herstel de code",
+    html:`<p>Het programma moet dit doen:</p><pre>Hoe heet je? Sara
+Hoe oud ben je? 14
+Dag Sara, volgend jaar ben je 15 jaar.</pre>
+    <div class="box warm"><b>Let op</b><br>Er zitten <b>twee</b> fouten in, allebei met datatypes. Vervang ook <code>Voornaam Naam</code> door je eigen naam.</div>`,
+    starter:'# Voornaam Naam\nnaam = input("Hoe heet je? ")\nleeftijd = input("Hoe oud ben je? ")\nvolgend_jaar = leeftijd + 1\nprint("Dag " + naam + ", volgend jaar ben je " + volgend_jaar + " jaar.")',
+    invoer:"Sara\n14", invoerNamen:["naam","leeftijd"],
+    tests:[
+      {invoer:["Sara","14"], getallen:[15], woorden:[["sara"]], tip:"Sara is 14, dus volgend jaar 15."},
+      {invoer:["Tom","9"], getallen:[10], woorden:[["tom"]], tip:"Tom is 9, dus volgend jaar 10."}
+    ],
+    moet:[[/int\s*\(/,"De leeftijd uit input() is tekst. Zet ze om met int() voor je er 1 bij telt."]],
+    fouten:[[/can only concatenate str/,"Je gebruikt + tussen tekst en een getal. Wil je rekenen? Zet de tekst dan eerst om met int(). Wil je een getal in een zin plakken? Gebruik dan str() of komma's in print()."]],
+    hulp:["Fout 1: wat is het datatype van leeftijd? Kun je daar 1 bij optellen? Fout 2: wat is het datatype van volgend_jaar? Kun je dat met + aan tekst plakken?","Gebruik <code>int(leeftijd)</code> om te rekenen en <code>str(volgend_jaar)</code> om het getal in de zin te plakken.","Zo kan het:<pre># {NAAM}\nnaam = input(\"Hoe heet je? \")\nleeftijd = input(\"Hoe oud ben je? \")\nvolgend_jaar = int(leeftijd) + 1\nprint(\"Dag \" + naam + \", volgend jaar ben je \" + str(volgend_jaar) + \" jaar.\")</pre>"],
+    ok:"Je hebt beide datatypefouten gevonden en hersteld!" } },
+/* ---------- Onderdeel B ---------- */
+{ id:"R1-B1", deel:"B", titel:"Remediëring 1 - B1 Lees het stroomdiagram", klaar:true, geenCode:true, stappen:[],
+  opdracht:`<p>Dit stroomdiagram hoort bij het programma van de pakjesrobot. Pakjes van <b>minder dan 2 kg</b> gaan in bak 1, pakjes van <b>minder dan 10 kg</b> in bak 2 en <b>alle andere</b> in bak 3. Volg de pijlen van <b>Start</b> naar <b>Stop</b>.</p>${FL_VORMEN}${FL_UITLEG}`,
+  hoofd:{ titel:"Lees het stroomdiagram", flow:"lezen", boom:FL_REM_MZ,
+    html:`<p>Volg de pijlen met je vinger en beantwoord de vragen.</p>`,
+    vragen:[
+      {q:"Een pakje weegt 1.5 kg. In welke bak komt het?", opties:["Bak 1","Bak 2","Bak 3"], juist:0},
+      {q:"Een pakje weegt precies 10 kg. In welke bak komt het?", opties:["Bak 1","Bak 2","Bak 3"], juist:2},
+      {q:"Een pakje weegt 5 kg. Hoeveel ruiten (vragen) worden er gecontroleerd?", opties:["0","1","2","3"], juist:2},
+      {q:"Een pakje weegt 0.5 kg. Hoeveel ruiten (vragen) worden er gecontroleerd?", opties:["0","1","2","3"], juist:1},
+      {q:"Welke regel Python hoort bij de tweede ruit?", opties:["elif gewicht < 10:","else gewicht < 10:","elif gewicht = 10:","if gewicht > 10:"], juist:0},
+      {q:"Welk vak wordt bij elk pakje uitgevoerd, wat het gewicht ook is?", opties:["Rijd naar bak 1","Leg het pakje in de bak","Rijd naar bak 3"], juist:1}
+    ],
+    foutTip:"Volg de pijlen nog eens met je vinger. Bij de eerste True-pijl ga je die kant op; de andere ruiten worden dan niet meer bekeken.",
+    hulp:["Begin bij Start. Bij elke ruit kies je één pijl: True als het antwoord ja is, False als het nee is. Een ruit die je niet tegenkomt, wordt niet gecontroleerd.","De tweede ruit staat aan de False-kant van de eerste: dat is een elif. Precies 10 is niet ‘kleiner dan 10’."],
+    ok:"Je leest een stroomdiagram met elif zonder fouten!" } },
+{ id:"R1-B2", deel:"B", titel:"Remediëring 1 - B2 Vervolledig het stroomdiagram", klaar:true, geenCode:true, stappen:[],
+  opdracht:`<p>Een zelfrijdende auto komt aan een verkeerslicht:</p><ul><li>Bij <b>groen</b> rijdt de auto door.</li><li>Bij <b>oranje</b> toont het programma <code>Opgelet!</code> en stopt de auto.</li><li>Bij <b>rood</b> stopt de auto.</li></ul><p>Maak het stroomdiagram af. De computer probeert het daarna uit bij elk licht.</p>${FL_UITLEG}${API_VERKEER}`,
+  hoofd:{ titel:"Vervolledig het stroomdiagram", flow:"vervolledig", wereld:"verkeer", kop:"from verkeer import auto", wie:"auto",
+    html:`<p>Kies voor elk leeg vak wat erin hoort. Een ruit is een vraag, een rechthoek is een actie.</p>`,
+    boom:[{t:"keuze",vak:"A",ja:[{t:"actie",vak:"B"}],nee:[{t:"keuze",vak:"C",ja:[{t:"actie",vak:"D"},{t:"actie",vak:"E"}],nee:[{t:"actie",vak:"F"}]}]}],
+    acties:[{tekst:"De auto rijdt",code:"auto.rijd()"},{tekst:"De auto stopt",code:"auto.stop()"},{tekst:'Toon "Opgelet!"',code:'print("Opgelet!")'}],
+    vragen:[{tekst:'Is het licht "groen"?',code:'auto.lees_licht() == "groen"'},{tekst:'Is het licht "oranje"?',code:'auto.lees_licht() == "oranje"'},{tekst:'Is het licht "rood"?',code:'auto.lees_licht() == "rood"'}],
+    scenarios:["groen","oranje","rood"].map(l=>({naam:`${l} licht`,licht:l,paneel:"🚦 Verkeerslicht"})), doel:remLichtDoel,
+    hulp:["Er zijn drie mogelijkheden, dus je hebt twee vragen nodig. De tweede ruit (vak C) staat aan de False-kant van de eerste.","Vak A: Is het licht \"groen\"? Vak B: De auto rijdt. Vak C: Is het licht \"oranje\"? Vak D en E: Toon \"Opgelet!\" en De auto stopt. Vak F: De auto stopt."],
+    ok:"Je stroomdiagram laat de auto veilig door elk licht rijden!" } },
+{ id:"R1-B3", deel:"B", titel:"Remediëring 1 - B3 Stel het stroomdiagram op", klaar:true, geenCode:true, stappen:[],
+  opdracht:`<p>De pakjesrobot sorteert op gewicht. Pakjes die <b>meer dan 5 kg</b> wegen, gaan in <b>bak 2</b> (zwaar). <b>Alle andere</b> pakjes gaan in <b>bak 1</b> (licht).</p><p>Stel het stroomdiagram op. Let op: niet alle vakken heb je nodig.</p>${FL_UITLEG}${API_MAGAZIJN}`,
+  hoofd:{ titel:"Stel het stroomdiagram op", flow:"opstellen", wereld:"magazijn", kop:"from magazijn import robot", wie:"robot", minKeuzes:1,
+    keuzeTip:"De robot moet kiezen tussen twee bakken. Daarvoor heb je een ruit nodig.",
+    html:`<p>Voeg vakken toe en kies wat erin komt.</p>`,
+    acties:[{tekst:"Rijd naar bak 1",code:"robot.naar(1)"},{tekst:"Rijd naar bak 2",code:"robot.naar(2)"},{tekst:"Leg het pakje in de bak",code:"robot.leg()"}],
+    vragen:[{tekst:"Weegt het pakje meer dan 5 kg?",code:"float(robot.lees_gewicht()) > 5"},{tekst:"Weegt het pakje 5 kg of meer?",code:"float(robot.lees_gewicht()) >= 5"},{tekst:'Is de postcode "9000"?',code:'robot.lees_postcode() == "9000"'}],
+    scenarios:REM_MZ_SC, doel:magazijnDoel,
+    hulp:["Wat doet de robot altijd, welk gewicht het pakje ook heeft? Dat vak staat buiten de ruit, onderaan.","Ruit ‘Weegt het pakje meer dan 5 kg?’ → True: Rijd naar bak 2, False: Rijd naar bak 1. Daarna: Leg het pakje in de bak."],
+    ok:"Je stroomdiagram sorteert lichte en zware pakjes perfect!" } },
+{ id:"R1-B4", deel:"B", titel:"Remediëring 1 - B4 Stroomdiagram met elif", klaar:true, geenCode:true, stappen:[],
+  opdracht:`<p>De havenkraan kiest het schip op <b>gewicht</b>:</p><ul><li>Containers van <b>minder dan 10 ton</b> gaan naar de <b>boot</b> op vak 2.</li><li>Containers van <b>10 tot en met 24 ton</b> gaan naar het <b>schip</b> op vak 4.</li><li><b>Alle andere</b> containers gaan naar het <b>vrachtschip</b> op vak 6.</li></ul><p>Stel het stroomdiagram op. Je hebt <b>twee ruiten</b> nodig: de tweede staat aan de False-kant van de eerste (dat is <code>elif</code>).</p>${FL_UITLEG}${API_HAVEN}`,
+  hoofd:{ titel:"Stel het stroomdiagram op", flow:"opstellen", wereld:"haven", kop:"from haven import kraan", wie:"kraan", minKeuzes:2,
+    keuzeTip:"Er zijn drie schepen, dus de kraan moet twee vragen stellen. Je hebt twee ruiten nodig.",
+    html:`<p>Een ruit kun je ook ín de False-tak van een andere ruit zetten.</p>`,
+    acties:[{tekst:"Pak de container",code:"kraan.pak()"},{tekst:"Zet de container neer",code:"kraan.zet()"},{tekst:"2 vakken naar rechts",code:"kraan.rechts(2)"},{tekst:"4 vakken naar rechts",code:"kraan.rechts(4)"},{tekst:"6 vakken naar rechts",code:"kraan.rechts(6)"}],
+    vragen:[{tekst:"Weegt de container minder dan 10 ton?",code:"int(kraan.lees_gewicht()) < 10"},{tekst:"Weegt de container minder dan 25 ton?",code:"int(kraan.lees_gewicht()) < 25"},{tekst:"Weegt de container meer dan 25 ton?",code:"int(kraan.lees_gewicht()) > 25"}],
+    scenarios:REM_H_SC, doel:havenDoel,
+    hulp:["Bovenaan: Pak de container. Onderaan: Zet de container neer. Daartussen komen de ruiten.","Eerste ruit: minder dan 10 ton? True: 2 vakken naar rechts. In de False-tak: tweede ruit ‘minder dan 25 ton?’ True: 4 vakken, False: 6 vakken naar rechts."],
+    ok:"Twee ruiten, drie schepen: elke container komt juist aan!" } },
+/* ---------- Onderdeel C ---------- */
+{ id:"R1-C1", deel:"C", titel:"Remediëring 1 - C1 Het pretpark", klaar:true, stappen:[],
+  opdracht:`<p>Aan de achtbaan van het pretpark staat een meetlat. Schrijf een programma dat de <b>lengte</b> van een bezoeker vraagt (in cm) en zegt of die mag meerijden:</p>
+  <ul><li>kleiner dan 100 cm: <code>Je mag niet in de achtbaan.</code></li><li>van 100 tot en met 139 cm: <code>Je mag mee met een volwassene.</code></li><li>140 cm of meer: <code>Je mag alleen in de achtbaan.</code></li></ul>${ZO_WERK_JE}`,
+  hoofd:{ titel:"Schrijf het programma",
+    html:`<pre>Hoe groot ben je in cm? 120
+Je mag mee met een volwassene.</pre><div class="box warm"><b>Let op</b><br>De computer test ook de grensgevallen <b>100</b> en <b>140</b>.</div>`,
+    starter:"", invoer:"120", invoerNamen:["lengte"],
+    tests:[
+      {invoer:["95"], woorden:[["niet"]], nietWoorden:["volwassene","alleen"], tip:"Wie kleiner is dan 100 cm, mag niet mee."},
+      {invoer:["100"], woorden:[["volwassene"]], nietWoorden:["niet in","alleen"], tip:"Precies 100 cm mag mee met een volwassene: < of <= ?"},
+      {invoer:["139"], woorden:[["volwassene"]], nietWoorden:["niet in","alleen"]},
+      {invoer:["140"], woorden:[["alleen"]], nietWoorden:["volwassene","niet in"], tip:"Precies 140 cm mag alleen in de achtbaan."},
+      {invoer:["175"], woorden:[["alleen"]], nietWoorden:["volwassene","niet in"]}
+    ],
+    moet:[[/input\s*\(/,"Vraag de lengte met input()."],[/int\s*\(/,"Zet de lengte om naar een getal met int()."],[/^\s*if\b/m,"Gebruik een if."],[/^\s*elif\b/m,"Drie mogelijkheden: gebruik if, elif en else."],[/^\s*else\b/m,"Gebruik een else voor de laatste mogelijkheid."]],
+    fouten:[[/not supported between instances of 'str'/,"Je vergelijkt tekst met een getal. Zet de lengte eerst om met int()."]],
+    hulp:["Welke voorwaarde controleer je eerst? Begin met de kleinste: is de lengte kleiner dan 100?","<pre>lengte = int(input(\"Hoe groot ben je in cm? \"))\nif lengte &lt; 100:\n    print(...)\nelif lengte &lt; 140:\n    print(...)\nelse:\n    print(...)</pre>","Zo kan het:<pre># {NAAM}\nlengte = int(input(\"Hoe groot ben je in cm? \"))\nif lengte &lt; 100:\n    print(\"Je mag niet in de achtbaan.\")\nelif lengte &lt; 140:\n    print(\"Je mag mee met een volwassene.\")\nelse:\n    print(\"Je mag alleen in de achtbaan.\")</pre>"],
+    ok:"Je programma kiest bij elke lengte juist, ook bij de grenzen!" } },
+{ id:"R1-C2", deel:"C", titel:"Remediëring 1 - C2 Het rapport", klaar:true, stappen:[],
+  opdracht:`<p>Schrijf een programma voor je rapport. Het vraagt je <b>score op 20</b> (dat kan een kommagetal zijn, bv. <code>12.5</code>), berekent het <b>percentage</b> en toont een boodschap:</p>
+  <ul><li>16 of meer: <code>Uitstekend!</code></li><li>10 of meer: <code>Geslaagd.</code></li><li>minder dan 10: <code>Niet geslaagd.</code></li></ul>${ZO_WERK_JE}`,
+  hoofd:{ titel:"Schrijf het programma",
+    html:`<p>Het percentage bereken je met <code>score / 20 * 100</code>.</p><pre>Wat is je score op 20? 12.5
+Je behaalde 62.5 procent.
+Geslaagd.</pre><div class="box warm"><b>Let op</b><br>Typ kommagetallen in met een <b>punt</b>: <code>12.5</code>, niet <code>12,5</code>.</div>`,
+    starter:"", invoer:"12.5", invoerNamen:["score"],
+    tests:[
+      {invoer:["17.5"], getallen:[87.5], woorden:[["uitstekend"]], nietWoorden:["geslaagd"]},
+      {invoer:["16"], getallen:[80], woorden:[["uitstekend"]], nietWoorden:["geslaagd"], tip:"Precies 16 is ook uitstekend: > of >= ?"},
+      {invoer:["12.5"], getallen:[62.5], woorden:[["geslaagd"]], nietWoorden:["niet geslaagd","uitstekend"]},
+      {invoer:["10"], getallen:[50], woorden:[["geslaagd"]], nietWoorden:["niet geslaagd","uitstekend"], tip:"Precies 10 is geslaagd."},
+      {invoer:["9.5"], getallen:[47.5], woorden:[["niet geslaagd"]], nietWoorden:["uitstekend"]}
+    ],
+    moet:[[/input\s*\(/,"Vraag de score met input()."],[/float\s*\(/,"De score kan een kommagetal zijn: zet ze om met float()."],[/^\s*elif\b/m,"Drie boodschappen: gebruik if, elif en else."]],
+    fouten:[[/not supported between instances of 'str'/,"Je vergelijkt tekst met een getal. Zet de score eerst om met float()."],[/could not convert string to float/,"Typ een kommagetal met een punt, bv. 12.5."],[/invalid literal for int\(\)/,"De score kan een kommagetal zijn. Gebruik float() in plaats van int()."]],
+    getalTip:"Bereken het percentage met score / 20 * 100 en toon het met print().",
+    hulp:["Drie stappen: vraag de score en zet ze om met float(), bereken het percentage en toon het, kies dan de boodschap met if, elif en else.","<pre>score = float(input(\"Wat is je score op 20? \"))\nprocent = score / 20 * 100\nprint(\"Je behaalde\", procent, \"procent.\")\nif score &gt;= 16:\n    ...</pre>","Zo kan het:<pre># {NAAM}\nscore = float(input(\"Wat is je score op 20? \"))\nprocent = score / 20 * 100\nprint(\"Je behaalde\", procent, \"procent.\")\nif score &gt;= 16:\n    print(\"Uitstekend!\")\nelif score &gt;= 10:\n    print(\"Geslaagd.\")\nelse:\n    print(\"Niet geslaagd.\")</pre>"],
+    ok:"Je rapportprogramma rekent en kiest juist!" } },
+{ id:"R1-C3", deel:"C", titel:"Remediëring 1 - C3 De havenkraan: blauw of vracht", klaar:true, stappen:[],
+  opdracht:`<p>Er liggen twee schepen. <b>Schip A</b> ligt altijd op <b>vak 3</b>. Het <b>vrachtschip</b> ligt elke keer op een andere plaats.</p>
+  <ul><li><b>Blauwe</b> containers (<code>"blauw"</code>) gaan naar <b>schip A</b> op vak 3.</li><li>Alle <b>andere</b> containers gaan naar het <b>vrachtschip</b>. Hoe ver het ligt, lees je met <code>kraan.lees_afstand()</code>. Die afstand geldt <b>alleen voor het vrachtschip</b>.</li></ul>${API_HAVEN}${W_UITLEG}`,
+  hoofd:{ titel:"Programmeer de kraan", wereld:"haven",
+    html:`<p>Begin met <code>from haven import kraan</code>. Denk eraan: <code>kraan.lees_afstand()</code> geeft <b>tekst</b>.</p>`,
+    starter:"from haven import kraan\n\n",
+    scenarios:[["blauw",5],["rood",4],["groen",7],["blauw",6],["geel",5]].map(([k,a])=>hSc({naam:`${KLEUR_BN[k]} container`,kleur:k,schepen:[3,a],namen:{3:"Schip A",[a]:"Vracht"},doel:k==="blauw"?3:a,doelNaam:k==="blauw"?"schip A":"het vrachtschip",afstand:a,paneel:`📟 Kleur: ${k} · afstand vrachtschip: ${a}`})),
+    doel:havenDoel,
+    moet:[[/lees_kleur\s*\(/,"Lees de kleur met kraan.lees_kleur()."],[/lees_afstand\s*\(/,"Het vrachtschip ligt telkens ergens anders: lees de afstand met kraan.lees_afstand()."],[/^\s*if\b/m,"Gebruik een if."],[/^\s*else\b/m,"Gebruik een else voor alle andere kleuren."]],
+    hulp:["Wat doet de kraan altijd? Wat hangt af van de kleur? Alleen bij het vrachtschip heb je de afstand nodig.","<pre>kraan.pak()\nif kraan.lees_kleur() == \"blauw\":\n    kraan.rechts(3)\nelse:\n    afstand = int(kraan.lees_afstand())\n    kraan.rechts(afstand)\nkraan.zet()</pre>","Zo kan het:<pre>"+regNaam+"from haven import kraan\n\nkraan.pak()\nif kraan.lees_kleur() == \"blauw\":\n    kraan.rechts(3)\nelse:\n    afstand = int(kraan.lees_afstand())\n    kraan.rechts(afstand)\nkraan.zet()</pre>"],
+    ok:"Blauw naar schip A, de rest naar het vrachtschip: perfect!" } },
+{ id:"R1-C4", deel:"C", titel:"Remediëring 1 - C4 Het station met drie sporen", klaar:true, stappen:[],
+  opdracht:`<p>Dit station heeft <b>drie</b> sporen. Wissel 1 stuurt de trein naar boven of naar onder. Op het onderste spoor ligt <b>wissel 2</b>.</p>
+  <ul><li>Spoor A (boven) → <b>Leuven</b></li><li>Spoor B (onder, wissel 2 boven) → <b>Mechelen</b></li><li>Spoor C (onder, wissel 2 onder) → <b>alle andere bestemmingen</b></li></ul><p>De computer test ook treinen naar bestemmingen die hierboven niet genoemd worden.</p>${API_STATION}${W_UITLEG}`,
+  hoofd:{ titel:"Programmeer de wissels", wereld:"station",
+    html:`<p>Begin met <code>from station import trein, wissel1, wissel2</code>.</p>`,
+    starter:"from station import trein, wissel1, wissel2\n\n",
+    scenarios:["Mechelen","Gent","Leuven","Lier","Brussel"].map(b=>({naam:`trein naar ${b}`,bestemming:b,wissel2:true,sporen:{A:"Leuven",B:"Mechelen",C:"alle andere"},doel:b==="Leuven"?"A":b==="Mechelen"?"B":"C",paneel:`🚆 Trein naar ${b}`})),
+    doel:stationDoel,
+    moet:[[/lees_bestemming\s*\(/,"Lees de bestemming met trein.lees_bestemming()."],[/^\s*elif\b/m,"Drie sporen: gebruik if, elif en else."]],
+    hulp:["Volg met je vinger het spoor naar elke bestemming: over welke wissels rijdt de trein, en in welke stand moeten ze staan? Alle andere bestemmingen vang je op met else.","Naar Leuven: <code>wissel1.boven()</code>. Naar Mechelen: <code>wissel1.onder()</code> en <code>wissel2.boven()</code>. Alle andere: <code>wissel1.onder()</code> en <code>wissel2.onder()</code>.","Zo kan het:<pre>"+regNaam+"from station import trein, wissel1, wissel2\n\nbestemming = trein.lees_bestemming()\nif bestemming == \"Leuven\":\n    wissel1.boven()\nelif bestemming == \"Mechelen\":\n    wissel1.onder()\n    wissel2.boven()\nelse:\n    wissel1.onder()\n    wissel2.onder()\ntrein.rijd()</pre>"],
+    ok:"Elke trein rijdt naar het juiste spoor!" } }
+  ] }
+];
+const REM_OEF=REMEDIERINGEN.flatMap(r=>r.oefeningen.map(o=>(o.remed=r.id,o)));
+const remLijst=(rem,code)=>{ const delen=REM_CODES[code]||[]; return rem.oefeningen.filter(o=>delen.includes(o.deel)) };
+const REM=id=>{ if(!S.remed) S.remed={}; return S.remed[id]||(S.remed[id]={}) };
+
+function renderRemediering(m,rem){
+  const R=REM(rem.id);
+  const kop=$(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Terug</button></div><div class="kicker">Remediëring</div><h2>${rem.icoon} ${esc(rem.titel)}</h2>
+    <p>Hier oefen je opnieuw de onderdelen van de toets die nog niet goed gingen. Je leerkracht geeft je een <b>code</b>. Die code bepaalt welke onderdelen je maakt. De oefeningen werken zoals de gewone oefeningen: je krijgt punten en op het einde verstuur je elke oefening naar je leerkracht.</p></div>`);
+  m.appendChild(kop); kop.querySelector("#terug").onclick=()=>{ S.deel="remediering"; go("start") };
+  const delen=REM_CODES[R.code];
+  if(!delen){
+    const c=$(`<div class="card"><h3>Geef je code in</h3><p style="margin-top:0">Typ de code (een cijfer van 1 tot 7) die je van je leerkracht kreeg.</p>
+      <div class="formrow" style="align-items:flex-end"><label>Code<input type="text" inputmode="numeric" maxlength="1" id="remcode" style="width:90px;font-size:22px;text-align:center" autocomplete="off"></label><button class="btn" id="remstart">Start</button></div><div class="fb" id="remfb"></div></div>`);
+    m.appendChild(c); const inp=c.querySelector("#remcode"), fb=c.querySelector("#remfb");
+    const start=()=>{ const v=inp.value.trim(); if(!REM_CODES[v]){ fb.className="fb bad"; fb.textContent="Die code bestaat niet. Typ een cijfer van 1 tot 7."; inp.focus(); return }
+      R.code=v; save(); render(); window.scrollTo(0,0) };
+    c.querySelector("#remstart").onclick=start; inp.onkeydown=e=>{ if(e.key==="Enter") start() }; setTimeout(()=>inp.focus(),50);
+    return }
+  const lijst=remLijst(rem,R.code), klaar=lijst.filter(o=>(S.oef[o.id]||{}).verstuurd).length;
+  const info=$(`<div class="card"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between"><div>Jouw code: <b>${esc(R.code)}</b> → ${delen.map(d=>"onderdeel <b>"+d+"</b>").join(" + ")}</div><button class="btn secondary" id="andere">Andere code ingeven</button></div>
+    <div class="voortgang" style="margin-top:12px"><div class="vg-tekst">Remediëring: <b>${klaar} van ${lijst.length}</b> verstuurd</div><div class="vg-balk"><div style="width:${lijst.length?Math.round(klaar/lijst.length*100):0}%"></div></div></div></div>`);
+  m.appendChild(info);
+  info.querySelector("#andere").onclick=()=>{ if(confirm("Een andere code ingeven? Wat je al gemaakt hebt, blijft bewaard.")){ delete R.code; save(); render() } };
+  const PILL={klaar:'<span class="pill mid">klaar, nog versturen</span>',bezig:'<span class="pill mid">bezig</span>',nieuw:""};
+  delen.forEach(d=>{ const od=rem.onderdelen[d], oefs=rem.oefeningen.filter(o=>o.deel===d);
+    const k=$(`<div class="card"><div class="kicker">Onderdeel ${d}</div><h3>${esc(od.titel)}</h3><p style="margin-top:0">${esc(od.uitleg)}</p><div class="exlist" style="padding:0"></div></div>`);
+    const ex=k.querySelector(".exlist");
+    oefs.forEach(o=>{ const a=S.oef[o.id]; const s=a&&a.verstuurd?"verstuurd":a&&a.ok?"klaar":a&&(a.controles||a.code||a.delen)?"bezig":"nieuw";
+      const b=$(`<button><span class="t">${esc(o.titel.replace(/^.*? - /,""))}</span>${s==="verstuurd"?`<span class="pill ok">✔ ${fmt(a.verstuurd.cijfer)}/10</span>`:PILL[s]}</button>`);
+      b.onclick=()=>go(o.id); ex.appendChild(b) });
+    m.appendChild(k) });
+}
 
 /* ---------------- Python in een worker ---------------- */
 let worker=null, pyReady=null;
@@ -4020,7 +4255,8 @@ function render(){const m=document.getElementById("main"); m.innerHTML="";
   document.body.classList.toggle("oefenmodus",OEFEN());
   if(OEFEN()&&S.naam&&S.klas) m.appendChild($(`<div class="oefenbanner">🏋️ <b>Oefenruimte</b> · Je oefent voor de toets. Dit telt <b>niet</b> mee voor je punten en er wordt <b>niets verstuurd</b>. Hulp, tips en oplossingen zijn hier gratis.</div>`));
   if(String(S.huidig).startsWith("T:")&&S.naam&&S.klas){ const les=THEORIE.find(l=>"T:"+l.id===S.huidig); if(les) return renderTheorie(m,les) }
-  const oef=OEFENINGEN.find(o=>o.id===S.huidig&&o.klaar);
+  if(String(S.huidig).startsWith("R:")&&S.naam&&S.klas&&!OEFEN()){ const rem=REMEDIERINGEN.find(r=>"R:"+r.id===S.huidig); if(rem) return renderRemediering(m,rem) }
+  const oef=OEFENINGEN.find(o=>o.id===S.huidig&&o.klaar)||(!OEFEN()&&REM_OEF.find(o=>o.id===S.huidig));
   if(oef && S.naam && S.klas) return renderOef(m,oef);
   if(OEFEN()){ S.modus="punten"; save(); return render() }
   renderStart(m)}
@@ -4063,13 +4299,18 @@ function renderStart(m){
       <button type="button" data-tab="tekenen">🐢 Tekenen <span class="tel">${telKlaar(tekenOef)}/${telOpen(tekenOef)}</span></button>
     </div><div class="tabinhoud"></div></div>`);
   if(!S.deel) S.deel="oef";
-  const hoofd=$(`<div class="hoofdtabs" role="tablist"><button type="button" data-deel="theorie">📖 Theorie<span>Uitleg, inoefenen en punten</span></button><button type="button" data-deel="oef">✏️ Oefeningen<span>Klas, werelden en tekenen</span></button><button type="button" data-deel="oefenruimte">🏋️ Oefenruimte<span>Oefen voor de toets</span></button></div>`);
+  const hoofd=$(`<div class="hoofdtabs" role="tablist"><button type="button" data-deel="theorie">📖 Theorie<span>Uitleg, inoefenen en punten</span></button><button type="button" data-deel="oef">✏️ Oefeningen<span>Klas, werelden en tekenen</span></button><button type="button" data-deel="oefenruimte">🏋️ Oefenruimte<span>Oefen voor de toets</span></button><button type="button" data-deel="remediering">🩹 Remediëring<span>Extra oefenen na de toets</span></button></div>`);
   m.appendChild(hoofd);
   const theorie=$(`<div class="card"><p class="w-intro" style="margin-top:0">Hier lees je de uitleg en oefen je in. Ook hier krijg je <b>punten</b>: op het einde verstuur je je resultaat naar je leerkracht.</p><div class="th-lessen"></div></div>`); m.appendChild(theorie);
   THEORIE.forEach(les=>{ const tl=theorieTel(les);
     const b=$(`<button type="button" class="th-les"><span class="w-icoon">${les.icoon}</span><span><span class="w-naam">${esc(les.titel)}</span><span class="w-sub">${esc(les.sub)}</span></span>${TH(les.id).verstuurd?`<span class="pill ok">✔ ${fmt(TH(les.id).verstuurd.cijfer)}/10</span>`:`<span class="tel">${tl.k}/${tl.n}</span>`}</button>`);
     b.onclick=()=>open({id:"T:"+les.id}); theorie.querySelector(".th-lessen").appendChild(b) });
   m.appendChild(kaart);
+  /* ---- remediëring ---- */
+  const remKaart=$(`<div class="card"><p class="w-intro" style="margin-top:0">🩹 Ging een deel van de toets nog niet goed? Hier oefen je het opnieuw. Kies de remediëring en typ de <b>code</b> die je van je leerkracht kreeg. Ook hier krijg je <b>punten</b> en verstuur je je resultaat naar je leerkracht.</p><div class="th-lessen"></div></div>`); m.appendChild(remKaart);
+  REMEDIERINGEN.forEach(rem=>{ const R=(S.remed||{})[rem.id]||{}, l=REM_CODES[R.code]?remLijst(rem,R.code):[], k=l.filter(o=>(S.oef[o.id]||{}).verstuurd).length;
+    const b=$(`<button type="button" class="th-les" style="border-left-color:#c0392b"><span class="w-icoon">${rem.icoon}</span><span><span class="w-naam">${esc(rem.titel)}</span><span class="w-sub">${esc(rem.sub)}</span></span>${l.length?`<span class="tel">${k}/${l.length}</span>`:'<span class="pill mid">code ingeven</span>'}</button>`);
+    b.onclick=()=>open({id:"R:"+rem.id}); remKaart.querySelector(".th-lessen").appendChild(b) });
   /* ---- oefenruimte ---- */
   const ruimte=$(`<div class="card"><p class="w-intro" style="margin-top:0">🏋️ Hier oefen je opnieuw voor de toets. Een oefening gaat hier pas open <b>nadat je ze op punten verstuurd hebt</b>. In de oefenruimte begin je met een lege oefening, is hulp gratis, krijg je geen punten en wordt er niets verstuurd. Je cijfers blijven zoals ze zijn.</p></div>`); m.appendChild(ruimte);
   const oefenStatus=id=>{ const so=S.oefen||{}; if(String(id).startsWith("T:")){ const t=(so.theorie||{})[id.slice(2)]; if(!t) return ""; const les=THEORIE.find(l=>l.id===id.slice(2)); const k=Object.values(t.quiz||{}).filter(x=>x===true).length+les.oefeningen.filter(o=>((t.oef||{})[o.id]||{}).ok).length; return k?`<span class="pill mid">${k}/${les.quiz.length+les.oefeningen.length}</span>`:"" }
@@ -4096,7 +4337,7 @@ function renderStart(m){
     c.groepen.forEach(g=>{ if(!g.k){ const ex=$(`<div class="exlist" style="padding:0"></div>`); g.lijst.forEach(o=>ex.appendChild(knop(o))); binnen.appendChild(ex); return }
       const sub=uitvouw("or-"+g.k,"",g.nr,g.titel,g.lijst,telOpenR(g.lijst)>0), ex=$(`<div class="exlist"></div>`); g.lijst.forEach(o=>ex.appendChild(knop(o))); sub.appendChild(ex); binnen.appendChild(sub) });
     ruimte.appendChild(cat) });
-  const kiesDeel=d=>{ S.deel=d; save(); hoofd.querySelectorAll("button").forEach(b=>b.classList.toggle("aan",b.dataset.deel===d)); theorie.hidden=d!=="theorie"; kaart.hidden=d!=="oef"; ruimte.hidden=d!=="oefenruimte" };
+  const kiesDeel=d=>{ S.deel=d; save(); hoofd.querySelectorAll("button").forEach(b=>b.classList.toggle("aan",b.dataset.deel===d)); theorie.hidden=d!=="theorie"; kaart.hidden=d!=="oef"; ruimte.hidden=d!=="oefenruimte"; remKaart.hidden=d!=="remediering" };
   hoofd.querySelectorAll("button").forEach(b=>b.onclick=()=>kiesDeel(b.dataset.deel));
   const inhoud=kaart.querySelector(".tabinhoud");
   const voortgang=(lijst,tekst)=>{ const k=telKlaar(lijst), n=telOpen(lijst), pct=n?Math.round(k/n*100):0;
@@ -4144,8 +4385,9 @@ function renderStart(m){
 
 function renderOef(m,oef){
   const a=O(oef.id);
-  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">${OEFEN()?"← Oefenruimte":"← Alle oefeningen"}</button>${OEFEN()?'<button class="btn reset" id="reset1">🔄 Opnieuw beginnen</button>':""}</div><div class="kicker">${OEFEN()?"Oefenruimte":"Oefening"}</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${KLASAFSPRAKEN&&!oef.geenCode?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
-  m.querySelector("#terug").onclick=()=>{ if(OEFEN()) S.deel="oefenruimte"; go("start") };
+  m.appendChild($(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">${OEFEN()?"← Oefenruimte":oef.remed?"← Remediëring":"← Alle oefeningen"}</button>${OEFEN()?'<button class="btn reset" id="reset1">🔄 Opnieuw beginnen</button>':""}</div><div class="kicker">${OEFEN()?"Oefenruimte":oef.remed?"Remediëring · onderdeel "+oef.deel:"Oefening"}</div><h2>${esc(oef.titel)}</h2>${oef.opdracht}${KLASAFSPRAKEN&&!oef.geenCode?`<details class="afspraken"><summary>📏 Klasafspraken (klik om te openen)</summary><p style="margin:8px 0 0">Zodra je programma werkt, kost elke overtreding <b>${fmt(CIJFER.perAfspraak)} punt</b>.</p>${AFSPRAKEN_HTML}</details>`:""}</div>`));
+  const terugId=oef.remed?"R:"+oef.remed:"start";
+  m.querySelector("#terug").onclick=()=>{ if(OEFEN()) S.deel="oefenruimte"; go(terugId) };
   const herbegin=()=>wisOefen("oef",oef.id,"Deze oefening helemaal leegmaken en opnieuw beginnen? (Alleen in de oefenruimte. Je punten blijven bewaard.)");
   if(OEFEN()) m.querySelector("#reset1").onclick=herbegin;
 
@@ -4267,12 +4509,12 @@ function renderOef(m,oef){
         <div class="line"><span>Extra uitdaging</span><span>${!oef.extra?"geen bij deze oefening":a.extraOk?"+ "+fmt(c.bonus):"—"}</span></div>
       </div>
       <div class="actions" style="margin-top:14px"><button class="btn" id="stuur" ${a.ok?"":"disabled"}>📤 Verstuur naar mijn leerkracht</button>
-        <button class="btn secondary" id="volgende" ${a.verstuurd?"":"disabled"}>${volgende?"Volgende oefening →":"✔ Terug naar alle oefeningen"}</button>
+        <button class="btn secondary" id="volgende" ${a.verstuurd?"":"disabled"}>${volgende?"Volgende oefening →":oef.remed?"✔ Terug naar de remediëring":"✔ Terug naar alle oefeningen"}</button>
         <span class="volg-hint" id="volghint" ${a.verstuurd?"hidden":""}>${volgende?"De knop naar de volgende oefening":"Deze knop"} wordt actief zodra je je resultaat verstuurd hebt.</span></div>
       <div class="fb" id="stuurfb"></div>`;
     if(a.verstuurd){const f=af.querySelector("#stuurfb"); f.className="fb ok"; f.innerHTML=`✔ Verstuurd op ${esc(a.verstuurd.op)} met cijfer ${fmt(a.verstuurd.cijfer)}.`+(a.verstuurd.cijfer!==c.cijfer?` <b>Je cijfer is sindsdien veranderd: verstuur opnieuw.</b>`:"")}
     af.querySelector("#stuur").onclick=()=>verstuur(oef,a,c);
-    af.querySelector("#volgende").onclick=()=>{ if(a.verstuurd) go(volgende?volgende.id:"start") };
+    af.querySelector("#volgende").onclick=()=>{ if(a.verstuurd) go(volgende?volgende.id:terugId) };
   }
   tekenAf();
 }
@@ -4281,6 +4523,7 @@ function volgordeKlas(){ return OEFENINGEN.filter(o=>!o.groep).map((o,k)=>[o,k])
 /* Volgende oefening in dezelfde volgorde als op het startscherm */
 function volgendeOef(oef){
   let lijst;
+  if(oef.remed){ const rem=REMEDIERINGEN.find(r=>r.id===oef.remed), l=remLijst(rem,((S.remed||{})[rem.id]||{}).code); return l[l.indexOf(oef)+1]||null }
   if(!oef.groep){ lijst=OEFENINGEN.filter(o=>!o.groep).map((o,k)=>[o,k]).sort((x,y)=>(x[0].id.split(".")[0]-y[0].id.split(".")[0])||(x[1]-y[1])).map(x=>x[0]) }
   else if(oef.teken) lijst=OEFENINGEN.filter(o=>o.teken);
   else { const W=OEFENINGEN.filter(o=>o.groep&&!o.teken); lijst=[...new Set(W.map(o=>o.groep))].flatMap(g=>W.filter(o=>o.groep===g)) }
