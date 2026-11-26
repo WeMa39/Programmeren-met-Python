@@ -272,6 +272,22 @@ details.or-cat[open]{border-color:var(--oefen)}
 .or-in details.hfd summary{padding:9px 12px;font-size:15.5px}
 .or-in .hfd-nr{width:26px;height:26px;font-size:14px}
 .btn.reset{background:var(--card);color:var(--oefen);border:2px solid var(--oefen)}
+/* Remediëring: aftelklok en slot */
+#remklok{display:none;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;background:#8a2b22;color:#fff;padding:6px 16px;font-size:15px}
+body.remmodus #remklok{display:flex}
+#remklok .tijd{font:700 20px/1.2 ui-monospace,Consolas,monospace;letter-spacing:1px;background:rgba(255,255,255,.16);padding:3px 10px;border-radius:8px}
+#remklok .tijd.laag{background:#f0b429;color:#1d2433}
+#remklok .uitleg{font-size:13px;opacity:.92}
+#remklok button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.65);border-radius:8px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer}
+body.remmodus header a.editor,body.remmodus header a[href="index.html"]{display:none}
+#remlaag{position:fixed;inset:0;z-index:100;background:rgba(15,18,24,.93);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+#remlaag .kaart{background:var(--card);color:var(--ink);border-radius:var(--radius);max-width:540px;width:100%;padding:22px 24px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+#remlaag input{font-size:20px;width:170px;text-align:center}
+.rem-reden{font-size:14px;color:var(--muted);background:var(--bg);border-radius:8px;padding:8px 12px}
+.rem-tag{display:inline-block;font-size:12px;line-height:1.5;padding:1px 8px;border-radius:999px;margin-left:6px;white-space:nowrap;vertical-align:middle}
+.rem-tag.focus{background:var(--bad-soft);color:var(--bad)}
+.rem-tag.extra{background:var(--brand-soft);color:var(--brand)}
+.rem-voorbeeld li{margin:3px 0}
 </style>
 </head>
 <body>
@@ -283,6 +299,7 @@ details.or-cat[open]{border-color:var(--oefen)}
     <a href="index.html" title="Terug naar de startpagina met beide cursussen" style="text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap">⌂ Alle cursussen</a>
     <button class="theme" id="themeBtn" title="Licht of donker scherm">◐ Thema</button>
   </div>
+  <div id="remklok" role="timer"></div>
 </header>
 <main id="main"></main>
 
@@ -3266,12 +3283,11 @@ OEFENINGEN.push(...TEKEN_OEFENINGEN);
 /* ================================================================
    REMEDIËRING (na een toets)
    Elke remediëring heeft onderdelen A, B en C, zoals in de toets.
-   De leerling typt de code die de leerkracht geeft:
-   1 = A, 2 = B, 3 = C, 4 = A+B, 5 = A+C, 6 = A+B+C, 7 = B+C
+   Elke leerling typt een persoonlijke code (REM_LEERLINGEN) en ziet alleen zijn eigen oefeningen.
+   Daarna start een klok van 40 minuten met vergrendeling (zie "aftelklok en vergrendeling").
    De oefeningen werken en tellen zoals gewone oefeningen (punten + versturen).
    ================================================================ */
-const REM_CODES={1:["A"],2:["B"],3:["C"],4:["A","B"],5:["A","C"],6:["A","B","C"],7:["B","C"]};
-const REM_UITLEG_QUIZ=`<div class="box"><b>Zo werk je</b><br>Lees elke code rustig, regel per regel, en kies wat Python doet. Klik daarna op <b>✓ Controleer</b>. Zijn er nog fouten, dan zie je welke vragen nog niet kloppen en krijg je een tip. Je mag de code ook overtypen in de <b>Python-editor</b> (link bovenaan) om ze uit te proberen.</div>`;
+const REM_UITLEG_QUIZ=`<div class="box"><b>Zo werk je</b><br>Lees elke code rustig, regel per regel, en kies wat Python doet. Klik daarna op <b>✓ Controleer</b>. Zijn er nog fouten, dan zie je welke vragen nog niet kloppen en krijg je een tip. Twijfel je? Zoek het op bij <b>Theorie</b> of in de <b>Oefenruimte</b>.</div>`;
 const remQuiz=(o)=>({klaar:true,geenCode:true,stappen:[],...o,opdracht:o.opdracht+REM_UITLEG_QUIZ,
   hoofd:{titel:o.kop||"Wat doet Python?",flow:"lezen",boom:null,html:o.html||"",vragen:o.vragen,hulp:o.hulp,ok:o.ok,foutTip:o.foutTip}});
 const MZ_GROOT={1:"klein",2:"middel",3:"groot"};
@@ -3293,7 +3309,7 @@ const REMEDIERINGEN=[
   onderdelen:{
     A:{ titel:"Datatypes, invoer en uitvoer, if lezen", uitleg:"Zoals deel A van de toets: welk datatype heeft een waarde, wat doen int(), float() en str(), wat geeft input() en wat toont Python bij if, elif en else?" },
     B:{ titel:"Stroomdiagrammen", uitleg:"Zoals deel B van de toets: een stroomdiagram lezen, vervolledigen en zelf opstellen." },
-    C:{ titel:"Zelf programmeren", uitleg:"Zoals deel C van de toets: programma's met input() en print(), en programma's in de werelden met if, elif en else." } },
+    C:{ titel:"Zelf programmeren", uitleg:"Zoals deel C van de toets: programma's met input() en print(), en programma's in de werelden met if, elif en else, en de slimme thermostaat." } },
   oefeningen:[
 /* ---------- Onderdeel A ---------- */
 remQuiz({ id:"R1-A1", deel:"A", titel:"Remediëring 1 - A1 Datatypes en omzetten",
@@ -3461,38 +3477,199 @@ Geslaagd.</pre><div class="box warm"><b>Let op</b><br>Typ kommagetallen in met e
     doel:stationDoel,
     moet:[[/lees_bestemming\s*\(/,"Lees de bestemming met trein.lees_bestemming()."],[/^\s*elif\b/m,"Drie sporen: gebruik if, elif en else."]],
     hulp:["Volg met je vinger het spoor naar elke bestemming: over welke wissels rijdt de trein, en in welke stand moeten ze staan? Alle andere bestemmingen vang je op met else.","Naar Leuven: <code>wissel1.boven()</code>. Naar Mechelen: <code>wissel1.onder()</code> en <code>wissel2.boven()</code>. Alle andere: <code>wissel1.onder()</code> en <code>wissel2.onder()</code>.","Zo kan het:<pre>"+regNaam+"from station import trein, wissel1, wissel2\n\nbestemming = trein.lees_bestemming()\nif bestemming == \"Leuven\":\n    wissel1.boven()\nelif bestemming == \"Mechelen\":\n    wissel1.onder()\n    wissel2.boven()\nelse:\n    wissel1.onder()\n    wissel2.onder()\ntrein.rijd()</pre>"],
-    ok:"Elke trein rijdt naar het juiste spoor!" } }
+    ok:"Elke trein rijdt naar het juiste spoor!" } },
+{ id:"R1-C5", deel:"C", titel:"Remediëring 1 - C5 De slimme thermostaat", klaar:true, stappen:[],
+  opdracht:`<p>In een klaslokaal hangt een slimme thermostaat. Schrijf een programma dat de <b>temperatuur</b> vraagt (dat kan een kommagetal zijn) en zegt wat er moet gebeuren:</p>
+  <ul><li>kouder dan 18 graden: <code>De verwarming gaat aan.</code></li><li>warmer dan 22 graden: <code>Het raam gaat open.</code></li><li>in alle andere gevallen: <code>Alles is in orde.</code></li></ul>${ZO_WERK_JE}`,
+  hoofd:{ titel:"Schrijf het programma",
+    html:`<pre>Hoeveel graden is het? 17.5
+De verwarming gaat aan.</pre><div class="box warm"><b>Let op</b><br>Vergelijk met een <b>getal</b> (<code>18</code>), niet met tekst (<code>"18 graden"</code>). Na <code>if</code> komt één vergelijking, bv. <code>temperatuur &lt; 18</code>: geen <code>== &lt;</code>. De computer test ook de grensgevallen <b>18</b> en <b>22</b>. Typ kommagetallen met een <b>punt</b>.</div>`,
+    starter:"", invoer:"17.5", invoerNamen:["temperatuur"],
+    tests:[
+      {invoer:["17.5"], woorden:[["verwarming"]], nietWoorden:["raam","in orde"], tip:"Kouder dan 18 graden: de verwarming gaat aan."},
+      {invoer:["18"], woorden:[["in orde"]], nietWoorden:["verwarming","raam"], tip:"Precies 18 graden is niet kouder dan 18: < of <= ?"},
+      {invoer:["20.5"], woorden:[["in orde"]], nietWoorden:["verwarming","raam"]},
+      {invoer:["22"], woorden:[["in orde"]], nietWoorden:["verwarming","raam"], tip:"Precies 22 graden is niet warmer dan 22: > of >= ?"},
+      {invoer:["24.5"], woorden:[["raam"]], nietWoorden:["verwarming","in orde"], tip:"Warmer dan 22 graden: het raam gaat open."}
+    ],
+    moet:[[/input\s*\(/,"Vraag de temperatuur met input()."],[/float\s*\(/,"De temperatuur kan een kommagetal zijn: zet ze om met float()."],[/^\s*if\b/m,"Gebruik een if."],[/^\s*elif\b/m,"Drie mogelijkheden: gebruik if, elif en else."],[/^\s*else\b/m,"Gebruik een else voor alle andere gevallen."]],
+    fouten:[[/not supported between instances of 'str'/,"Je vergelijkt tekst met een getal. Zet de temperatuur eerst om met float() en vergelijk met een getal zonder aanhalingstekens."],[/could not convert string to float/,"Typ een kommagetal met een punt, bv. 17.5."],[/invalid literal for int\(\)/,"De temperatuur kan een kommagetal zijn. Gebruik float() in plaats van int()."]],
+    hulp:["Drie stappen: vraag de temperatuur en zet ze om met float(). Kijk dan eerst of het kouder is dan 18, daarna of het warmer is dan 22. Al de rest is in orde.","<pre>temperatuur = float(input(\"Hoeveel graden is het? \"))\nif temperatuur &lt; 18:\n    print(...)\nelif temperatuur &gt; 22:\n    print(...)\nelse:\n    print(...)</pre>","Zo kan het:<pre># {NAAM}\ntemperatuur = float(input(\"Hoeveel graden is het? \"))\nif temperatuur &lt; 18:\n    print(\"De verwarming gaat aan.\")\nelif temperatuur &gt; 22:\n    print(\"Het raam gaat open.\")\nelse:\n    print(\"Alles is in orde.\")</pre>"],
+    ok:"Je thermostaat kiest bij elke temperatuur juist, ook bij de grenzen!" } }
   ] }
 ];
 const REM_OEF=REMEDIERINGEN.flatMap(r=>r.oefeningen.map(o=>(o.remed=r.id,o)));
-const remLijst=(rem,code)=>{ const delen=REM_CODES[code]||[]; return rem.oefeningen.filter(o=>delen.includes(o.deel)) };
+/* Individuele codes (toets 1, 20/11/2026). Per code: l = oefeningen (R1-..), f = gericht op fouten in de toets,
+   n = sleutel van de naam (de naam zelf staat niet in dit bestand), a = afwezig op de toets (algemene herhaling).
+   De lijst met namen en codes heeft de leerkracht apart gekregen. */
+const REM_LEERLINGEN={R1:{"84U4V":{"l":["A1","C1","C3","C4","C5"],"f":["A1","C1","C4","C5","C3"],"n":["1nhvqyz"]},"GWTJN":{"l":["A1","A3","B4","C2","C4"],"f":["A1","A3","C4"],"n":["t6g02s"]},"PR9A5":{"l":["A1","A2","A3","B3","C1","C3"],"f":[],"n":["nvnwqt"],"a":1},"S3JA3":{"l":["A2","A3","C1","C3","C5"],"f":["A2","A3","C1","C3","C5"],"n":["zh4el"]},"APX2M":{"l":["A1","A3","C1","C2","C5"],"f":["A1","A3","C5","C1","C2"],"n":["1kxxm7v"]},"NZHDM":{"l":["A1","A2","A3","B3","C1","C3"],"f":["A1","A2","A3","B3","C1","C3"],"n":["1lxuf8d"]},"23TD3":{"l":["A2","A3","A4","C1","C2"],"f":["A2","C1","A4","C2","A3"],"n":["1czjv7s"]},"M5DT9":{"l":["A1","A2","A3","A4","B3","B4"],"f":["A2","B3","B4","A1","A3","A4"],"n":["lpp9ck"]},"B7UM9":{"l":["A1","B3","B4","C1","C5"],"f":["A1","C5","B3","B4","C1"],"n":["uu98d6"]},"8M9N3":{"l":["A1","B3","C1","C3","C4"],"f":["A1","B3","C1","C3","C4"],"n":["8v70k2"]},"X4RSB":{"l":["A2","A3","A4","C1","C2"],"f":["C1","C2","A2","A3","A4"],"n":["c5haoe"]},"GHH4W":{"l":["A1","A3","C1","C2","C3"],"f":["C1","C3","C2","A1","A3"],"n":["1uyh22u"]},"N78XG":{"l":["A1","A2","A3","B3","C1","C3"],"f":[],"n":["10gcloh"],"a":1},"8FBA3":{"l":["A1","C1","C3","C4","C5"],"f":["C1","C4","C5","C3","A1"],"n":["thp6g7"]},"N3YK7":{"l":["A1","A2","C1","C3","C4"],"f":["A1","A2","C1","C3","C4"],"n":["vcu8xg"]},"5SQRU":{"l":["A2","A3","C1","C2","C3"],"f":["C1","C3","C2","A2","A3"],"n":["77kzmm"]},"YRM9Y":{"l":["A1","A2","A4","B1","C1","C2"],"f":["A1","A2","A4","C1","C2","B1"],"n":["1poeiws"]},"MT8YB":{"l":["A2","C1","C3","C4","C5"],"f":["A2","C1","C3","C4","C5"],"n":["33aw5z"]},"PE465":{"l":["A1","A3","B1","B2","C3","C5"],"f":["C3","A1","A3","C5","B1","B2"],"n":["x9z2yi"]},"FFZ2T":{"l":["A2","C1","C3","C4","C5"],"f":["A2","C1","C4","C5","C3"],"n":["fmgbcf"]},"K9ZVN":{"l":["A1","A2","A3","B3","C1","C3"],"f":[],"n":["3g1hka"],"a":1},"MH8CJ":{"l":["A2","B3","C3","C4","C5"],"f":["A2","B3","C3","C4","C5"],"n":["1htep1b"]},"QRW2Q":{"l":["A2","A3","A4","C2","C5"],"f":["A2","A3","A4","C5"],"n":["1qi6oyc"]},"BRD79":{"l":["A1","C1","C3","C4","C5"],"f":["C1","C3","C4","C5","A1"],"n":["g19qut"]},"JPMTJ":{"l":["A1","A2","A3","B3","C1","C3"],"f":[],"n":["e8im4c"],"a":1},"FVVVR":{"l":["A1","C1","C3","C4","C5"],"f":["C1","C3","C4","C5","A1"],"n":["rpkwsi"]},"4BS6D":{"l":["A2","A4","C1","C3","C4"],"f":["A2","C4","C3","C1","A4"],"n":["1irp9fq"]},"MV69Z":{"l":["A2","A4","C1","C4","C5"],"f":["A2","C5","C1","A4","C4"],"n":["1yq6rqd"]},"QF7UB":{"l":["A2","A3","A4","C1","C5"],"f":["A2","C5","A4","A3","C1"],"n":["1nr4z8i"]},"4UDGQ":{"l":["A4","B4","C2","C4","C5"],"f":[],"n":["192uiev"]},"7X7BG":{"l":["A1","C1","C3","C4","C5"],"f":["C1","C3","C4","C5","A1"],"n":["v4utzv"]},"UZ36A":{"l":["A2","A3","A4","B1","C1","C2"],"f":["A2","C1","A4","C2","A3","B1"],"n":["dgfurx"]},"P72MB":{"l":["A2","C1","C3","C4","C5"],"f":["A2","C1","C5","C4","C3"],"n":["1u0rfot"]},"C9JHA":{"l":["A3","C1","C3","C4","C5"],"f":["A3","C1","C3","C4","C5"],"n":["1nwmrud"]},"NEK4D":{"l":["A2","A3","A4","B1","C4","C5"],"f":["C5","C4","A2","A3","B1","A4"],"n":["k43jx8"]},"XSPUB":{"l":["B3","C1","C3","C4","C5"],"f":["B3","C1","C3","C4","C5"],"n":["1t1p7ik"]},"6QKV6":{"l":["A1","A2","A3","B3","C1","C3"],"f":[],"n":["g601zr"],"a":1},"6PDHS":{"l":["A2","C1","C3","C4","C5"],"f":["C1","C3","C4","C5","A2"],"n":["16wb46z"]},"7KQRN":{"l":["A1","C1","C3","C4","C5"],"f":["C1","C4","C5","C3","A1"],"n":["122pi4x"]},"W9V55":{"l":["A1","A2","A3","B1","C1","C3"],"f":["A1","A2","A3","C1","C3","B1"],"n":["uyrb6n"]}}};
+const REM_MIN={A1:6,A2:6,A3:6,A4:7,B1:5,B2:7,B3:6,B4:8,C1:10,C2:10,C3:10,C4:10,C5:8};   // geschatte minuten per oefening
+const remInfo=(rem,code)=>(REM_LEERLINGEN[rem.id]||{})[String(code||"").toUpperCase()]||null;
+const remLijst=(rem,code)=>{ const i=remInfo(rem,code); return i?i.l.map(k=>rem.oefeningen.find(o=>o.id===rem.id+"-"+k)).filter(Boolean):[] };
 const REM=id=>{ if(!S.remed) S.remed={}; return S.remed[id]||(S.remed[id]={}) };
 
+/* ---------------- Remediëring: aftelklok en vergrendeling ----------------
+   Na "Start" loopt bovenaan een klok van REM_MINUTEN minuten. Tijdens die tijd staat de app in volledig scherm.
+   Wie het volledige scherm verlaat, naar een ander venster/tabblad/programma gaat of de pagina herlaadt,
+   krijgt een slot dat alleen de leerkracht opent met de leerkrachtcode. Elke onderbreking wordt bewaard.
+   Rondkijken binnen de app (Theorie, Oefenruimte, andere oefeningen) mag wel.
+   Eerlijk: een webpagina kan het besturingssysteem niet blokkeren (Alt+Tab, Windows-toets, Ctrl+Alt+Del,
+   de laptop dichtklappen, de browser afsluiten via Taakbeheer). Ze merkt het wel op, vergrendelt en registreert. */
+const REM_MINUTEN=40, REM_FORM_PAUZE=3*60000, REM_FOCUSMARGE=1000;
+const REM_LK_HASH="1eh3pcq";   // sleutel van de leerkrachtcode (de code zelf staat niet in dit bestand)
+const remHash=s=>{ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619) } return (h>>>0).toString(36) };
+const remLkOk=c=>remHash("rem-lk|"+String(c||"").trim())===REM_LK_HASH;
+const remNaamSleutel=s=>remHash(String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z ]/g," ").split(/\s+/).filter(Boolean).sort().join(" "));
+const remUur=t=>new Date(t).toLocaleTimeString("nl-BE",{hour:"2-digit",minute:"2-digit"});
+const RL=()=>S.remlock&&!S.remlock.klaar?S.remlock:null;      // actieve remediëring (klok loopt)
+let remBewaking=false, remFocusTimer=null, remKlokTimer=null;
+
+function remVolScherm(){ const el=document.documentElement;
+  if(!el.requestFullscreen) return Promise.reject(new Error("geen volledig scherm"));
+  return el.requestFullscreen({navigationUI:"hide"}).then(()=>{ try{ if(navigator.keyboard&&navigator.keyboard.lock) navigator.keyboard.lock().catch(()=>{}) }catch(e){} }) }
+function remStopVolScherm(){ try{ if(navigator.keyboard&&navigator.keyboard.unlock) navigator.keyboard.unlock() }catch(e){} if(document.fullscreenElement&&document.exitFullscreen) document.exitFullscreen().catch(()=>{}) }
+function remBewaakStraks(){ setTimeout(()=>{ const L=RL(); if(L&&!L.slot&&!L.pauze) remBewaking=true },500) }
+
+function remStart(rem){
+  return remVolScherm().then(()=>{ const nu=Date.now();
+    S.remlock={rem:rem.id,start:nu,eind:nu+REM_MINUTEN*60000,slot:null,inc:[],forms:[],pauze:null,klaar:false};
+    REM(rem.id).start=nu; save(); remActiveer(); render(); window.scrollTo(0,0) });
+}
+function remActiveer(){ document.body.classList.add("remmodus"); clearInterval(remKlokTimer); remKlokTimer=setInterval(remKlok,1000); remKlok(); remBewaakStraks() }
+function remKlok(){
+  const L=RL(), k=document.getElementById("remklok");
+  if(!L){ clearInterval(remKlokTimer); document.body.classList.remove("remmodus"); return }
+  const rest=L.eind-Date.now();
+  if(rest<=0) return remEinde("tijd");
+  if(!k.dataset.klaar){ k.dataset.klaar="1";
+    k.innerHTML=`<span>🩹 <b>Remediëring</b></span><span class="tijd"></span><span class="uitleg">Blijf in dit venster. Opzoeken in de app mag.</span><button type="button" id="remsluit">🔒 Afsluiten (leerkracht)</button>`;
+    k.querySelector("#remsluit").onclick=()=>remLaag("sluit") }
+  const mm=Math.floor(rest/60000), ss=Math.floor(rest%60000/1000), t=k.querySelector(".tijd");
+  t.textContent=`⏱ ${mm}:${String(ss).padStart(2,"0")}`; t.classList.toggle("laag",rest<5*60000);
+}
+function remIncident(wat){
+  const L=RL(); if(!L||!remBewaking||L.pauze) return;
+  clearTimeout(remFocusTimer);
+  const t=new Date().toISOString();
+  if(L.slot){ if(!L.slot.redenen.includes(wat)){ L.slot.redenen.push(wat); save(); remLaag("slot") } return }
+  L.slot={tijd:t,redenen:[wat]}; L.inc.push({tijd:t,wat}); remBewaking=false; save(); remLaag("slot");
+}
+function remEinde(reden){
+  const L=S.remlock; if(!L||L.klaar) return;
+  L.klaar=true; L.einde=Date.now(); L.reden=reden; L.slot=null; L.pauze=null; remBewaking=false; save();
+  clearInterval(remKlokTimer); document.body.classList.remove("remmodus"); remStopVolScherm(); remLaag(reden); render();
+}
+/* Venster met een boodschap over de hele app: slot, afsluiten, versturen, einde */
+function remLaag(type){
+  let o=document.getElementById("remlaag"); if(o) o.remove(); if(!type) return;
+  const L=S.remlock||{};
+  o=document.createElement("div"); o.id="remlaag"; document.body.appendChild(o);
+  const lkVeld=(knop)=>`<div class="formrow" style="align-items:flex-end;margin-top:12px"><label>Leerkrachtcode<input type="password" id="remlkc" autocomplete="off" inputmode="numeric"></label><button class="btn" id="remok">${knop}</button></div><div class="fb" id="remlfb"></div>`;
+  const lkActie=(f)=>{ const inp=o.querySelector("#remlkc"), fb=o.querySelector("#remlfb");
+    const doe=()=>{ if(!remLkOk(inp.value)){ fb.className="fb bad"; fb.textContent="Die code klopt niet."; inp.value=""; inp.focus(); return } f() };
+    o.querySelector("#remok").onclick=doe; inp.onkeydown=e=>{ if(e.key==="Enter") doe() }; setTimeout(()=>inp.focus(),50) };
+  if(type==="slot"){
+    const n=(L.inc||[]).length;
+    o.innerHTML=`<div class="kaart"><div style="font-size:40px">🔒</div><h2 style="margin:4px 0 8px">De remediëring is vergrendeld</h2>
+      <p style="margin-top:0">Je hebt de app verlaten tijdens de remediëring. Roep je leerkracht: alleen je leerkracht kan de app weer openen. De klok loopt door.</p>
+      <p class="rem-reden">${esc(remUur(L.slot.tijd))}: ${L.slot.redenen.map(esc).join(", ")}<br>Onderbrekingen in totaal: <b>${n}</b></p>${lkVeld("Openen")}</div>`;
+    lkActie(()=>{ L.slot=null; save(); remLaag(null); remVolScherm().catch(()=>{}).finally(remBewaakStraks) });
+  } else if(type==="sluit"){
+    o.innerHTML=`<div class="kaart"><h2 style="margin:0 0 8px">Remediëring afsluiten</h2><p style="margin-top:0">Alleen je leerkracht kan de remediëring vóór het einde van de klok afsluiten.</p>${lkVeld("Afsluiten")}
+      <div class="actions"><button class="btn secondary" id="remterug">← Verder met de remediëring</button></div></div>`;
+    o.querySelector("#remterug").onclick=()=>{ remLaag(null); if(!document.fullscreenElement) remVolScherm().catch(()=>{}); remBewaakStraks() };
+    lkActie(()=>remEinde("leerkracht"));
+  } else if(type==="pauze"){
+    o.innerHTML=`<div class="kaart"><div style="font-size:40px">📨</div><h2 style="margin:4px 0 8px">Verstuur je oefening</h2>
+      <p style="margin-top:0">Het Form is geopend in een <b>nieuw tabblad</b>. Klik daar op <b>Verzenden</b> en kom dan meteen terug naar dit tabblad.</p>
+      <p>Je hebt daarvoor <b>3 minuten</b>. Blijf je langer weg, dan wordt de remediëring vergrendeld.</p>
+      <div class="actions"><button class="btn" id="remverder">▶ Verder met de remediëring</button></div></div>`;
+    o.querySelector("#remverder").onclick=()=>{ const P=L.pauze; L.pauze=null;
+      if(P&&Date.now()>P.tot){ const t=new Date().toISOString(), wat=`Na het versturen ${Math.round((Date.now()-P.van)/60000)} min weggebleven`;
+        L.slot={tijd:t,redenen:[wat]}; L.inc.push({tijd:t,wat}); save(); remLaag("slot"); remVolScherm().catch(()=>{}); return }
+      save(); remLaag(null); remVolScherm().catch(()=>{}).finally(remBewaakStraks) };
+  } else {
+    const tijd=type==="tijd";
+    o.innerHTML=`<div class="kaart"><div style="font-size:40px">${tijd?"⏰":"✅"}</div><h2 style="margin:4px 0 8px">${tijd?"De 40 minuten zijn om":"De remediëring is afgesloten"}</h2>
+      <p style="margin-top:0">${tijd?"Je remediëring is afgelopen.":"Je leerkracht heeft de remediëring afgesloten."} Heb je een oefening af die je nog niet verstuurd hebt? Verstuur ze dan nu.</p>
+      <div class="actions"><button class="btn" id="remdicht">OK</button></div></div>`;
+    o.querySelector("#remdicht").onclick=()=>remLaag(null);
+  }
+}
+document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElement) remIncident("Volledig scherm verlaten") });
+document.addEventListener("visibilitychange",()=>{ if(document.hidden) remIncident("Ander tabblad of venster geopend") });
+window.addEventListener("blur",()=>{ if(!remBewaking) return; clearTimeout(remFocusTimer);
+  remFocusTimer=setTimeout(()=>{ const a=document.activeElement; if(!document.hasFocus()&&!(a&&a.tagName==="IFRAME")) remIncident("Ander venster of programma gebruikt") },REM_FOCUSMARGE) });
+window.addEventListener("pagehide",()=>remIncident("Pagina herladen of gesloten"));
+window.addEventListener("beforeunload",e=>{ const L=RL(); if(L&&!L.pauze){ e.preventDefault(); e.returnValue="" } });
+document.addEventListener("keydown",e=>{
+  if(!RL()) return;
+  const k=(e.key||"").toLowerCase(), ctrl=e.ctrlKey||e.metaKey;
+  const blok=e.key==="F5"||e.key==="F12"||e.key==="BrowserBack"||e.key==="BrowserForward"||(ctrl&&e.shiftKey&&["i","j","c","k","n","t","w","q"].includes(k))
+    ||(ctrl&&["r","w","t","n","l","u","p","s","o","h","j","d","q"].includes(k))||(e.altKey&&["arrowleft","arrowright","home","f4"].includes(k));
+  if(blok){ e.preventDefault(); e.stopPropagation() }
+},true);
+document.addEventListener("contextmenu",e=>{ if(RL()) e.preventDefault() },true);
+
 function renderRemediering(m,rem){
-  const R=REM(rem.id);
+  const R=REM(rem.id), info=remInfo(rem,R.code), L=S.remlock&&S.remlock.rem===rem.id?S.remlock:null;
   const kop=$(`<div class="card"><div class="actions" style="margin:0 0 6px"><button class="btn secondary" id="terug">← Terug</button></div><div class="kicker">Remediëring</div><h2>${rem.icoon} ${esc(rem.titel)}</h2>
-    <p>Hier oefen je opnieuw de onderdelen van de toets die nog niet goed gingen. Je leerkracht geeft je een <b>code</b>. Die code bepaalt welke onderdelen je maakt. De oefeningen werken zoals de gewone oefeningen: je krijgt punten en op het einde verstuur je elke oefening naar je leerkracht.</p></div>`);
+    <p>Hier oefen je opnieuw wat in de toets nog niet goed ging. Je leerkracht gaf je een <b>persoonlijke code</b>: daarmee zie je alleen <b>jouw</b> oefeningen. Je werkt <b>${REM_MINUTEN} minuten</b>. De oefeningen werken zoals de gewone oefeningen: je krijgt punten en je verstuurt elke oefening naar je leerkracht.</p></div>`);
   m.appendChild(kop); kop.querySelector("#terug").onclick=()=>{ S.deel="remediering"; go("start") };
-  const delen=REM_CODES[R.code];
-  if(!delen){
-    const c=$(`<div class="card"><h3>Geef je code in</h3><p style="margin-top:0">Typ de code (een cijfer van 1 tot 7) die je van je leerkracht kreeg.</p>
-      <div class="formrow" style="align-items:flex-end"><label>Code<input type="text" inputmode="numeric" maxlength="1" id="remcode" style="width:90px;font-size:22px;text-align:center" autocomplete="off"></label><button class="btn" id="remstart">Start</button></div><div class="fb" id="remfb"></div></div>`);
-    m.appendChild(c); const inp=c.querySelector("#remcode"), fb=c.querySelector("#remfb");
-    const start=()=>{ const v=inp.value.trim(); if(!REM_CODES[v]){ fb.className="fb bad"; fb.textContent="Die code bestaat niet. Typ een cijfer van 1 tot 7."; inp.focus(); return }
+  /* 1. Code ingeven */
+  if(!info){
+    const c=$(`<div class="card"><h3>Geef je persoonlijke code in</h3><p style="margin-top:0">Typ de code van <b>5 tekens</b> (letters en cijfers) die je van je leerkracht kreeg. De code hoort bij jouw naam: <b>${esc(S.naam)}</b>.</p>
+      <div class="formrow" style="align-items:flex-end"><label>Code<input type="text" maxlength="6" id="remcode" style="width:150px;font-size:22px;text-align:center;text-transform:uppercase;letter-spacing:3px" autocomplete="off" spellcheck="false"></label><button class="btn" id="remstart">Verder</button></div>
+      <div id="remlkwrap" hidden><div class="formrow" style="align-items:flex-end;margin-top:10px"><label>Leerkrachtcode<input type="password" id="remlk" autocomplete="off" inputmode="numeric" style="width:150px"></label></div></div>
+      <div class="fb" id="remfb"></div></div>`);
+    m.appendChild(c); const inp=c.querySelector("#remcode"), fb=c.querySelector("#remfb"), lkw=c.querySelector("#remlkwrap");
+    const start=()=>{ const v=inp.value.toUpperCase().replace(/[^A-Z0-9]/g,""), i=remInfo(rem,v);
+      if(!i){ fb.className="fb bad"; fb.textContent="Die code bestaat niet. Controleer de code: 5 tekens, letters en cijfers."; inp.focus(); return }
+      if(!i.n.includes(remNaamSleutel(S.naam))&&!remLkOk(c.querySelector("#remlk").value)){
+        lkw.hidden=false; fb.className="fb bad";
+        fb.innerHTML=`Deze code hoort niet bij de naam <b>${esc(S.naam)}</b>. Staat je naam juist (voornaam en familienaam, zoals op de toets)? Pas hem aan op de startpagina. Klopt je naam wel, roep dan je leerkracht.`; return }
       R.code=v; save(); render(); window.scrollTo(0,0) };
-    c.querySelector("#remstart").onclick=start; inp.onkeydown=e=>{ if(e.key==="Enter") start() }; setTimeout(()=>inp.focus(),50);
+    c.querySelector("#remstart").onclick=start; inp.onkeydown=e=>{ if(e.key==="Enter") start() }; c.querySelector("#remlk").onkeydown=e=>{ if(e.key==="Enter") start() };
+    setTimeout(()=>inp.focus(),50); return }
+  const lijst=remLijst(rem,R.code), klaar=lijst.filter(o=>(S.oef[o.id]||{}).verstuurd).length, min=lijst.reduce((s,o)=>s+(REM_MIN[o.id.split("-")[1]]||0),0);
+  const tag=o=>{ const k=o.id.split("-")[1]; return info.a?'<span class="rem-tag extra">herhaling</span>':info.f.includes(k)?'<span class="rem-tag focus">🎯 uit je toets</span>':'<span class="rem-tag extra">➕ extra oefenen</span>' };
+  const kort=o=>esc(o.titel.replace(/^.*? - /,""));
+  /* 2. Code is juist, maar de klok is nog niet gestart */
+  if(!R.start){
+    const c=$(`<div class="card"><div class="kicker">Jouw remediëring</div><h3 style="margin-top:0">${lijst.length} oefeningen · ongeveer ${REM_MINUTEN} minuten</h3>
+      ${info.a?'<p>Je was afwezig op de toets. Daarom krijg je een algemene herhaling van de belangrijkste onderdelen.</p>':'<p>De oefeningen met 🎯 gaan over wat in jouw toets nog niet goed ging. Met ➕ oefen je extra.</p>'}
+      <ul class="rem-voorbeeld">${lijst.map(o=>`<li>${kort(o)} ${tag(o)}</li>`).join("")}</ul>
+      <div class="box warm"><b>Zo werkt het</b><ul style="margin:6px 0 0">
+        <li>Klik je op <b>Start</b>, dan gaat de app in <b>volledig scherm</b> en loopt bovenaan een klok van <b>${REM_MINUTEN} minuten</b>.</li>
+        <li><b>Blijf in dit venster.</b> Ga je naar een ander venster, tabblad of programma, of verlaat je het volledige scherm, dan wordt de app <b>vergrendeld</b>. Alleen je leerkracht kan ze weer openen. Elke onderbreking wordt bewaard.</li>
+        <li>Binnen de app mag je wel <b>opzoeken</b>: bij Theorie, in de Oefenruimte of bij oefeningen die je al gemaakt hebt.</li>
+        <li>Verstuur je een oefening, dan opent het Form in een nieuw tabblad. Dat mag: klik daar op <b>Verzenden</b> en kom binnen 3 minuten terug.</li>
+        <li>Na ${REM_MINUTEN} minuten stopt de klok. Wat je af hebt, kun je dan nog versturen.</li></ul></div>
+      <div class="actions"><button class="btn" id="remgo">▶ Start de remediëring (${REM_MINUTEN} minuten)</button><button class="btn secondary" id="andere">Andere code ingeven</button></div><div class="fb" id="remfb"></div></div>`);
+    m.appendChild(c);
+    c.querySelector("#remgo").onclick=()=>{ remStart(rem).catch(()=>{ const fb=c.querySelector("#remfb"); fb.className="fb bad"; fb.textContent="Volledig scherm lukt niet in deze browser. Gebruik Chrome of Edge, of roep je leerkracht." }) };
+    c.querySelector("#andere").onclick=()=>{ delete R.code; save(); render() };
     return }
-  const lijst=remLijst(rem,R.code), klaar=lijst.filter(o=>(S.oef[o.id]||{}).verstuurd).length;
-  const info=$(`<div class="card"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between"><div>Jouw code: <b>${esc(R.code)}</b> → ${delen.map(d=>"onderdeel <b>"+d+"</b>").join(" + ")}</div><button class="btn secondary" id="andere">Andere code ingeven</button></div>
+  /* 3. Bezig of afgelopen */
+  const bezig=L&&!L.klaar;
+  const info2=$(`<div class="card"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between">
+      <div>Jouw code: <b>${esc(R.code)}</b> · ${lijst.length} oefeningen · ongeveer ${min} minuten</div>
+      ${bezig?`<div>⏱ De klok loopt tot <b>${remUur(L.eind)}</b>.</div>`:`<button class="btn secondary" id="remopnieuw">🔁 Opnieuw starten (leerkracht)</button>`}</div>
+    ${bezig?"":`<p style="margin:10px 0 0">De remediëring is afgelopen${L&&L.einde?" om <b>"+remUur(L.einde)+"</b>":""}. Heb je een oefening af, maar nog niet verstuurd? Dan kun je dat nog doen.</p>`}
+    <div id="remlkopn" hidden><div class="formrow" style="align-items:flex-end;margin-top:10px"><label>Leerkrachtcode<input type="password" id="remlk2" autocomplete="off" inputmode="numeric" style="width:150px"></label><button class="btn" id="remlkok">Opnieuw starten</button></div><div class="fb" id="remfb3"></div></div>
     <div class="voortgang" style="margin-top:12px"><div class="vg-tekst">Remediëring: <b>${klaar} van ${lijst.length}</b> verstuurd</div><div class="vg-balk"><div style="width:${lijst.length?Math.round(klaar/lijst.length*100):0}%"></div></div></div></div>`);
-  m.appendChild(info);
-  info.querySelector("#andere").onclick=()=>{ if(confirm("Een andere code ingeven? Wat je al gemaakt hebt, blijft bewaard.")){ delete R.code; save(); render() } };
+  m.appendChild(info2);
+  const opn=info2.querySelector("#remopnieuw");
+  if(opn){ opn.onclick=()=>{ const w=info2.querySelector("#remlkopn"); w.hidden=false; w.querySelector("input").focus() };
+    const doe=()=>{ const inp=info2.querySelector("#remlk2"); if(!remLkOk(inp.value)){ const f=info2.querySelector("#remfb3"); f.className="fb bad"; f.textContent="Die code klopt niet."; return }
+      delete R.start; if(S.remlock&&S.remlock.rem===rem.id) S.remlock=null; save(); render() };
+    info2.querySelector("#remlkok").onclick=doe; info2.querySelector("#remlk2").onkeydown=e=>{ if(e.key==="Enter") doe() } }
   const PILL={klaar:'<span class="pill mid">klaar, nog versturen</span>',bezig:'<span class="pill mid">bezig</span>',nieuw:""};
-  delen.forEach(d=>{ const od=rem.onderdelen[d], oefs=rem.oefeningen.filter(o=>o.deel===d);
-    const k=$(`<div class="card"><div class="kicker">Onderdeel ${d}</div><h3>${esc(od.titel)}</h3><p style="margin-top:0">${esc(od.uitleg)}</p><div class="exlist" style="padding:0"></div></div>`);
+  ["A","B","C"].forEach(d=>{ const oefs=lijst.filter(o=>o.deel===d); if(!oefs.length) return; const od=rem.onderdelen[d];
+    const k=$(`<div class="card"><div class="kicker">Onderdeel ${d}</div><h3>${esc(od.titel)}</h3><div class="exlist" style="padding:0"></div></div>`);
     const ex=k.querySelector(".exlist");
     oefs.forEach(o=>{ const a=S.oef[o.id]; const s=a&&a.verstuurd?"verstuurd":a&&a.ok?"klaar":a&&(a.controles||a.code||a.delen)?"bezig":"nieuw";
-      const b=$(`<button><span class="t">${esc(o.titel.replace(/^.*? - /,""))}</span>${s==="verstuurd"?`<span class="pill ok">✔ ${fmt(a.verstuurd.cijfer)}/10</span>`:PILL[s]}</button>`);
+      const b=$(`<button><span class="t">${kort(o)} ${tag(o)}</span>${s==="verstuurd"?`<span class="pill ok">✔ ${fmt(a.verstuurd.cijfer)}/10</span>`:PILL[s]}</button>`);
       b.onclick=()=>go(o.id); ex.appendChild(b) });
     m.appendChild(k) });
 }
@@ -4257,6 +4434,8 @@ function render(){const m=document.getElementById("main"); m.innerHTML="";
   if(String(S.huidig).startsWith("T:")&&S.naam&&S.klas){ const les=THEORIE.find(l=>"T:"+l.id===S.huidig); if(les) return renderTheorie(m,les) }
   if(String(S.huidig).startsWith("R:")&&S.naam&&S.klas&&!OEFEN()){ const rem=REMEDIERINGEN.find(r=>"R:"+r.id===S.huidig); if(rem) return renderRemediering(m,rem) }
   const oef=OEFENINGEN.find(o=>o.id===S.huidig&&o.klaar)||(!OEFEN()&&REM_OEF.find(o=>o.id===S.huidig));
+  if(oef && oef.remed && S.naam && S.klas){ const rem=REMEDIERINGEN.find(r=>r.id===oef.remed), R=(S.remed||{})[rem.id]||{};
+    if(!R.start||!remLijst(rem,R.code).includes(oef)){ S.huidig="R:"+rem.id; save(); return renderRemediering(m,rem) } }
   if(oef && S.naam && S.klas) return renderOef(m,oef);
   if(OEFEN()){ S.modus="punten"; save(); return render() }
   renderStart(m)}
@@ -4307,8 +4486,8 @@ function renderStart(m){
     b.onclick=()=>open({id:"T:"+les.id}); theorie.querySelector(".th-lessen").appendChild(b) });
   m.appendChild(kaart);
   /* ---- remediëring ---- */
-  const remKaart=$(`<div class="card"><p class="w-intro" style="margin-top:0">🩹 Ging een deel van de toets nog niet goed? Hier oefen je het opnieuw. Kies de remediëring en typ de <b>code</b> die je van je leerkracht kreeg. Ook hier krijg je <b>punten</b> en verstuur je je resultaat naar je leerkracht.</p><div class="th-lessen"></div></div>`); m.appendChild(remKaart);
-  REMEDIERINGEN.forEach(rem=>{ const R=(S.remed||{})[rem.id]||{}, l=REM_CODES[R.code]?remLijst(rem,R.code):[], k=l.filter(o=>(S.oef[o.id]||{}).verstuurd).length;
+  const remKaart=$(`<div class="card"><p class="w-intro" style="margin-top:0">🩹 Ging een deel van de toets nog niet goed? Hier oefen je het opnieuw. Kies de remediëring en typ je <b>persoonlijke code</b> die je van je leerkracht kreeg. Ook hier krijg je <b>punten</b> en verstuur je je resultaat naar je leerkracht.</p><div class="th-lessen"></div></div>`); m.appendChild(remKaart);
+  REMEDIERINGEN.forEach(rem=>{ const R=(S.remed||{})[rem.id]||{}, l=remLijst(rem,R.code), k=l.filter(o=>(S.oef[o.id]||{}).verstuurd).length;
     const b=$(`<button type="button" class="th-les" style="border-left-color:#c0392b"><span class="w-icoon">${rem.icoon}</span><span><span class="w-naam">${esc(rem.titel)}</span><span class="w-sub">${esc(rem.sub)}</span></span>${l.length?`<span class="tel">${k}/${l.length}</span>`:'<span class="pill mid">code ingeven</span>'}</button>`);
     b.onclick=()=>open({id:"R:"+rem.id}); remKaart.querySelector(".th-lessen").appendChild(b) });
   /* ---- oefenruimte ---- */
@@ -4548,14 +4727,17 @@ function formLink(waarden){
 function verstuur(oef,a,c){
   const f=document.querySelector("#stuurfb");
   const pog=a.controles, hulp=a.hulp, cijferTxt=fmt(c.cijfer);
-  const code=(a.extraOk?a.extraOplossing:a.oplossing)||"";
+  let code=(a.extraOk?a.extraOplossing:a.oplossing)||"";
+  const RLk=S.remlock; if(oef.remed&&RLk&&RLk.rem===oef.remed) code+=`\n# Remediëring: ${RLk.inc.length} ${RLk.inc.length===1?"onderbreking":"onderbrekingen"}`;
   const waarden={ LEERLING:S.naam, KLAS:S.klas, OEFENING:oef.titel, CIJFER:cijferTxt, POGINGEN:pog, HULP:hulp, AFSPRAKEN:a.afspraken||0,
     CONTROLE:controleCode(S.naam,S.klas,oef.titel,c.cijfer), CODE:code.length>1500?code.slice(0,1500)+"\n…(ingekort)":code };
   const overzicht=`<table style="margin-top:8px;font-size:14px">${[["Leerling",S.naam],["Klas",S.klas],["Oefening",oef.titel],["Cijfer",cijferTxt],["Pogingen",pog],["Hulp",hulp],["Overtredingen klasafspraken",a.afspraken||0],["Controlecode",waarden.CONTROLE]].map(([k,v])=>`<tr><th style="width:130px">${k}</th><td>${esc(v)}</td></tr>`).join("")}</table>`;
   if(!FORM_URL){ f.className="fb info"; f.innerHTML="<b>Testmodus:</b> je leerkracht heeft nog geen Form gekoppeld. Dit zou er verstuurd worden:"+overzicht; return }
   const l=formLink(waarden);
   if(!l||!l.gevonden){ f.className="fb bad"; f.textContent="De link naar het Form is niet goed ingesteld. Verwittig je leerkracht."; return }
+  const L=RL(); if(L){ const nu=Date.now(); L.pauze={van:nu,tot:nu+REM_FORM_PAUZE}; (L.forms=L.forms||[]).push({tijd:new Date(nu).toISOString(),oef:oef.titel}); remBewaking=false; clearTimeout(remFocusTimer); save() }
   window.open(l.url,"_blank","noopener");
+  if(L) remLaag("pauze");
   a.verstuurd={cijfer:c.cijfer,op:new Date().toLocaleString("nl-BE",{dateStyle:"short",timeStyle:"short"})}; save();
   const vk=document.querySelector("#volgende"), vh=document.querySelector("#volghint"); if(vk) vk.disabled=false; if(vh) vh.hidden=true;
   f.className="fb ok"; f.innerHTML="✔ Het Form opent in een nieuw tabblad. <b>Controleer of deze gegevens erin staan</b> en klik dan op <b>Verzenden</b>. Pas niets aan: je leerkracht haalt je cijfer uit de controlecode, niet uit het veld Cijfer."+overzicht;
@@ -4567,6 +4749,11 @@ function verstuur(oef,a,c){
 document.getElementById("home").onclick=()=>go("start");
 
 render(); toonWie();
+/* Remediëring bezig bij het (her)openen van de pagina: klok verder, en vergrendelen */
+(function(){ const L=RL(); if(!L) return;
+  if(Date.now()>=L.eind){ remEinde("tijd"); return }
+  L.pauze=null; remActiveer();
+  if(L.slot) remLaag("slot"); else { remBewaking=true; remIncident("Pagina herladen of opnieuw geopend") } })();
 </script>
 </body>
 </html>
